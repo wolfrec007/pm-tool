@@ -8,6 +8,7 @@ from app.auth.auth import get_current_user, require_role
 from app.csrf_utils import get_csrf_token, validate_csrf
 from app.database import get_db
 from app.exceptions import ConflictWithLeaveError, NotFoundError, OverAllocationError, ValidationError
+from app.flash import set_flash
 from app.models.models import TechnicalRole
 from app.schemas.schemas import AssignmentCreate, AssignmentRead, AssignmentUpdate
 from app.services import allocation_service as service
@@ -44,6 +45,24 @@ def list_assignments(
     })
 
 
+@router.get("/assign-staff", response_class=HTMLResponse)
+def assign_staff_page(
+    request: Request,
+    q: Optional[str] = None,
+    db: Session = Depends(get_db),
+    user=Depends(require_role(TechnicalRole.admin, TechnicalRole.moderator)),
+):
+    members, _ = team_member_service.list_team_members(db, limit=200, is_active=True, q=q)
+    allocations = service.get_member_allocations(db)
+    return templates.TemplateResponse(request, "assignments/assign_staff.html", {
+        "members": members,
+        "allocations": allocations,
+        "q": q or "",
+        "user": user,
+        "csrf_token": get_csrf_token(request),
+    })
+
+
 @router.get("/json", response_model=dict)
 def list_assignments_json(
     limit: int = Query(50, ge=1, le=200), offset: int = Query(0, ge=0),
@@ -60,14 +79,16 @@ def list_assignments_json(
 @router.get("/new", response_class=HTMLResponse)
 def new_assignment_form(
     request: Request, db: Session = Depends(get_db),
+    member_id: Optional[int] = None,
     _=Depends(require_role(TechnicalRole.admin, TechnicalRole.moderator)),
 ):
     members, _ = team_member_service.list_team_members(db, limit=200, is_active=True)
     instances, _ = engagement_service.list_instances(db, limit=200)
     return templates.TemplateResponse(request, "assignments/form.html", {
         "assignment": None, "action": "/assignments/new", "errors": [],
-        "members": [str(m.id) for m in members],
-        "instances": [str(i.id) for i in instances],
+        "members": members,
+        "instances": instances,
+        "preselected_member_id": member_id,
         "csrf_token": get_csrf_token(request),
     })
 
@@ -105,6 +126,7 @@ async def create_assignment_form(
     return templates.TemplateResponse(request, "assignments/form.html", {
         "assignment": None, "action": "/assignments/new", "errors": errors,
         "members": members, "instances": instances,
+        "preselected_member_id": None,
         "csrf_token": get_csrf_token(request),
     })
 

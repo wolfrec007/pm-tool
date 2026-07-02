@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 
 from app.config import settings
@@ -38,7 +39,16 @@ async def lifespan(app):
 
 app = FastAPI(title=settings.APP_NAME, version="0.1.0", lifespan=lifespan)
 
-# Session middleware (required for auth)
+class FlashMiddleware(BaseHTTPMiddleware):
+    """Pop flash message before rendering so it shows only once."""
+    async def dispatch(self, request: Request, call_next):
+        request.state.flash = request.session.pop("_flash", None)
+        response = await call_next(request)
+        return response
+
+
+# Flash middleware first (innermost), then session middleware (wraps around it)
+app.add_middleware(FlashMiddleware)
 app.add_middleware(
     SessionMiddleware,
     secret_key=settings.SECRET_KEY,
@@ -61,12 +71,7 @@ def csrf_token(request: Request) -> str:
     return token
 
 
-@app.middleware("http")
-async def flash_middleware(request: Request, call_next):
-    """Pop flash message after response so it shows only once."""
-    response = await call_next(request)
-    request.session.pop("_flash", None)
-    return response
+
 
 
 # Static files

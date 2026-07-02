@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% from "macros/_csrf.html" import csrf_field %}
+
+{% block title %}Assign Staff — StaffPlan{% endblock %}
+
+{% block content %}
+<div class="uk-card uk-card-body uk-margin">
+    <div class="flex items-center justify-between mb-4">
+        <div>
+            <h2 class="text-xl font-semibold">Assign Staff</h2>
+            <p class="text-sm text-muted-foreground mt-1">Select a team member to create a new assignment.</p>
+        </div>
+        <a href="/assignments/new" class="uk-btn uk-btn-primary uk-btn-sm">
+            <uk-icon icon="plus" width="14" height="14" class="mr-1"></uk-icon>New Assignment
+        </a>
+    </div>
+
+    <!-- Search -->
+    <form method="GET" action="/assignments/assign-staff" class="mb-4">
+        <div class="flex gap-2 items-center">
+            <div class="flex-1 relative">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"><uk-icon icon="search" width="16" height="16"></uk-icon></span>
+                <input type="text" name="q" value="{{ q }}" placeholder="Search name, email, or code..." class="uk-input w-full pl-10">
+            </div>
+            <button type="submit" class="uk-btn uk-btn-primary uk-btn-sm">Search</button>
+            {% if q %}<a href="/assignments/assign-staff" class="uk-btn uk-btn-default uk-btn-sm">Clear</a>{% endif %}
+        </div>
+    </form>
+
+    <!-- Staff List -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {% for member in members %}
+        {% set alloc = allocations.get(member.id, 0) %}
+        <div class="uk-card uk-card-body border border-border rounded-lg">
+            <div class="flex items-start justify-between mb-3">
+                <div>
+                    <h3 class="font-semibold text-foreground">{{ member.name }}</h3>
+                    <p class="text-sm text-muted-foreground">{{ member.email }}</p>
+                </div>
+                <span class="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">
+                    {{ member.business_role.value | replace('_', ' ') | title if member.business_role else '—' }}
+                </span>
+            </div>
+
+            <!-- Allocation bar -->
+            <div class="mb-3">
+                <div class="flex items-center justify-between mb-1">
+                    <span class="text-xs text-muted-foreground">Current Allocation</span>
+                    <span class="text-xs font-medium {% if alloc >= 100 %}text-destructive{% elif alloc >= 75 %}text-orange-500{% else %}text-green-600{% endif %}">{{ alloc }}%</span>
+                </div>
+                <div class="w-full bg-muted rounded-full h-2">
+                    <div class="h-2 rounded-full transition-all {% if alloc >= 100 %}bg-destructive{% elif alloc >= 75 %}bg-orange-500{% else %}bg-green-500{% endif %}" style="width: {{ [alloc, 100]|min }}%"></div>
+                </div>
+            </div>
+
+            <!-- Status tag -->
+            <div class="flex items-center justify-between">
+                {% if alloc >= 100 %}
+                <span class="uk-badge uk-badge-destructive text-xs">Fully Allocated</span>
+                {% elif alloc >= 75 %}
+                <span class="uk-badge uk-badge-secondary text-xs">Nearly Full</span>
+                {% elif alloc > 0 %}
+                <span class="uk-badge uk-badge-primary text-xs">Available</span>
+                {% else %}
+                <span class="uk-badge text-xs">On Bench</span>
+                {% endif %}
+
+                {% if alloc < 100 %}
+                <a href="/assignments/new?member_id={{ member.id }}" class="uk-btn uk-btn-primary uk-btn-xs">
+                    <uk-icon icon="plus" width="12" height="12" class="mr-1"></uk-icon>Assign
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if not members %}
+    <div class="uk-alert" uk-alert>
+        <p>No team members found.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

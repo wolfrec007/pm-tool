@@ -33,7 +33,7 @@
             <tbody>
                 {% for eng in items %}
                 <tr class="hover:bg-muted/50 transition-colors">
-                    <td class="font-medium">{{ eng.name }}</td>
+                    <td class="font-medium"><a href="/engagements/{{ eng.id }}" class="text-primary hover:underline">{{ eng.name }}</a></td>
                     <td>{{ eng.client.name if eng.client else "—" }}</td>
                     <td><span class="uk-badge">{{ eng.engagement_type.value if eng.engagement_type else eng.engagement_type }}</span></td>
                     <td>{{ eng.recurrence_pattern.value if eng.recurrence_pattern else eng.recurrence_pattern }}</td>

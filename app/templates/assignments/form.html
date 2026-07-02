@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% from "macros/_forms.html" import form_field, select_field, form_errors %}
+{% from "macros/_forms.html" import form_field, form_errors %}
 {% from "macros/_csrf.html" import csrf_field %}
 
 {% block title %}{{ "Edit" if assignment else "New" }} Assignment — StaffPlan{% endblock %}
 
 {% block content %}
-<div class="uk-card uk-card-body uk-margin" style="max-width:700px;">
+<div class="uk-card uk-card-body uk-margin overflow-visible" style="max-width:700px;">
     <h2 class="text-xl font-semibold">{{ "Edit Assignment" if assignment else "New Assignment" }}</h2>
 
     {{ form_errors(errors) }}
@@ -14,23 +14,45 @@
         {{ csrf_field(csrf_token) }}
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="space-y-2">
-                <label class="uk-form-label" for="team_member_id">Team Member <span class="text-destructive">*</span></label>
-                <select name="team_member_id" id="team_member_id" class="uk-select w-full" required>
-                    <option value="">Select member...</option>
-                    {% for m in members %}
-                    <option value="{{ m.id }}" {% if assignment and assignment.team_member_id == m.id %}selected{% endif %}>{{ m.name }}</option>
-                    {% endfor %}
-                </select>
+            <!-- Searchable Team Member dropdown -->
+            <div class="space-y-2" id="member-select-container">
+                <label class="uk-form-label" for="member-search">Team Member <span class="text-destructive">*</span></label>
+                <input type="hidden" name="team_member_id" id="team_member_id" value="{{ preselected_member_id or (assignment.team_member_id if assignment else '') }}">
+                <div class="relative">
+                    <input type="text" id="member-search" class="uk-input w-full" placeholder="Search member..." autocomplete="off"
+                        value="{% for m in members %}{% if (preselected_member_id and m.id == preselected_member_id) or (assignment and m.id == assignment.team_member_id) %}{{ m.name }}{% endif %}{% endfor %}">
+                    <div id="member-dropdown" class="hidden absolute left-0 right-0 mt-1 bg-background border border-border rounded-md shadow-lg max-h-60 overflow-y-auto" style="z-index: 9999;">
+                        {% for m in members %}
+                        <div class="member-option px-3 py-2 text-sm cursor-pointer hover:bg-muted" data-id="{{ m.id }}" data-name="{{ m.name }}">
+                            {{ m.name }} <span class="text-muted-foreground text-xs">({{ m.business_role.value | replace('_', ' ') | title if m.business_role else '' }})</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
-            <div class="space-y-2">
-                <label class="uk-form-label" for="engagement_instance_id">Engagement Instance <span class="text-destructive">*</span></label>
-                <select name="engagement_instance_id" id="engagement_instance_id" class="uk-select w-full" required>
-                    <option value="">Select instance...</option>
-                    {% for inst in instances %}
-                    <option value="{{ inst.id }}" {% if assignment and assignment.engagement_instance_id == inst.id %}selected{% endif %}>{{ inst.period_label }} ({{ inst.engagement.name if inst.engagement else "—" }})</option>
-                    {% endfor %}
-                </select>
+
+            <!-- Searchable Engagement Instance dropdown -->
+            <div class="space-y-2" id="instance-select-container">
+                <label class="uk-form-label" for="instance-search">Engagement Instance <span class="text-destructive">*</span></label>
+                <input type="hidden" name="engagement_instance_id" id="engagement_instance_id" value="{{ assignment.engagement_instance_id if assignment else '' }}">
+                <div class="relative">
+                    <input type="text" id="instance-search" class="uk-input w-full" placeholder="Search engagement..." autocomplete="off"
+                        value="{% for inst in instances %}{% if assignment and inst.id == assignment.engagement_instance_id %}{{ inst.period_label }} ({{ inst.engagement.name if inst.engagement else '—' }}){% endif %}{% endfor %}">
+                    <div id="instance-dropdown" class="hidden absolute left-0 right-0 mt-1 bg-background border border-border rounded-md shadow-lg max-h-60 overflow-y-auto" style="z-index: 9999;">
+                        {% if instances %}
+                        {% for inst in instances %}
+                        <div class="instance-option px-3 py-2 text-sm cursor-pointer hover:bg-muted" data-id="{{ inst.id }}" data-name="{{ inst.period_label }} ({{ inst.engagement.name if inst.engagement else '—' }})">
+                            {{ inst.period_label }} <span class="text-muted-foreground text-xs">({{ inst.engagement.name if inst.engagement else "—" }})</span>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="px-3 py-4 text-center">
+                            <p class="text-sm text-muted-foreground mb-2">No engagement instances found.</p>
+                            <a href="/engagements" class="text-sm text-primary hover:underline">Go to Engagements to create one</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -54,4 +76,44 @@
         </div>
     </form>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function setupSearchable(inputId, dropdownId, hiddenId, optionClass) {
+        var input = document.getElementById(inputId);
+        var dropdown = document.getElementById(dropdownId);
+        var hidden = document.getElementById(hiddenId);
+        var options = dropdown.querySelectorAll('.' + optionClass);
+
+        input.addEventListener('focus', function() {
+            dropdown.classList.remove('hidden');
+        });
+        input.addEventListener('click', function() {
+            dropdown.classList.remove('hidden');
+        });
+        input.addEventListener('input', function() {
+            var q = this.value.toLowerCase();
+            dropdown.classList.remove('hidden');
+            options.forEach(function(opt) {
+                opt.style.display = opt.textContent.toLowerCase().includes(q) ? '' : 'none';
+            });
+        });
+        options.forEach(function(opt) {
+            opt.addEventListener('click', function() {
+                input.value = this.dataset.name;
+                hidden.value = this.dataset.id;
+                dropdown.classList.add('hidden');
+            });
+        });
+        document.addEventListener('click', function(e) {
+            if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+    }
+
+    setupSearchable('member-search', 'member-dropdown', 'team_member_id', 'member-option');
+    setupSearchable('instance-search', 'instance-dropdown', 'engagement_instance_id', 'instance-option');
+});
+</script>
 {% endblock %}

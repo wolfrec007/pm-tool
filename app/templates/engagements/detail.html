@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% from "macros/_csrf.html" import csrf_field %}
+
+{% block title %}{{ engagement.name }} — StaffPlan{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Engagement Info -->
+    <div class="uk-card uk-card-body">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <h2 class="text-xl font-semibold">{{ engagement.name }}</h2>
+                <p class="text-sm text-muted-foreground mt-1">
+                    {{ engagement.client.name if engagement.client else "—" }} · 
+                    {{ engagement.engagement_type.value | replace('_', ' ') | title }} · 
+                    {{ engagement.recurrence_pattern.value | replace('_', ' ') | title }}
+                </p>
+            </div>
+            <div class="flex gap-2">
+                <a href="/engagements/{{ engagement.id }}/edit" class="uk-btn uk-btn-default uk-btn-sm">
+                    <uk-icon icon="pencil" width="14" height="14" class="mr-1"></uk-icon>Edit
+                </a>
+                <a href="/engagements" class="uk-btn uk-btn-default uk-btn-sm">Back</a>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
+            <div><span class="text-muted-foreground">Status:</span> 
+                {% if engagement.status.value == "active" %}
+                <span class="uk-badge uk-badge-primary">Active</span>
+                {% elif engagement.status.value == "on_hold" %}
+                <span class="uk-badge uk-badge-secondary">On Hold</span>
+                {% elif engagement.status.value == "completed" %}
+                <span class="uk-badge uk-badge-primary">Completed</span>
+                {% else %}
+                <span class="uk-badge uk-badge-destructive">{{ engagement.status.value }}</span>
+                {% endif %}
+            </div>
+            <div><span class="text-muted-foreground">Start:</span> {{ engagement.start_date }}</div>
+            <div><span class="text-muted-foreground">End:</span> {{ engagement.end_date or "—" }}</div>
+            <div><span class="text-muted-foreground">Instances:</span> {{ instances | length }}</div>
+        </div>
+    </div>
+
+    <!-- Instances -->
+    <div class="uk-card uk-card-body">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold">Engagement Instances</h3>
+            {% if user.technical_role.value in ["admin", "moderator"] %}
+            <button onclick="document.getElementById('new-instance-form').classList.toggle('hidden')" class="uk-btn uk-btn-primary uk-btn-sm">
+                <uk-icon icon="plus" width="14" height="14" class="mr-1"></uk-icon>Add Instance
+            </button>
+            {% endif %}
+        </div>
+
+        <p class="text-sm text-muted-foreground mb-4">Instances represent specific time periods for this engagement (e.g., "FY 2024-25 Audit").</p>
+
+        <!-- New Instance Form (hidden by default) -->
+        {% if user.technical_role.value in ["admin", "moderator"] %}
+        <div id="new-instance-form" class="hidden mb-6 p-4 border border-border rounded-lg bg-muted/30">
+            <h4 class="font-medium mb-3">Create New Instance</h4>
+            <form method="POST" action="/engagements/{{ engagement.id }}/instances/new" class="space-y-3">
+                {{ csrf_field(csrf_token) }}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="space-y-1">
+                        <label class="uk-form-label text-xs">Period Label <span class="text-destructive">*</span></label>
+                        <input type="text" name="period_label" class="uk-input w-full" placeholder="e.g. FY 2024-25 Audit" required>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="uk-form-label text-xs">Status</label>
+                        <select name="status" class="uk-select w-full">
+                            <option value="planned">Planned</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="completed">Completed</option>
+                            <option value="delayed">Delayed</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div class="space-y-1">
+                        <label class="uk-form-label text-xs">Start Date <span class="text-destructive">*</span></label>
+                        <input type="date" name="start_date" class="uk-input w-full" required>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="uk-form-label text-xs">End Date <span class="text-destructive">*</span></label>
+                        <input type="date" name="end_date" class="uk-input w-full" required>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="uk-form-label text-xs">Due Date</label>
+                        <input type="date" name="due_date" class="uk-input w-full">
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button type="submit" class="uk-btn uk-btn-primary uk-btn-sm">Create Instance</button>
+                    <button type="button" onclick="document.getElementById('new-instance-form').classList.add('hidden')" class="uk-btn uk-btn-default uk-btn-sm">Cancel</button>
+                </div>
+            </form>
+        </div>
+        {% endif %}
+
+        <!-- Instances List -->
+        {% if instances %}
+        <div class="overflow-auto">
+            <table class="uk-table uk-table-hover uk-table-divider uk-table-small uk-table-striped">
+                <thead>
+                    <tr>
+                        <th>Period Label</th>
+                        <th>Status</th>
+                        <th>Start</th>
+                        <th>End</th>
+                        <th>Due</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for inst in instances %}
+                    <tr class="hover:bg-muted/50 transition-colors">
+                        <td class="font-medium">{{ inst.period_label }}</td>
+                        <td>
+                            {% if inst.status.value == "planned" %}
+                            <span class="uk-badge">Planned</span>
+                            {% elif inst.status.value == "in_progress" %}
+                            <span class="uk-badge uk-badge-primary">In Progress</span>
+                            {% elif inst.status.value == "completed" %}
+                            <span class="uk-badge uk-badge-primary">Completed</span>
+                            {% else %}
+                            <span class="uk-badge uk-badge-secondary">Delayed</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ inst.start_date }}</td>
+                        <td>{{ inst.end_date }}</td>
+                        <td>{{ inst.due_date or "—" }}</td>
+                        <td>
+                            <a href="/assignments/new?member_id=&engagement_instance_id={{ inst.id }}" class="uk-btn uk-btn-default uk-btn-xs">
+                                <uk-icon icon="plus" width="12" height="12" class="mr-1"></uk-icon>Assign Staff
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="uk-alert" uk-alert>
+            <p>No instances created yet. Click "Add Instance" to create one.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

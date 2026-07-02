@@ -37,11 +37,11 @@
 </head>
 <body class="bg-background text-foreground min-h-screen">
     <!-- Flash Messages (Top right, below navbar) -->
-    {% if request.session._flash %}
+    {% if request.state.flash %}
     <div id="flash-message" class="fixed top-16 right-4 z-50" style="max-width: 350px;">
-        <div class="{% if request.session._flash.level == 'danger' %}uk-alert-destructive{% endif %} uk-alert" uk-alert>
+        <div class="{% if request.state.flash.level == 'danger' %}uk-alert-destructive{% endif %} uk-alert" uk-alert>
             <a class="uk-alert-close" uk-close></a>
-            <p>{{ request.session._flash.message }}</p>
+            <p>{{ request.state.flash.message }}</p>
         </div>
     </div>
     <script>

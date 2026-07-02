@@ -14,6 +14,24 @@ from app.models.models import Assignment, EngagementInstance, Leave, LeaveStatus
 from app.services.email_service import queue_assignment_notification
 
 
+def get_member_allocations(db: Session) -> dict:
+    """Get current allocation percentage for all active team members."""
+    today = date.today()
+    results = (
+        db.query(
+            Assignment.team_member_id,
+            func.coalesce(func.sum(Assignment.allocation_percent), 0).label("total"),
+        )
+        .filter(
+            Assignment.start_date <= today,
+            Assignment.end_date >= today,
+        )
+        .group_by(Assignment.team_member_id)
+        .all()
+    )
+    return {r.team_member_id: r.total for r in results}
+
+
 def create_assignment(
     db: Session,
     team_member_id: int,

@@ -8,6 +8,7 @@ from app.auth.auth import get_current_user, require_role
 from app.csrf_utils import get_csrf_token, validate_csrf
 from app.database import get_db
 from app.exceptions import ValidationError
+from app.flash import set_flash
 from app.models.models import TechnicalRole
 from app.schemas.schemas import (
     EngagementCreate,
@@ -85,6 +86,58 @@ async def create_engagement_form(
     return templates.TemplateResponse(request, "engagements/form.html", {
         "engagement": None, "action": "/engagements/new", "errors": errors,
         "clients": clients, "csrf_token": get_csrf_token(request),
+    })
+
+
+@router.get("/{engagement_id}", response_class=HTMLResponse)
+def engagement_detail(
+    request: Request, engagement_id: int,
+    db: Session = Depends(get_db), user=Depends(get_current_user),
+):
+    engagement = service.get_engagement(db, engagement_id)
+    instances, _ = service.list_instances(db, limit=200, engagement_id=engagement_id)
+    return templates.TemplateResponse(request, "engagements/detail.html", {
+        "engagement": engagement,
+        "instances": instances,
+        "csrf_token": get_csrf_token(request),
+        "user": user,
+    })
+
+
+@router.post("/{engagement_id}/instances/new")
+async def create_instance_form(
+    request: Request, engagement_id: int,
+    db: Session = Depends(get_db),
+    user=Depends(require_role(TechnicalRole.admin, TechnicalRole.moderator)),
+):
+    form_data = await request.form()
+    if not validate_csrf(request, form_data.get("csrf_token")):
+        raise HTTPException(status_code=403, detail="Invalid CSRF token")
+
+    errors = []
+    try:
+        data = {
+            "engagement_id": engagement_id,
+            "period_label": form_data.get("period_label", "").strip(),
+            "start_date": form_data.get("start_date"),
+            "end_date": form_data.get("end_date"),
+            "due_date": form_data.get("due_date") or None,
+            "status": form_data.get("status", "planned"),
+        }
+        service.create_instance(db, data)
+        set_flash(request, f"Instance '{data['period_label']}' created.")
+        return RedirectResponse(url=f"/engagements/{engagement_id}", status_code=303)
+    except Exception as e:
+        errors.append(str(e))
+
+    engagement = service.get_engagement(db, engagement_id)
+    instances, _ = service.list_instances(db, limit=200, engagement_id=engagement_id)
+    return templates.TemplateResponse(request, "engagements/detail.html", {
+        "engagement": engagement,
+        "instances": instances,
+        "errors": errors,
+        "csrf_token": get_csrf_token(request),
+        "user": user,
     })
 
 
