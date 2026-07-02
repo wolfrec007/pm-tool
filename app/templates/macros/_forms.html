@@ -1,0 +1,40 @@
+{% macro form_field(name, label, value="", type="text", required=false, placeholder="") %}
+<div class="uk-margin">
+    <label class="uk-form-label" for="{{ name }}">{{ label }}{% if required %} <span class="uk-text-danger">*</span>{% endif %}</label>
+    <div class="uk-form-controls">
+        {% if type == "select" %}
+        {{ caller() }}
+        {% elif type == "textarea" %}
+        <textarea name="{{ name }}" id="{{ name }}" class="uk-textarea uk-form-small" placeholder="{{ placeholder }}">{% if value and value != "None" %}{{ value }}{% endif %}</textarea>
+        {% else %}
+        <input type="{{ type }}" name="{{ name }}" id="{{ name }}" value="{% if value and value != 'None' %}{{ value }}{% endif %}" class="uk-input uk-form-small" placeholder="{{ placeholder }}" {% if required %}required{% endif %}>
+        {% endif %}
+    </div>
+</div>
+{% endmacro %}
+
+{% macro select_field(name, label, options, value="", required=false) %}
+<div class="uk-margin">
+    <label class="uk-form-label" for="{{ name }}">{{ label }}{% if required %} <span class="uk-text-danger">*</span>{% endif %}</label>
+    <div class="uk-form-controls">
+        <select name="{{ name }}" id="{{ name }}" class="uk-select uk-form-small" {% if required %}required{% endif %}>
+            <option value="">Select...</option>
+            {% for opt in options %}
+            <option value="{{ opt }}" {% if opt == value %}selected{% endif %}>{{ opt | replace('_', ' ') | title }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
+{% endmacro %}
+
+{% macro form_errors(errors) %}
+{% if errors %}
+<div class="uk-alert-danger uk-margin" uk-alert>
+    <ul class="uk-list uk-list-disc uk-margin-remove">
+        {% for err in errors %}
+        <li>{{ err }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+{% endmacro %}

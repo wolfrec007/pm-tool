@@ -1,0 +1,29 @@
+{% macro pagination(total, limit, offset, base_url, params={}) %}
+{% set pages = (total / limit)|round(0, 'ceil')|int %}
+{% set current = (offset / limit)|int + 1 %}
+{% if pages > 1 %}
+<nav>
+    <ul class="uk-pagination uk-flex-center uk-margin-top">
+        {% if offset > 0 %}
+        <li><a href="{{ base_url }}?limit={{ limit }}&offset={{ (current - 2) * limit }}{% for k,v in params.items() %}&{{ k }}={{ v }}{% endfor %}"><span uk-pagination-previous></span></a></li>
+        {% else %}
+        <li class="uk-disabled"><span uk-pagination-previous></span></li>
+        {% endif %}
+
+        {% for p in range(1, pages + 1) %}
+        {% if p == current %}
+        <li class="uk-active"><span>{{ p }}</span></li>
+        {% else %}
+        <li><a href="{{ base_url }}?limit={{ limit }}&offset={{ (p - 1) * limit }}{% for k,v in params.items() %}&{{ k }}={{ v }}{% endfor %}">{{ p }}</a></li>
+        {% endif %}
+        {% endfor %}
+
+        {% if offset + limit < total %}
+        <li><a href="{{ base_url }}?limit={{ limit }}&offset={{ current * limit }}{% for k,v in params.items() %}&{{ k }}={{ v }}{% endfor %}"><span uk-pagination-next></span></a></li>
+        {% else %}
+        <li class="uk-disabled"><span uk-pagination-next></span></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endmacro %}

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% from "macros/_pagination.html" import pagination %}
+{% from "macros/_search.html" import search_bar %}
+{% from "macros/_csrf.html" import csrf_field %}
+
+{% block title %}Clients — StaffPlan{% endblock %}
+
+{% block content %}
+<div class="uk-card uk-card-default uk-card-body uk-margin">
+    <div class="uk-flex uk-flex-between uk-flex-middle uk-margin-bottom">
+        <h2 class="uk-card-title uk-margin-remove">Clients</h2>
+        {% if user.technical_role.value in ["admin", "moderator"] %}
+        <a href="/clients/new" class="uk-button uk-button-primary uk-button-small">
+            <span uk-icon="icon: plus" class="uk-margin-small-right"></span>Add Client
+        </a>
+        {% endif %}
+    </div>
+
+    {{ search_bar("/clients", placeholder="Search name or code...", q=q, params={"is_active": is_active}) }}
+
+    <div class="uk-overflow-auto">
+        <table class="uk-table uk-table-hover uk-table-divider uk-table-small uk-table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Code</th>
+                    <th>Industry</th>
+                    <th>Active</th>
+                    <th>Created</th>
+                    {% if user.technical_role.value in ["admin", "moderator"] %}
+                    <th>Actions</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for client in items %}
+                <tr>
+                    <td>{{ client.name }}</td>
+                    <td>{{ client.code or "—" }}</td>
+                    <td>{{ client.industry or "—" }}</td>
+                    <td>
+                        {% if client.is_active %}
+                        <span class="uk-badge" style="background:#32d296;">Active</span>
+                        {% else %}
+                        <span class="uk-badge" style="background:#f0506e;">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ client.created_at.strftime('%Y-%m-%d') if client.created_at else "—" }}</td>
+                    {% if user.technical_role.value in ["admin", "moderator"] %}
+                    <td>
+                        <a href="/clients/{{ client.id }}/edit" class="uk-button uk-button-small uk-button-default" uk-tooltip="Edit">
+                            <span uk-icon="icon: pencil"></span>
+                        </a>
+                        {% if user.technical_role.value == "admin" and client.is_active %}
+                        <form method="POST" action="/clients/{{ client.id }}/deactivate" class="uk-display-inline"
+                              onsubmit="return confirm('Deactivate this client?')">
+                            {{ csrf_field() }}
+                            <button type="submit" class="uk-button uk-button-small uk-button-danger" uk-tooltip="Deactivate">
+                                <span uk-icon="icon: ban"></span>
+                            </button>
+                        </form>
+                        {% endif %}
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if not items %}
+    <div class="uk-alert-warning" uk-alert><p>No clients found.</p></div>
+    {% endif %}
+
+    <div class="uk-text-small uk-text-muted uk-margin-small-top">
+        Showing {{ offset + 1 }}–{{ [offset + limit, total]|min }} of {{ total }}
+    </div>
+    {{ pagination(total, limit, offset, "/clients", {"q": q}) }}
+</div>
+{% endblock %}

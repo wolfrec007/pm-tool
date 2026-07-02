@@ -1,0 +1,20 @@
+{% macro search_bar(base_url, placeholder="Search...", q="", params={}) %}
+<form method="GET" action="{{ base_url }}" class="uk-margin-bottom">
+    <div class="uk-grid-small uk-flex-middle" uk-grid>
+        <div class="uk-width-expand">
+            <div class="uk-inline uk-width-1-1">
+                <span class="uk-form-icon" uk-icon="icon: search"></span>
+                <input type="text" name="q" value="{{ q }}" placeholder="{{ placeholder }}"
+                    class="uk-input uk-form-small uk-width-1-1">
+            </div>
+        </div>
+        {% for k,v in params.items() %}
+        <input type="hidden" name="{{ k }}" value="{{ v }}">
+        {% endfor %}
+        <div>
+            <button type="submit" class="uk-button uk-button-primary uk-button-small">Search</button>
+            {% if q %}<a href="{{ base_url }}" class="uk-button uk-button-default uk-button-small">Clear</a>{% endif %}
+        </div>
+    </div>
+</form>
+{% endmacro %}

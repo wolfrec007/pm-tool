@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% from "macros/_forms.html" import form_field, select_field, form_errors %}
+{% from "macros/_csrf.html" import csrf_field %}
+
+{% block title %}{{ "Edit" if leave else "New" }} Leave — StaffPlan{% endblock %}
+
+{% block content %}
+<div class="uk-card uk-card-default uk-card-body uk-margin" style="max-width:600px;">
+    <h2 class="uk-card-title">{{ "Edit Leave" if leave else "New Leave" }}</h2>
+
+    {{ form_errors(errors) }}
+
+    <form method="POST" action="{{ action }}" class="uk-form-stacked">
+        {{ csrf_field() }}
+
+        <div class="uk-margin">
+            <label class="uk-form-label" for="team_member_id">Team Member <span class="uk-text-danger">*</span></label>
+            <div class="uk-form-controls">
+                <select name="team_member_id" id="team_member_id" class="uk-select uk-form-small" required>
+                    <option value="">Select member...</option>
+                    {% for m in members %}
+                    <option value="{{ m.id }}" {% if leave and leave.team_member_id == m.id %}selected{% endif %}>{{ m.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="uk-grid-small uk-child-width-1-2@s" uk-grid>
+            <div>
+                {% call select_field("leave_type", "Leave Type", ["sick","vacation","exam_leave","other"], value=leave.leave_type.value if leave and leave.leave_type else "", required=true) %}{% endcall %}
+            </div>
+            <div>
+                {% if leave %}
+                {% call select_field("status", "Status", ["pending","approved","rejected"], value=leave.status.value if leave and leave.status else "pending") %}{% endcall %}
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="uk-grid-small uk-child-width-1-2@s" uk-grid>
+            <div>
+                {{ form_field("start_date", "Start Date", value=leave.start_date if leave else "", type="date", required=true) }}
+            </div>
+            <div>
+                {{ form_field("end_date", "End Date", value=leave.end_date if leave else "", type="date", required=true) }}
+            </div>
+        </div>
+
+        {{ form_field("reason", "Reason", value=leave.reason if leave else "", type="textarea", placeholder="Optional reason") }}
+
+        <div class="uk-margin-top">
+            <button type="submit" class="uk-button uk-button-primary">
+                <span uk-icon="icon: check" class="uk-margin-small-right"></span>
+                {{ "Update" if leave else "Create" }} Leave
+            </button>
+            <a href="/leaves" class="uk-button uk-button-default uk-margin-small-left">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

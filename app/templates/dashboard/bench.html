@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Bench Dashboard — StaffPlan{% endblock %}
+
+{% block content %}
+<div class="uk-card uk-card-default uk-card-body uk-margin">
+    <h2 class="uk-card-title">Bench Dashboard</h2>
+    <p class="uk-text-muted uk-text-small">Team members currently on bench and those rolling off soon.</p>
+
+    <div class="uk-overflow-auto">
+        <table class="uk-table uk-table-hover uk-table-divider uk-table-small uk-table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Business Role</th>
+                    <th>Last Assignment Ended</th>
+                    <th>Days Since</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td><span class="uk-badge">{{ item.business_role }}</span></td>
+                    <td>{{ item.last_assignment_end or "Never" }}</td>
+                    <td>{{ item.days_since_last_assignment if item.days_since_last_assignment is not none else "—" }}</td>
+                    <td>
+                        {% if item.is_rolling_off %}
+                        <span class="uk-badge" style="background:#faa05a;">Rolling Off Soon</span>
+                        {% else %}
+                        <span class="uk-badge" style="background:#f0506e;">On Bench</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if not items %}
+    <div class="uk-alert-success" uk-alert>
+        <p>No team members currently on bench. Everyone is allocated!</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

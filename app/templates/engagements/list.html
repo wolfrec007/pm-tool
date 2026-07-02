@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% from "macros/_pagination.html" import pagination %}
+{% from "macros/_search.html" import search_bar %}
+
+{% block title %}Engagements — StaffPlan{% endblock %}
+
+{% block content %}
+<div class="uk-card uk-card-default uk-card-body uk-margin">
+    <div class="uk-flex uk-flex-between uk-flex-middle uk-margin-bottom">
+        <h2 class="uk-card-title uk-margin-remove">Engagements</h2>
+        {% if user.technical_role.value in ["admin", "moderator"] %}
+        <a href="/engagements/new" class="uk-button uk-button-primary uk-button-small">
+            <span uk-icon="icon: plus" class="uk-margin-small-right"></span>Add Engagement
+        </a>
+        {% endif %}
+    </div>
+
+    {{ search_bar("/engagements", placeholder="Search engagement name...", q=q, params={"is_active": is_active}) }}
+
+    <div class="uk-overflow-auto">
+        <table class="uk-table uk-table-hover uk-table-divider uk-table-small uk-table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Client</th>
+                    <th>Type</th>
+                    <th>Recurrence</th>
+                    <th>Status</th>
+                    <th>Start</th>
+                    <th>End</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for eng in items %}
+                <tr>
+                    <td>{{ eng.name }}</td>
+                    <td>{{ eng.client.name if eng.client else "—" }}</td>
+                    <td><span class="uk-badge">{{ eng.engagement_type.value if eng.engagement_type else eng.engagement_type }}</span></td>
+                    <td>{{ eng.recurrence_pattern.value if eng.recurrence_pattern else eng.recurrence_pattern }}</td>
+                    <td>
+                        {% if eng.status.value == "active" %}
+                        <span class="uk-badge" style="background:#32d296;">Active</span>
+                        {% elif eng.status.value == "on_hold" %}
+                        <span class="uk-badge" style="background:#faa05a;">On Hold</span>
+                        {% elif eng.status.value == "completed" %}
+                        <span class="uk-badge" style="background:#1e87f0;">Completed</span>
+                        {% else %}
+                        <span class="uk-badge" style="background:#f0506e;">{{ eng.status.value }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ eng.start_date }}</td>
+                    <td>{{ eng.end_date or "—" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if not items %}
+    <div class="uk-alert-warning" uk-alert><p>No engagements found.</p></div>
+    {% endif %}
+
+    <div class="uk-text-small uk-text-muted uk-margin-small-top">
+        Showing {{ offset + 1 }}–{{ [offset + limit, total]|min }} of {{ total }}
+    </div>
+    {{ pagination(total, limit, offset, "/engagements", {"q": q}) }}
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% from "macros/_pagination.html" import pagination %}
+
+{% block title %}Assignments — StaffPlan{% endblock %}
+
+{% block content %}
+<div class="uk-card uk-card-default uk-card-body uk-margin">
+    <div class="uk-flex uk-flex-between uk-flex-middle uk-margin-bottom">
+        <h2 class="uk-card-title uk-margin-remove">Assignments</h2>
+        {% if user.technical_role.value in ["admin", "moderator"] %}
+        <a href="/assignments/new" class="uk-button uk-button-primary uk-button-small">
+            <span uk-icon="icon: plus" class="uk-margin-small-right"></span>Add Assignment
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="uk-overflow-auto">
+        <table class="uk-table uk-table-hover uk-table-divider uk-table-small uk-table-striped">
+            <thead>
+                <tr>
+                    <th>Team Member</th>
+                    <th>Engagement</th>
+                    <th>Period</th>
+                    <th>Role</th>
+                    <th>Allocation %</th>
+                    <th>Start</th>
+                    <th>End</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in items %}
+                <tr>
+                    <td>{{ a.team_member.name if a.team_member else "—" }}</td>
+                    <td>{{ a.engagement_instance.engagement.name if a.engagement_instance and a.engagement_instance.engagement else "—" }}</td>
+                    <td>{{ a.engagement_instance.period_label if a.engagement_instance else "—" }}</td>
+                    <td>{{ a.role_on_engagement or "—" }}</td>
+                    <td>
+                        <progress class="uk-progress" value="{{ a.allocation_percent }}" max="100" style="width:100px;display:inline-block;vertical-align:middle;"></progress>
+                        <span class="uk-text-small uk-text-bold uk-margin-small-left">{{ a.allocation_percent }}%</span>
+                    </td>
+                    <td>{{ a.start_date }}</td>
+                    <td>{{ a.end_date }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if not items %}
+    <div class="uk-alert-warning" uk-alert><p>No assignments found.</p></div>
+    {% endif %}
+
+    <div class="uk-text-small uk-text-muted uk-margin-small-top">
+        Showing {{ offset + 1 }}–{{ [offset + limit, total]|min }} of {{ total }}
+    </div>
+    {{ pagination(total, limit, offset, "/assignments") }}
+</div>
+{% endblock %}

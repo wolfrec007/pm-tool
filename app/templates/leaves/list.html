@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% from "macros/_pagination.html" import pagination %}
+
+{% block title %}Leaves — StaffPlan{% endblock %}
+
+{% block content %}
+<div class="uk-card uk-card-default uk-card-body uk-margin">
+    <div class="uk-flex uk-flex-between uk-flex-middle uk-margin-bottom">
+        <h2 class="uk-card-title uk-margin-remove">Leaves</h2>
+        {% if user.technical_role.value in ["admin", "moderator"] %}
+        <a href="/leaves/new" class="uk-button uk-button-primary uk-button-small">
+            <span uk-icon="icon: plus" class="uk-margin-small-right"></span>Add Leave
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="uk-overflow-auto">
+        <table class="uk-table uk-table-hover uk-table-divider uk-table-small uk-table-striped">
+            <thead>
+                <tr>
+                    <th>Team Member</th>
+                    <th>Type</th>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>Status</th>
+                    <th>Reason</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for leave in items %}
+                <tr>
+                    <td>{{ leave.team_member.name if leave.team_member else "—" }}</td>
+                    <td><span class="uk-badge">{{ leave.leave_type.value if leave.leave_type else leave.leave_type }}</span></td>
+                    <td>{{ leave.start_date }}</td>
+                    <td>{{ leave.end_date }}</td>
+                    <td>
+                        {% if leave.status.value == "approved" %}
+                        <span class="uk-badge" style="background:#32d296;">Approved</span>
+                        {% elif leave.status.value == "pending" %}
+                        <span class="uk-badge" style="background:#faa05a;">Pending</span>
+                        {% else %}
+                        <span class="uk-badge" style="background:#f0506e;">Rejected</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ leave.reason or "—" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if not items %}
+    <div class="uk-alert-warning" uk-alert><p>No leaves found.</p></div>
+    {% endif %}
+
+    <div class="uk-text-small uk-text-muted uk-margin-small-top">
+        Showing {{ offset + 1 }}–{{ [offset + limit, total]|min }} of {{ total }}
+    </div>
+    {{ pagination(total, limit, offset, "/leaves") }}
+</div>
+{% endblock %}

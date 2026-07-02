@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% from "macros/_pagination.html" import pagination %}
+{% from "macros/_search.html" import search_bar %}
+{% from "macros/_csrf.html" import csrf_field %}
+
+{% block title %}Email Outbox — StaffPlan{% endblock %}
+
+{% block content %}
+<div class="uk-card uk-card-default uk-card-body uk-margin">
+    <div class="uk-flex uk-flex-between uk-flex-middle uk-margin-bottom">
+        <h2 class="uk-card-title uk-margin-remove">Email Outbox</h2>
+        <form method="POST" action="/admin/outbox/process" class="uk-display-inline">
+            {{ csrf_field() }}
+            <button type="submit" class="uk-button uk-button-primary uk-button-small">
+                <span uk-icon="icon: bolt" class="uk-margin-small-right"></span>Process Now
+            </button>
+        </form>
+    </div>
+
+    {{ search_bar("/admin/outbox", placeholder="Search email or subject...", q=q, params={"status": status}) }}
+
+    <div class="uk-margin-small-bottom">
+        <div class="uk-grid-small uk-flex-middle" uk-grid>
+            <div>
+                <select class="uk-select uk-form-small" style="width:140px;"
+                        onchange="window.location.href='/admin/outbox?q={{ q }}&status='+this.value">
+                    <option value="">All Status</option>
+                    <option value="pending" {% if status == 'pending' %}selected{% endif %}>Pending</option>
+                    <option value="sent" {% if status == 'sent' %}selected{% endif %}>Sent</option>
+                    <option value="failed" {% if status == 'failed' %}selected{% endif %}>Failed</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="uk-overflow-auto">
+        <table class="uk-table uk-table-hover uk-table-divider uk-table-small uk-table-striped">
+            <thead>
+                <tr>
+                    <th>To</th>
+                    <th>Subject</th>
+                    <th>Status</th>
+                    <th>Retries</th>
+                    <th>Created</th>
+                    <th>Sent At</th>
+                    <th>Error</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in items %}
+                <tr>
+                    <td>{{ entry.recipient_email }}</td>
+                    <td>{{ entry.subject }}</td>
+                    <td>
+                        {% if entry.status == 'sent' %}
+                        <span class="uk-badge" style="background:#32d296;">Sent</span>
+                        {% elif entry.status == 'pending' %}
+                        <span class="uk-badge" style="background:#1e87f0;">Pending</span>
+                        {% else %}
+                        <span class="uk-badge" style="background:#f0506e;">Failed</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ entry.retry_count }}</td>
+                    <td>{{ entry.created_at.strftime('%Y-%m-%d %H:%M') if entry.created_at else "—" }}</td>
+                    <td>{{ entry.sent_at.strftime('%Y-%m-%d %H:%M') if entry.sent_at else "—" }}</td>
+                    <td class="uk-text-small uk-text-danger" style="max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                        {{ entry.last_error[:80] if entry.last_error else "—" }}
+                    </td>
+                    <td>
+                        {% if entry.status == 'failed' %}
+                        <form method="POST" action="/admin/outbox/{{ entry.id }}/retry" class="uk-display-inline">
+                            {{ csrf_field() }}
+                            <button type="submit" class="uk-button uk-button-small uk-button-default" uk-tooltip="Retry">
+                                <span uk-icon="icon: refresh"></span>
+                            </button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if not items %}
+    <div class="uk-alert-warning" uk-alert><p>No emails found.</p></div>
+    {% endif %}
+
+    <div class="uk-text-small uk-text-muted uk-margin-small-top">
+        Showing {{ offset + 1 }}–{{ [offset + limit, total]|min }} of {{ total }}
+    </div>
+    {{ pagination(total, limit, offset, "/admin/outbox", {"q": q, "status": status}) }}
+</div>
+{% endblock %}
