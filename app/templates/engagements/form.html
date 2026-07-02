@@ -11,7 +11,7 @@
     {{ form_errors(errors) }}
 
     <form method="POST" action="{{ action }}" class="uk-form-stacked">
-        {{ csrf_field() }}
+        {{ csrf_field(csrf_token) }}
 
         {{ form_field("name", "Engagement Name", value=engagement.name if engagement else "", required=true) }}
 
@@ -30,16 +30,16 @@
                 </div>
             </div>
             <div>
-                {% call select_field("engagement_type", "Type", ["statutory_audit","internal_audit","tax_audit","consulting","special_assignment","other"], value=engagement.engagement_type.value if engagement and engagement.engagement_type else "", required=true) %}{% endcall %}
+                {{ select_field("engagement_type", "Type", ["statutory_audit","internal_audit","tax_audit","consulting","special_assignment","other"], value=engagement.engagement_type.value if engagement and engagement.engagement_type else "", required=true) }}
             </div>
         </div>
 
         <div class="uk-grid-small uk-child-width-1-2@s" uk-grid>
             <div>
-                {% call select_field("recurrence_pattern", "Recurrence", ["one_off","weekly","fortnightly","monthly","quarterly","annual"], value=engagement.recurrence_pattern.value if engagement and engagement.recurrence_pattern else "", required=true) %}{% endcall %}
+                {{ select_field("recurrence_pattern", "Recurrence", ["one_off","weekly","fortnightly","monthly","quarterly","annual"], value=engagement.recurrence_pattern.value if engagement and engagement.recurrence_pattern else "", required=true) }}
             </div>
             <div>
-                {% call select_field("status", "Status", ["active","on_hold","completed","lost_client"], value=engagement.status.value if engagement and engagement.status else "active") %}{% endcall %}
+                {{ select_field("status", "Status", ["active","on_hold","completed","lost_client"], value=engagement.status.value if engagement and engagement.status else "active") }}
             </div>
         </div>
 

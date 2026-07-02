@@ -13,7 +13,7 @@
         {% endif %}
 
         <form method="POST" action="/auth/login" class="uk-form-stacked">
-            {{ csrf_field() }}
+            {{ csrf_field(csrf_token) }}
 
             <div class="uk-margin">
                 <label class="uk-form-label" for="email">Email</label>

@@ -11,7 +11,7 @@
     {{ form_errors(errors) }}
 
     <form method="POST" action="{{ action }}" class="uk-form-stacked">
-        {{ csrf_field() }}
+        {{ csrf_field(csrf_token) }}
 
         <div class="uk-grid-small uk-child-width-1-2@s" uk-grid>
             <div>
@@ -27,13 +27,13 @@
                 {{ form_field("employee_code", "Employee Code", value=member.employee_code if member else "", placeholder="Optional") }}
             </div>
             <div>
-                {% call select_field("business_role", "Business Role", ["partner","director","ca_manager","paid_assistant","staff","article","data_analyst"], value=member.business_role.value if member and member.business_role else "", required=true) %}{% endcall %}
+                {{ select_field("business_role", "Business Role", ["partner","director","ca_manager","paid_assistant","staff","article","data_analyst"], value=member.business_role.value if member and member.business_role else "", required=true) }}
             </div>
         </div>
 
         <div class="uk-grid-small uk-child-width-1-2@s" uk-grid>
             <div>
-                {% call select_field("technical_role", "Technical Role", ["admin","moderator","viewer"], value=member.technical_role.value if member and member.technical_role else "viewer") %}{% endcall %}
+                {{ select_field("technical_role", "Technical Role", ["admin","moderator","viewer"], value=member.technical_role.value if member and member.technical_role else "viewer") }}
             </div>
             <div>
                 <div class="uk-margin">

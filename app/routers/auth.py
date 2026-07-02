@@ -34,6 +34,9 @@ def _set_session(request: Request, user: User) -> None:
 
 @router.get("/login", response_class=HTMLResponse)
 def login_page(request: Request, error: str = ""):
+    # Redirect to home if already logged in
+    if request.session.get("user_id"):
+        return RedirectResponse(url="/", status_code=303)
     ms365 = get_ms365_oauth_client()
     return templates.TemplateResponse(request, "auth/login.html", {
         "csrf_token": get_csrf_token(request),
@@ -45,7 +48,10 @@ def login_page(request: Request, error: str = ""):
 @router.post("/login")
 async def login(request: Request, db: Session = Depends(get_db)):
     form_data = await request.form()
-    if not validate_csrf(request, form_data.get("csrf_token")):
+    form_token = form_data.get("csrf_token")
+    session_token = request.session.get("csrf_token")
+    print(f"DEBUG: form_token={form_token!r}, session_token={session_token!r}")
+    if not validate_csrf(request, form_token):
         raise HTTPException(status_code=403, detail="Invalid CSRF token")
 
     email = form_data.get("email", "").strip().lower()

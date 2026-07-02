@@ -11,7 +11,7 @@
     {{ form_errors(errors) }}
 
     <form method="POST" action="{{ action }}" class="uk-form-stacked">
-        {{ csrf_field() }}
+        {{ csrf_field(csrf_token) }}
 
         <div class="uk-margin">
             <label class="uk-form-label" for="team_member_id">Team Member <span class="uk-text-danger">*</span></label>
@@ -27,11 +27,11 @@
 
         <div class="uk-grid-small uk-child-width-1-2@s" uk-grid>
             <div>
-                {% call select_field("leave_type", "Leave Type", ["sick","vacation","exam_leave","other"], value=leave.leave_type.value if leave and leave.leave_type else "", required=true) %}{% endcall %}
+                {{ select_field("leave_type", "Leave Type", ["sick","vacation","exam_leave","other"], value=leave.leave_type.value if leave and leave.leave_type else "", required=true) }}
             </div>
             <div>
                 {% if leave %}
-                {% call select_field("status", "Status", ["pending","approved","rejected"], value=leave.status.value if leave and leave.status else "pending") %}{% endcall %}
+                {{ select_field("status", "Status", ["pending","approved","rejected"], value=leave.status.value if leave and leave.status else "pending") }}
                 {% endif %}
             </div>
         </div>

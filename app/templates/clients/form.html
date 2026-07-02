@@ -11,7 +11,7 @@
     {{ form_errors(errors) }}
 
     <form method="POST" action="{{ action }}" class="uk-form-stacked">
-        {{ csrf_field() }}
+        {{ csrf_field(csrf_token) }}
 
         {{ form_field("name", "Client Name", value=client.name if client else "", required=true) }}
         {{ form_field("code", "Client Code", value=client.code if client else "", placeholder="Optional unique code") }}

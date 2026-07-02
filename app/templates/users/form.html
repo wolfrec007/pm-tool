@@ -11,7 +11,7 @@
     {{ form_errors(errors) }}
 
     <form method="POST" action="{{ action }}" class="uk-form-stacked">
-        {{ csrf_field() }}
+        {{ csrf_field(csrf_token) }}
 
         {{ form_field("display_name", "Display Name", value=user_obj.display_name if user_obj else "", required=true, placeholder="Full name") }}
         {{ form_field("email", "Email", value=user_obj.email if user_obj else "", type="email", required=true, placeholder="user@example.com") }}

@@ -27,7 +27,7 @@
     </div>
 
     <form method="POST" action="/auth/2fa-setup" class="uk-form-stacked">
-        {{ csrf_field() }}
+        {{ csrf_field(csrf_token) }}
         <input type="hidden" name="secret" value="{{ secret }}">
 
         <p class="uk-text-small uk-margin">2. Enter the 6-digit code from your app to confirm setup:</p>

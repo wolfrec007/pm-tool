@@ -16,7 +16,7 @@
             </a>
             {% if member.is_active %}
             <form method="POST" action="/team-members/{{ member.id }}/deactivate" class="uk-display-inline">
-                {{ csrf_field() }}
+                {{ csrf_field(csrf_token) }}
                 <button type="submit" class="uk-button uk-button-small uk-button-danger"
                     onclick="return confirm('Deactivate {{ member.name }}?')">
                     Deactivate

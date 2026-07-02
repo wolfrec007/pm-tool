@@ -71,7 +71,7 @@
                         {% if u.is_active and u.id != user.id %}
                         <form method="POST" action="/users/{{ u.id }}/deactivate" class="uk-display-inline"
                               onsubmit="return confirm('Deactivate this user?')">
-                            {{ csrf_field() }}
+                            {{ csrf_field(csrf_token) }}
                             <button type="submit" class="uk-button uk-button-small uk-button-danger" uk-tooltip="Deactivate">
                                 <span uk-icon="icon: ban"></span>
                             </button>

@@ -16,7 +16,7 @@
             </a>
             {% endif %}
             <form method="POST" action="/team-members/bulk-upload" enctype="multipart/form-data" class="uk-display-inline">
-                {{ csrf_field() }}
+                {{ csrf_field(csrf_token) }}
                 <label class="uk-button uk-button-small uk-button-default">
                     <span uk-icon="icon: upload"></span> Upload CSV
                     <input type="file" name="file" accept=".csv" hidden
@@ -76,8 +76,5 @@
     </div>
 
     {{ pagination(total, limit, offset, "/team-members", {"q": q}) }}
-</div>
-{% endblock %}
-set, "/team-members", {"q": q}) }}
 </div>
 {% endblock %}

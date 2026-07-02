@@ -74,7 +74,7 @@ def new_user_form(
         "action": "/users/new",
         "errors": [],
         "csrf_token": get_csrf_token(request),
-        "roles": list(TechnicalRole),
+        "roles": [r.value for r in TechnicalRole],
     })
 
 
@@ -115,7 +115,7 @@ async def create_user_form(
         "action": "/users/new",
         "errors": errors,
         "csrf_token": get_csrf_token(request),
-        "roles": list(TechnicalRole),
+        "roles": [r.value for r in TechnicalRole],
     })
 
 
@@ -132,7 +132,7 @@ def edit_user_form(
         "action": f"/users/{user_id}/edit",
         "errors": [],
         "csrf_token": get_csrf_token(request),
-        "roles": list(TechnicalRole),
+        "roles": [r.value for r in TechnicalRole],
     })
 
 
@@ -180,7 +180,7 @@ async def update_user_form(
         "action": f"/users/{user_id}/edit",
         "errors": errors,
         "csrf_token": get_csrf_token(request),
-        "roles": list(TechnicalRole),
+        "roles": [r.value for r in TechnicalRole],
     })
 
 

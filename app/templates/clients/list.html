@@ -54,7 +54,7 @@
                         {% if user.technical_role.value == "admin" and client.is_active %}
                         <form method="POST" action="/clients/{{ client.id }}/deactivate" class="uk-display-inline"
                               onsubmit="return confirm('Deactivate this client?')">
-                            {{ csrf_field() }}
+                            {{ csrf_field(csrf_token) }}
                             <button type="submit" class="uk-button uk-button-small uk-button-danger" uk-tooltip="Deactivate">
                                 <span uk-icon="icon: ban"></span>
                             </button>
