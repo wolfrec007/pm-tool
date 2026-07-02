@@ -1,20 +1,16 @@
 {% macro search_bar(base_url, placeholder="Search...", q="", params={}) %}
-<form method="GET" action="{{ base_url }}" class="uk-margin-bottom">
-    <div class="uk-grid-small uk-flex-middle" uk-grid>
-        <div class="uk-width-expand">
-            <div class="uk-inline uk-width-1-1">
-                <span class="uk-form-icon" uk-icon="icon: search"></span>
-                <input type="text" name="q" value="{{ q }}" placeholder="{{ placeholder }}"
-                    class="uk-input uk-form-small uk-width-1-1">
-            </div>
+<form method="GET" action="{{ base_url }}" class="mb-4">
+    <div class="flex gap-2 items-center">
+        <div class="flex-1 relative">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"><uk-icon icon="search" width="16" height="16"></uk-icon></span>
+            <input type="text" name="q" value="{{ q }}" placeholder="{{ placeholder }}"
+                class="uk-input w-full pl-10">
         </div>
         {% for k,v in params.items() %}
         <input type="hidden" name="{{ k }}" value="{{ v }}">
         {% endfor %}
-        <div>
-            <button type="submit" class="uk-button uk-button-primary uk-button-small">Search</button>
-            {% if q %}<a href="{{ base_url }}" class="uk-button uk-button-default uk-button-small">Clear</a>{% endif %}
-        </div>
+        <button type="submit" class="uk-btn uk-btn-primary uk-btn-sm">Search</button>
+        {% if q %}<a href="{{ base_url }}" class="uk-btn uk-btn-default uk-btn-sm">Clear</a>{% endif %}
     </div>
 </form>
 {% endmacro %}

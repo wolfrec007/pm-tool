@@ -5,59 +5,44 @@
 {% block title %}{{ "Edit" if engagement else "New" }} Engagement — StaffPlan{% endblock %}
 
 {% block content %}
-<div class="uk-card uk-card-default uk-card-body uk-margin" style="max-width:700px;">
-    <h2 class="uk-card-title">{{ "Edit Engagement" if engagement else "New Engagement" }}</h2>
+<div class="uk-card uk-card-body uk-margin" style="max-width:700px;">
+    <h2 class="text-xl font-semibold">{{ "Edit Engagement" if engagement else "New Engagement" }}</h2>
 
     {{ form_errors(errors) }}
 
-    <form method="POST" action="{{ action }}" class="uk-form-stacked">
+    <form method="POST" action="{{ action }}" class="space-y-4 mt-4">
         {{ csrf_field(csrf_token) }}
 
         {{ form_field("name", "Engagement Name", value=engagement.name if engagement else "", required=true) }}
 
-        <div class="uk-grid-small uk-child-width-1-2@s" uk-grid>
-            <div>
-                <div class="uk-margin">
-                    <label class="uk-form-label" for="client_id">Client <span class="uk-text-danger">*</span></label>
-                    <div class="uk-form-controls">
-                        <select name="client_id" id="client_id" class="uk-select uk-form-small" required>
-                            <option value="">Select client...</option>
-                            {% for c in clients %}
-                            <option value="{{ c.id }}" {% if engagement and engagement.client_id == c.id %}selected{% endif %}>{{ c.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="space-y-2">
+                <label class="uk-form-label" for="client_id">Client <span class="text-destructive">*</span></label>
+                <select name="client_id" id="client_id" class="uk-select w-full" required>
+                    <option value="">Select client...</option>
+                    {% for c in clients %}
+                    <option value="{{ c.id }}" {% if engagement and engagement.client_id == c.id %}selected{% endif %}>{{ c.name }}</option>
+                    {% endfor %}
+                </select>
             </div>
-            <div>
-                {{ select_field("engagement_type", "Type", ["statutory_audit","internal_audit","tax_audit","consulting","special_assignment","other"], value=engagement.engagement_type.value if engagement and engagement.engagement_type else "", required=true) }}
-            </div>
+            {{ select_field("engagement_type", "Type", ["statutory_audit","internal_audit","tax_audit","consulting","special_assignment","other"], value=engagement.engagement_type.value if engagement and engagement.engagement_type else "", required=true) }}
         </div>
 
-        <div class="uk-grid-small uk-child-width-1-2@s" uk-grid>
-            <div>
-                {{ select_field("recurrence_pattern", "Recurrence", ["one_off","weekly","fortnightly","monthly","quarterly","annual"], value=engagement.recurrence_pattern.value if engagement and engagement.recurrence_pattern else "", required=true) }}
-            </div>
-            <div>
-                {{ select_field("status", "Status", ["active","on_hold","completed","lost_client"], value=engagement.status.value if engagement and engagement.status else "active") }}
-            </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {{ select_field("recurrence_pattern", "Recurrence", ["one_off","weekly","fortnightly","monthly","quarterly","annual"], value=engagement.recurrence_pattern.value if engagement and engagement.recurrence_pattern else "", required=true) }}
+            {{ select_field("status", "Status", ["active","on_hold","completed","lost_client"], value=engagement.status.value if engagement and engagement.status else "active") }}
         </div>
 
-        <div class="uk-grid-small uk-child-width-1-2@s" uk-grid>
-            <div>
-                {{ form_field("start_date", "Start Date", value=engagement.start_date if engagement else "", type="date", required=true) }}
-            </div>
-            <div>
-                {{ form_field("end_date", "End Date", value=engagement.end_date if engagement else "", type="date") }}
-            </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {{ form_field("start_date", "Start Date", value=engagement.start_date if engagement else "", type="date", required=true) }}
+            {{ form_field("end_date", "End Date", value=engagement.end_date if engagement else "", type="date") }}
         </div>
 
-        <div class="uk-margin-top">
-            <button type="submit" class="uk-button uk-button-primary">
-                <span uk-icon="icon: check" class="uk-margin-small-right"></span>
-                {{ "Update" if engagement else "Create" }} Engagement
+        <div class="flex gap-2 mt-6 pt-4 border-t border-border">
+            <button type="submit" class="uk-btn uk-btn-primary">
+                <span uk-icon="icon: check; ratio: 0.8" class="mr-2"></span>{{ "Update" if engagement else "Create" }} Engagement
             </button>
-            <a href="/engagements" class="uk-button uk-button-default uk-margin-small-left">Cancel</a>
+            <a href="/engagements" class="uk-btn uk-btn-default">Cancel</a>
         </div>
     </form>
 </div>

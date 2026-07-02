@@ -1,10 +1,10 @@
 {% if request.session.flash_message %}
-<div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded mb-4">
-    {{ request.session.flash_message }}
+<div class="uk-alert mb-4" uk-alert uk-close="">
+    <p>{{ request.session.flash_message }}</p>
 </div>
 {% endif %}
 {% if request.session.error_message %}
-<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-    {{ request.session.error_message }}
+<div class="uk-alert uk-alert-destructive mb-4" uk-alert uk-close="">
+    <p>{{ request.session.error_message }}</p>
 </div>
 {% endif %}

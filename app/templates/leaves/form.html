@@ -5,54 +5,43 @@
 {% block title %}{{ "Edit" if leave else "New" }} Leave — StaffPlan{% endblock %}
 
 {% block content %}
-<div class="uk-card uk-card-default uk-card-body uk-margin" style="max-width:600px;">
-    <h2 class="uk-card-title">{{ "Edit Leave" if leave else "New Leave" }}</h2>
+<div class="uk-card uk-card-body uk-margin" style="max-width:600px;">
+    <h2 class="text-xl font-semibold">{{ "Edit Leave" if leave else "New Leave" }}</h2>
 
     {{ form_errors(errors) }}
 
-    <form method="POST" action="{{ action }}" class="uk-form-stacked">
+    <form method="POST" action="{{ action }}" class="space-y-4 mt-4">
         {{ csrf_field(csrf_token) }}
 
-        <div class="uk-margin">
-            <label class="uk-form-label" for="team_member_id">Team Member <span class="uk-text-danger">*</span></label>
-            <div class="uk-form-controls">
-                <select name="team_member_id" id="team_member_id" class="uk-select uk-form-small" required>
-                    <option value="">Select member...</option>
-                    {% for m in members %}
-                    <option value="{{ m.id }}" {% if leave and leave.team_member_id == m.id %}selected{% endif %}>{{ m.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+        <div class="space-y-2">
+            <label class="uk-form-label" for="team_member_id">Team Member <span class="text-destructive">*</span></label>
+            <select name="team_member_id" id="team_member_id" class="uk-select w-full" required>
+                <option value="">Select member...</option>
+                {% for m in members %}
+                <option value="{{ m.id }}" {% if leave and leave.team_member_id == m.id %}selected{% endif %}>{{ m.name }}</option>
+                {% endfor %}
+            </select>
         </div>
 
-        <div class="uk-grid-small uk-child-width-1-2@s" uk-grid>
-            <div>
-                {{ select_field("leave_type", "Leave Type", ["sick","vacation","exam_leave","other"], value=leave.leave_type.value if leave and leave.leave_type else "", required=true) }}
-            </div>
-            <div>
-                {% if leave %}
-                {{ select_field("status", "Status", ["pending","approved","rejected"], value=leave.status.value if leave and leave.status else "pending") }}
-                {% endif %}
-            </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {{ select_field("leave_type", "Leave Type", ["sick","vacation","exam_leave","other"], value=leave.leave_type.value if leave and leave.leave_type else "", required=true) }}
+            {% if leave %}
+            {{ select_field("status", "Status", ["pending","approved","rejected"], value=leave.status.value if leave and leave.status else "pending") }}
+            {% endif %}
         </div>
 
-        <div class="uk-grid-small uk-child-width-1-2@s" uk-grid>
-            <div>
-                {{ form_field("start_date", "Start Date", value=leave.start_date if leave else "", type="date", required=true) }}
-            </div>
-            <div>
-                {{ form_field("end_date", "End Date", value=leave.end_date if leave else "", type="date", required=true) }}
-            </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {{ form_field("start_date", "Start Date", value=leave.start_date if leave else "", type="date", required=true) }}
+            {{ form_field("end_date", "End Date", value=leave.end_date if leave else "", type="date", required=true) }}
         </div>
 
         {{ form_field("reason", "Reason", value=leave.reason if leave else "", type="textarea", placeholder="Optional reason") }}
 
-        <div class="uk-margin-top">
-            <button type="submit" class="uk-button uk-button-primary">
-                <span uk-icon="icon: check" class="uk-margin-small-right"></span>
-                {{ "Update" if leave else "Create" }} Leave
+        <div class="flex gap-2 mt-6 pt-4 border-t border-border">
+            <button type="submit" class="uk-btn uk-btn-primary">
+                <span uk-icon="icon: check; ratio: 0.8" class="mr-2"></span>{{ "Update" if leave else "Create" }} Leave
             </button>
-            <a href="/leaves" class="uk-button uk-button-default uk-margin-small-left">Cancel</a>
+            <a href="/leaves" class="uk-btn uk-btn-default">Cancel</a>
         </div>
     </form>
 </div>

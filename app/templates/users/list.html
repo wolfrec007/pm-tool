@@ -6,31 +6,26 @@
 {% block title %}Users — StaffPlan{% endblock %}
 
 {% block content %}
-<div class="uk-card uk-card-default uk-card-body uk-margin">
-    <div class="uk-flex uk-flex-between uk-flex-middle uk-margin-bottom">
-        <h2 class="uk-card-title uk-margin-remove">Users</h2>
-        <a href="/users/new" class="uk-button uk-button-primary uk-button-small">
-            <span uk-icon="icon: plus" class="uk-margin-small-right"></span>Add User
+<div class="uk-card uk-card-body uk-margin">
+    <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-semibold">Users</h2>
+        <a href="/users/new" class="uk-btn uk-btn-primary uk-btn-sm">
+            <span uk-icon="icon: plus; ratio: 0.8" class="mr-1"></span>Add User
         </a>
     </div>
 
     {{ search_bar("/users", placeholder="Search name or email...", q=q, params={"technical_role": technical_role or "", "is_active": is_active if is_active is not none else ""}) }}
 
-    <div class="uk-margin-small-bottom">
-        <div class="uk-grid-small uk-flex-middle" uk-grid>
-            <div>
-                <select name="technical_role_filter" class="uk-select uk-form-small" style="width:160px;"
-                        onchange="window.location.href='/users?q={{ q }}&technical_role='+this.value">
-                    <option value="">All Roles</option>
-                    <option value="admin" {% if technical_role == 'admin' %}selected{% endif %}>Admin</option>
-                    <option value="moderator" {% if technical_role == 'moderator' %}selected{% endif %}>Moderator</option>
-                    <option value="viewer" {% if technical_role == 'viewer' %}selected{% endif %}>Viewer</option>
-                </select>
-            </div>
-        </div>
+    <div class="mb-3 flex items-center gap-2">
+        <select name="technical_role_filter" class="uk-select w-40" onchange="window.location.href='/users?q={{ q }}&technical_role='+this.value">
+            <option value="">All Roles</option>
+            <option value="admin" {% if technical_role == 'admin' %}selected{% endif %}>Admin</option>
+            <option value="moderator" {% if technical_role == 'moderator' %}selected{% endif %}>Moderator</option>
+            <option value="viewer" {% if technical_role == 'viewer' %}selected{% endif %}>Viewer</option>
+        </select>
     </div>
 
-    <div class="uk-overflow-auto">
+    <div class="overflow-auto">
         <table class="uk-table uk-table-hover uk-table-divider uk-table-small uk-table-striped">
             <thead>
                 <tr>
@@ -44,36 +39,35 @@
             </thead>
             <tbody>
                 {% for u in items %}
-                <tr>
-                    <td>{{ u.display_name }}</td>
-                    <td>{{ u.email }}</td>
+                <tr class="hover:bg-muted/50 transition-colors">
+                    <td class="font-medium">{{ u.display_name }}</td>
+                    <td class="text-muted-foreground">{{ u.email }}</td>
                     <td>
                         {% if u.technical_role.value == 'admin' %}
-                        <span class="uk-badge" style="background:#1e87f0;">Admin</span>
+                        <span class="uk-badge uk-badge-primary">Admin</span>
                         {% elif u.technical_role.value == 'moderator' %}
-                        <span class="uk-badge" style="background:#faa05a;">Moderator</span>
+                        <span class="uk-badge uk-badge-secondary">Moderator</span>
                         {% else %}
                         <span class="uk-badge">Viewer</span>
                         {% endif %}
                     </td>
                     <td>
                         {% if u.is_active %}
-                        <span class="uk-badge" style="background:#32d296;">Active</span>
+                        <span class="uk-badge uk-badge-primary">Active</span>
                         {% else %}
-                        <span class="uk-badge" style="background:#f0506e;">Inactive</span>
+                        <span class="uk-badge uk-badge-destructive">Inactive</span>
                         {% endif %}
                     </td>
                     <td>{{ u.created_at.strftime('%Y-%m-%d') if u.created_at else "—" }}</td>
-                    <td>
-                        <a href="/users/{{ u.id }}/edit" class="uk-button uk-button-small uk-button-default" uk-tooltip="Edit">
-                            <span uk-icon="icon: pencil"></span>
+                    <td class="flex gap-1">
+                        <a href="/users/{{ u.id }}/edit" class="uk-btn uk-btn-default uk-btn-sm uk-btn-icon" uk-tooltip="Edit">
+                            <uk-icon icon="pencil" width="14" height="14"></uk-icon>
                         </a>
                         {% if u.is_active and u.id != user.id %}
-                        <form method="POST" action="/users/{{ u.id }}/deactivate" class="uk-display-inline"
-                              onsubmit="return confirm('Deactivate this user?')">
+                        <form method="POST" action="/users/{{ u.id }}/deactivate" class="inline" onsubmit="return confirm('Deactivate this user?')">
                             {{ csrf_field(csrf_token) }}
-                            <button type="submit" class="uk-button uk-button-small uk-button-danger" uk-tooltip="Deactivate">
-                                <span uk-icon="icon: ban"></span>
+                            <button type="submit" class="uk-btn uk-btn-destructive uk-btn-sm uk-btn-icon" uk-tooltip="Deactivate">
+                                <uk-icon icon="ban" width="14" height="14"></uk-icon>
                             </button>
                         </form>
                         {% endif %}
@@ -85,10 +79,10 @@
     </div>
 
     {% if not items %}
-    <div class="uk-alert-warning" uk-alert><p>No users found.</p></div>
+    <div class="uk-alert uk-alert-warning" uk-alert><p>No users found.</p></div>
     {% endif %}
 
-    <div class="uk-text-small uk-text-muted uk-margin-small-top">
+    <div class="text-sm text-muted-foreground mt-2">
         Showing {{ offset + 1 }}–{{ [offset + limit, total]|min }} of {{ total }}
     </div>
     {{ pagination(total, limit, offset, "/users", {"q": q, "technical_role": technical_role or ""}) }}

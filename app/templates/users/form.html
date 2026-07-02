@@ -5,12 +5,12 @@
 {% block title %}{{ "Edit" if user_obj else "New" }} User — StaffPlan{% endblock %}
 
 {% block content %}
-<div class="uk-card uk-card-default uk-card-body uk-margin" style="max-width:600px;">
-    <h2 class="uk-card-title">{{ "Edit User" if user_obj else "New User" }}</h2>
+<div class="uk-card uk-card-body uk-margin" style="max-width:600px;">
+    <h2 class="text-xl font-semibold">{{ "Edit User" if user_obj else "New User" }}</h2>
 
     {{ form_errors(errors) }}
 
-    <form method="POST" action="{{ action }}" class="uk-form-stacked">
+    <form method="POST" action="{{ action }}" class="space-y-4 mt-4">
         {{ csrf_field(csrf_token) }}
 
         {{ form_field("display_name", "Display Name", value=user_obj.display_name if user_obj else "", required=true, placeholder="Full name") }}
@@ -20,12 +20,11 @@
 
         {{ form_field("password", "Password" ~ (" (leave blank to keep current)" if user_obj else ""), type="password", required=not user_obj, placeholder="At least 8 characters") }}
 
-        <div class="uk-margin-top">
-            <button type="submit" class="uk-button uk-button-primary">
-                <span uk-icon="icon: check" class="uk-margin-small-right"></span>
-                {{ "Update" if user_obj else "Create" }} User
+        <div class="flex gap-2 mt-6 pt-4 border-t border-border">
+            <button type="submit" class="uk-btn uk-btn-primary">
+                <span uk-icon="icon: check; ratio: 0.8" class="mr-2"></span>{{ "Update" if user_obj else "Create" }} User
             </button>
-            <a href="/users" class="uk-button uk-button-default uk-margin-small-left">Cancel</a>
+            <a href="/users" class="uk-btn uk-btn-default">Cancel</a>
         </div>
     </form>
 </div>

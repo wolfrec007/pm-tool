@@ -5,69 +5,51 @@
 {% block title %}{{ "Edit" if member else "New" }} Team Member — StaffPlan{% endblock %}
 
 {% block content %}
-<div class="uk-card uk-card-default uk-card-body uk-margin" style="max-width:700px;">
-    <h2 class="uk-card-title">{{ "Edit Team Member" if member else "New Team Member" }}</h2>
+<div class="uk-card uk-card-body uk-margin" style="max-width:700px;">
+    <h2 class="text-xl font-semibold">{{ "Edit Team Member" if member else "New Team Member" }}</h2>
 
     {{ form_errors(errors) }}
 
-    <form method="POST" action="{{ action }}" class="uk-form-stacked">
+    <form method="POST" action="{{ action }}" class="space-y-4 mt-4">
         {{ csrf_field(csrf_token) }}
 
-        <div class="uk-grid-small uk-child-width-1-2@s" uk-grid>
-            <div>
-                {{ form_field("name", "Full Name", value=member.name if member else "", required=true) }}
-            </div>
-            <div>
-                {{ form_field("email", "Email", value=member.email if member else "", type="email", required=true) }}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {{ form_field("name", "Full Name", value=member.name if member else "", required=true) }}
+            {{ form_field("email", "Email", value=member.email if member else "", type="email", required=true) }}
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {{ form_field("employee_code", "Employee Code", value=member.employee_code if member else "", placeholder="Optional") }}
+            {{ select_field("business_role", "Business Role", ["partner","director","ca_manager","paid_assistant","staff","article","data_analyst"], value=member.business_role.value if member and member.business_role else "", required=true) }}
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {{ select_field("technical_role", "Technical Role", ["admin","moderator","viewer"], value=member.technical_role.value if member and member.technical_role else "viewer") }}
+            <div class="space-y-2">
+                <label class="uk-form-label">Oversight Only</label>
+                <label class="flex items-center gap-2 cursor-pointer mt-2">
+                    <input type="checkbox" name="is_oversight_only" value="true" class="uk-checkbox" {% if member and member.is_oversight_only %}checked{% endif %}>
+                    <span>Partner/Director (no billable work)</span>
+                </label>
             </div>
         </div>
 
-        <div class="uk-grid-small uk-child-width-1-2@s" uk-grid>
-            <div>
-                {{ form_field("employee_code", "Employee Code", value=member.employee_code if member else "", placeholder="Optional") }}
-            </div>
-            <div>
-                {{ select_field("business_role", "Business Role", ["partner","director","ca_manager","paid_assistant","staff","article","data_analyst"], value=member.business_role.value if member and member.business_role else "", required=true) }}
-            </div>
-        </div>
-
-        <div class="uk-grid-small uk-child-width-1-2@s" uk-grid>
-            <div>
-                {{ select_field("technical_role", "Technical Role", ["admin","moderator","viewer"], value=member.technical_role.value if member and member.technical_role else "viewer") }}
-            </div>
-            <div>
-                <div class="uk-margin">
-                    <label class="uk-form-label">Oversight Only</label>
-                    <div class="uk-form-controls">
-                        <label><input type="checkbox" name="is_oversight_only" value="true" class="uk-checkbox" {% if member and member.is_oversight_only %}checked{% endif %}> Partner/Director (no billable work)</label>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="uk-grid-small uk-child-width-1-2@s" uk-grid>
-            <div>
-                {{ form_field("seniority_level", "Seniority Level", value=member.seniority_level if member else "", placeholder="e.g. Senior, Junior") }}
-            </div>
-            <div>
-                {{ form_field("date_of_joining", "Date of Joining", value=member.date_of_joining if member else "", type="date") }}
-            </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {{ form_field("seniority_level", "Seniority Level", value=member.seniority_level if member else "", placeholder="e.g. Senior, Junior") }}
+            {{ form_field("date_of_joining", "Date of Joining", value=member.date_of_joining if member else "", type="date") }}
         </div>
 
         {% if member %}
-        <div class="uk-grid-small uk-child-width-1-2@s" uk-grid>
-            <div>
-                {{ form_field("date_of_relieving", "Date of Relieving", value=member.date_of_relieving if member else "", type="date") }}
-            </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {{ form_field("date_of_relieving", "Date of Relieving", value=member.date_of_relieving if member else "", type="date") }}
         </div>
         {% endif %}
 
-        <div class="uk-margin-top">
-            <button type="submit" class="uk-button uk-button-primary">
-                <span uk-icon="icon: check" class="uk-margin-small-right"></span>
-                {{ "Update" if member else "Create" }} Team Member
+        <div class="flex gap-2 mt-6 pt-4 border-t border-border">
+            <button type="submit" class="uk-btn uk-btn-primary">
+                <span uk-icon="icon: check; ratio: 0.8" class="mr-2"></span>{{ "Update" if member else "Create" }} Team Member
             </button>
-            <a href="/team-members" class="uk-button uk-button-default uk-margin-small-left">Cancel</a>
+            <a href="/team-members" class="uk-btn uk-btn-default">Cancel</a>
         </div>
     </form>
 </div>

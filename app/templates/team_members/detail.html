@@ -4,21 +4,20 @@
 {% block title %}{{ member.name }} — StaffPlan{% endblock %}
 
 {% block content %}
-<div class="uk-card uk-card-default uk-card-body uk-margin">
-    <div class="uk-flex uk-flex-between uk-flex-middle uk-margin-bottom">
+<div class="uk-card uk-card-body uk-margin">
+    <div class="flex items-center justify-between mb-4">
         <div>
-            <h2 class="uk-card-title uk-margin-remove">{{ member.name }}</h2>
-            <p class="uk-text-muted uk-text-small uk-margin-remove-top">{{ member.email }} · {{ member.business_role.value | replace('_', ' ') | title }}</p>
+            <h2 class="text-xl font-semibold">{{ member.name }}</h2>
+            <p class="text-sm text-muted-foreground mt-1">{{ member.email }} · {{ member.business_role.value | replace('_', ' ') | title }}</p>
         </div>
-        <div>
-            <a href="/team-members/{{ member.id }}/edit" class="uk-button uk-button-small uk-button-default">
-                <span uk-icon="icon: pencil" class="uk-margin-small-right"></span> Edit
+        <div class="flex gap-2">
+            <a href="/team-members/{{ member.id }}/edit" class="uk-btn uk-btn-default uk-btn-sm">
+                <span uk-icon="icon: pencil; ratio: 0.8" class="mr-1"></span> Edit
             </a>
             {% if member.is_active %}
-            <form method="POST" action="/team-members/{{ member.id }}/deactivate" class="uk-display-inline">
+            <form method="POST" action="/team-members/{{ member.id }}/deactivate" class="inline">
                 {{ csrf_field(csrf_token) }}
-                <button type="submit" class="uk-button uk-button-small uk-button-danger"
-                    onclick="return confirm('Deactivate {{ member.name }}?')">
+                <button type="submit" class="uk-btn uk-btn-destructive uk-btn-sm" onclick="return confirm('Deactivate {{ member.name }}?')">
                     Deactivate
                 </button>
             </form>
@@ -26,29 +25,29 @@
         </div>
     </div>
 
-    <div class="uk-grid-small uk-child-width-1-3@s" uk-grid>
-        <div><span class="uk-text-muted">Employee Code:</span> {{ member.employee_code or "—" }}</div>
-        <div><span class="uk-text-muted">Technical Role:</span> {{ member.technical_role.value }}</div>
-        <div><span class="uk-text-muted">Seniority:</span> {{ member.seniority_level or "—" }}</div>
-        <div><span class="uk-text-muted">Joined:</span> {{ member.date_of_joining or "—" }}</div>
-        <div><span class="uk-text-muted">Relieved:</span> {{ member.date_of_relieving or "—" }}</div>
-        <div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+        <div><span class="text-muted-foreground">Employee Code:</span> {{ member.employee_code or "—" }}</div>
+        <div><span class="text-muted-foreground">Technical Role:</span> {{ member.technical_role.value }}</div>
+        <div><span class="text-muted-foreground">Seniority:</span> {{ member.seniority_level or "—" }}</div>
+        <div><span class="text-muted-foreground">Joined:</span> {{ member.date_of_joining or "—" }}</div>
+        <div><span class="text-muted-foreground">Relieved:</span> {{ member.date_of_relieving or "—" }}</div>
+        <div class="flex gap-2 items-center flex-wrap">
             {% if member.is_active %}
-            <span class="uk-badge" style="background:#32d296;">Active</span>
+            <span class="uk-badge uk-badge-primary">Active</span>
             {% else %}
-            <span class="uk-badge" style="background:#f0506e;">Inactive</span>
+            <span class="uk-badge uk-badge-destructive">Inactive</span>
             {% endif %}
             {% if member.is_oversight_only %}
-            <span class="uk-badge uk-margin-small-left">Oversight Only</span>
+            <span class="uk-badge uk-badge-secondary">Oversight Only</span>
             {% endif %}
         </div>
     </div>
 </div>
 
 {% if assignments %}
-<div class="uk-card uk-card-default uk-card-body uk-margin">
-    <h3 class="uk-card-title">Assignments</h3>
-    <div class="uk-overflow-auto">
+<div class="uk-card uk-card-body uk-margin">
+    <h3 class="text-lg font-semibold mb-3">Assignments</h3>
+    <div class="overflow-auto">
         <table class="uk-table uk-table-hover uk-table-divider uk-table-small uk-table-striped">
             <thead>
                 <tr>
@@ -62,8 +61,8 @@
             </thead>
             <tbody>
                 {% for a in assignments %}
-                <tr>
-                    <td>{{ a.engagement_instance.engagement.name if a.engagement_instance and a.engagement_instance.engagement else "—" }}</td>
+                <tr class="hover:bg-muted/50 transition-colors">
+                    <td class="font-medium">{{ a.engagement_instance.engagement.name if a.engagement_instance and a.engagement_instance.engagement else "—" }}</td>
                     <td>{{ a.engagement_instance.period_label if a.engagement_instance else "—" }}</td>
                     <td>{{ a.role_on_engagement or "—" }}</td>
                     <td><span class="uk-badge">{{ a.allocation_percent }}%</span></td>
@@ -78,26 +77,26 @@
 {% endif %}
 
 {% if leaves_list %}
-<div class="uk-card uk-card-default uk-card-body uk-margin">
-    <h3 class="uk-card-title">Leave History</h3>
-    <div class="uk-overflow-auto">
+<div class="uk-card uk-card-body uk-margin">
+    <h3 class="text-lg font-semibold mb-3">Leave History</h3>
+    <div class="overflow-auto">
         <table class="uk-table uk-table-hover uk-table-divider uk-table-small uk-table-striped">
             <thead>
                 <tr><th>Type</th><th>Start</th><th>End</th><th>Status</th><th>Reason</th></tr>
             </thead>
             <tbody>
                 {% for l in leaves_list %}
-                <tr>
+                <tr class="hover:bg-muted/50 transition-colors">
                     <td>{{ l.leave_type.value }}</td>
                     <td>{{ l.start_date }}</td>
                     <td>{{ l.end_date }}</td>
                     <td>
                         {% if l.status.value == "approved" %}
-                        <span class="uk-badge" style="background:#32d296;">Approved</span>
+                        <span class="uk-badge uk-badge-primary">Approved</span>
                         {% elif l.status.value == "pending" %}
-                        <span class="uk-badge" style="background:#faa05a;">Pending</span>
+                        <span class="uk-badge uk-badge-secondary">Pending</span>
                         {% else %}
-                        <span class="uk-badge" style="background:#f0506e;">Rejected</span>
+                        <span class="uk-badge uk-badge-destructive">Rejected</span>
                         {% endif %}
                     </td>
                     <td>{{ l.reason or "—" }}</td>

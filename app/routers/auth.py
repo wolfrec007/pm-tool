@@ -48,10 +48,7 @@ def login_page(request: Request, error: str = ""):
 @router.post("/login")
 async def login(request: Request, db: Session = Depends(get_db)):
     form_data = await request.form()
-    form_token = form_data.get("csrf_token")
-    session_token = request.session.get("csrf_token")
-    print(f"DEBUG: form_token={form_token!r}, session_token={session_token!r}")
-    if not validate_csrf(request, form_token):
+    if not validate_csrf(request, form_data.get("csrf_token")):
         raise HTTPException(status_code=403, detail="Invalid CSRF token")
 
     email = form_data.get("email", "").strip().lower()
@@ -238,12 +235,27 @@ async def change_password(
 
 @router.get("/2fa-setup", response_class=HTMLResponse)
 def twofa_setup_page(request: Request, user=Depends(get_current_user)):
+    import qrcode
+    import io
+    import base64
+    
     secret = generate_totp_secret()
     uri = get_totp_uri(secret, user.email)
+    
+    # Generate QR code as base64 image
+    qr = qrcode.QRCode(version=1, box_size=10, border=2)
+    qr.add_data(uri)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="black", back_color="white")
+    
+    buffer = io.BytesIO()
+    img.save(buffer, format="PNG")
+    qr_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
+    
     return templates.TemplateResponse(request, "auth/2fa_setup.html", {
         "csrf_token": get_csrf_token(request),
         "secret": secret,
-        "totp_uri": uri,
+        "qr_base64": qr_base64,
         "error": "",
         "user": user,
     })
@@ -255,23 +267,36 @@ async def twofa_enable(
     db: Session = Depends(get_db),
     user=Depends(get_current_user),
 ):
+    import qrcode
+    import io
+    import base64
+    
     form_data = await request.form()
     if not validate_csrf(request, form_data.get("csrf_token")):
         raise HTTPException(status_code=403, detail="Invalid CSRF token")
 
-    secret = form_data.get("secret", "")
+    secret = form_data.get("secret", "").strip()
     code = form_data.get("code", "").strip()
 
     if enable_totp(db, user, secret, code):
         set_flash(request, "Two-factor authentication enabled.")
         return RedirectResponse(url="/", status_code=303)
 
+    # Regenerate QR for error case
     uri = get_totp_uri(secret, user.email)
+    qr = qrcode.QRCode(version=1, box_size=10, border=2)
+    qr.add_data(uri)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="black", back_color="white")
+    buffer = io.BytesIO()
+    img.save(buffer, format="PNG")
+    qr_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
+
     return templates.TemplateResponse(request, "auth/2fa_setup.html", {
         "csrf_token": get_csrf_token(request),
         "secret": secret,
-        "totp_uri": uri,
-        "error": "Invalid code. Make sure you entered the correct code from your authenticator.",
+        "qr_base64": qr_base64,
+        "error": "Invalid code. Make sure your authenticator time is synced and try again.",
         "user": user,
     })
 

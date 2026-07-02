@@ -4,91 +4,133 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}StaffPlan{% endblock %}</title>
-    <!-- UIkit CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.23.7/dist/css/uikit.min.css">
-    <!-- UIkit JS -->
-    <script src="https://cdn.jsdelivr.net/npm/uikit@3.23.7/dist/js/uikit.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/uikit@3.23.7/dist/js/uikit-icons.min.js"></script>
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://rsms.me/">
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    <!-- Franken UI CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/franken-ui@2.1.2/dist/css/core.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/franken-ui@2.1.2/dist/css/utilities.min.css">
+    <!-- Theme Setup -->
+    <script>
+        const htmlElement = document.documentElement;
+        const __FRANKEN__ = JSON.parse(localStorage.getItem("__FRANKEN__") || "{}");
+        if (__FRANKEN__.mode === "dark" || (!__FRANKEN__.mode && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+            htmlElement.classList.add("dark");
+        } else {
+            htmlElement.classList.remove("dark");
+        }
+        htmlElement.classList.add(__FRANKEN__.theme || "uk-theme-zinc");
+        htmlElement.classList.add(__FRANKEN__.radii || "uk-radii-md");
+        htmlElement.classList.add(__FRANKEN__.shadows || "uk-shadows-sm");
+        htmlElement.classList.add(__FRANKEN__.font || "uk-font-sm");
+    </script>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-        .uk-navbar-nav > li > a { font-size: 14px; }
-        .uk-logo { font-size: 20px !important; }
+        :root {
+            font-family: Inter, sans-serif;
+            font-feature-settings: "liga" 1, "calt" 1;
+        }
+        @supports (font-variation-settings: normal) {
+            :root { font-family: InterVariable, sans-serif; }
+        }
     </style>
     {% block extra_head %}{% endblock %}
 </head>
-<body>
+<body class="bg-background text-foreground min-h-screen">
+    <!-- Flash Messages (Top right, below navbar) -->
+    {% if request.session._flash %}
+    <div id="flash-message" class="fixed top-16 right-4 z-50" style="max-width: 350px;">
+        <div class="{% if request.session._flash.level == 'danger' %}uk-alert-destructive{% endif %} uk-alert" uk-alert>
+            <a class="uk-alert-close" uk-close></a>
+            <p>{{ request.session._flash.message }}</p>
+        </div>
+    </div>
+    <script>
+        setTimeout(function() {
+            var flash = document.getElementById('flash-message');
+            if (flash) {
+                flash.style.transition = 'opacity 0.5s';
+                flash.style.opacity = '0';
+                setTimeout(function() { flash.remove(); }, 500);
+            }
+        }, 20000);
+    </script>
+    {% endif %}
+
     <!-- Navbar -->
-    <nav class="uk-navbar-container uk-navbar-transparent" uk-navbar uk-sticky="sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky">
-        <div class="uk-container uk-container-expand">
-            <div class="uk-navbar-left">
-                <a href="/" class="uk-navbar-item uk-logo uk-text-bold">StaffPlan</a>
-            </div>
-            <div class="uk-navbar-center">
-                <ul class="uk-navbar-nav">
-                    <li{% if request.url.path.startswith("/team-members") %} class="uk-active"{% endif %}>
-                        <a href="/team-members">Team</a>
-                    </li>
-                    <li{% if request.url.path.startswith("/clients") %} class="uk-active"{% endif %}>
-                        <a href="/clients">Clients</a>
-                    </li>
-                    <li{% if request.url.path.startswith("/engagements") %} class="uk-active"{% endif %}>
-                        <a href="/engagements">Engagements</a>
-                    </li>
-                    <li{% if request.url.path.startswith("/assignments") %} class="uk-active"{% endif %}>
-                        <a href="/assignments">Assignments</a>
-                    </li>
-                    <li{% if request.url.path.startswith("/leaves") %} class="uk-active"{% endif %}>
-                        <a href="/leaves">Leaves</a>
-                    </li>
-                    <li{% if request.url.path.startswith("/dashboard") %} class="uk-active"{% endif %}>
-                        <a href="/dashboard/bench">Bench</a>
-                    </li>
-                    <li{% if request.url.path.startswith("/admin") %} class="uk-active"{% endif %}>
-                        <a href="/admin/settings">Settings</a>
-                    </li>
+    <nav class="bg-background border-b border-border sticky top-0" style="z-index: 100;">
+        <div class="uk-container uk-container-xlarge">
+            <div class="flex items-center justify-between h-14">
+                <!-- Logo -->
+                <a href="/" class="font-semibold text-lg text-foreground">StaffPlan</a>
+                
+                <!-- Navigation Links -->
+                <div class="hidden md:flex items-center gap-1">
+                    <a href="/dashboard" class="px-3 py-2 text-sm rounded-md transition-colors {% if request.url.path == '/dashboard' %}bg-primary text-primary-foreground{% else %}text-muted-foreground hover:text-foreground hover:bg-muted{% endif %}">Dashboard</a>
+                    <a href="/team-members" class="px-3 py-2 text-sm rounded-md transition-colors {% if request.url.path.startswith('/team-members') %}bg-primary text-primary-foreground{% else %}text-muted-foreground hover:text-foreground hover:bg-muted{% endif %}">Team</a>
+                    <a href="/clients" class="px-3 py-2 text-sm rounded-md transition-colors {% if request.url.path.startswith('/clients') %}bg-primary text-primary-foreground{% else %}text-muted-foreground hover:text-foreground hover:bg-muted{% endif %}">Clients</a>
+                    <a href="/engagements" class="px-3 py-2 text-sm rounded-md transition-colors {% if request.url.path.startswith('/engagements') %}bg-primary text-primary-foreground{% else %}text-muted-foreground hover:text-foreground hover:bg-muted{% endif %}">Engagements</a>
+                    <a href="/assignments" class="px-3 py-2 text-sm rounded-md transition-colors {% if request.url.path.startswith('/assignments') %}bg-primary text-primary-foreground{% else %}text-muted-foreground hover:text-foreground hover:bg-muted{% endif %}">Assignments</a>
+                    <a href="/leaves" class="px-3 py-2 text-sm rounded-md transition-colors {% if request.url.path.startswith('/leaves') %}bg-primary text-primary-foreground{% else %}text-muted-foreground hover:text-foreground hover:bg-muted{% endif %}">Leaves</a>
+                    <a href="/dashboard/bench" class="px-3 py-2 text-sm rounded-md transition-colors {% if request.url.path == '/dashboard/bench' %}bg-primary text-primary-foreground{% else %}text-muted-foreground hover:text-foreground hover:bg-muted{% endif %}">Bench</a>
                     {% if request.session.get("user_role") == "admin" %}
-                    <li{% if request.url.path.startswith("/users") %} class="uk-active"{% endif %}>
-                        <a href="/users">Users</a>
-                    </li>
-                    <li{% if request.url.path.startswith("/admin/outbox") %} class="uk-active"{% endif %}>
-                        <a href="/admin/outbox">Outbox</a>
-                    </li>
+                    <a href="/users" class="px-3 py-2 text-sm rounded-md transition-colors {% if request.url.path.startswith('/users') %}bg-primary text-primary-foreground{% else %}text-muted-foreground hover:text-foreground hover:bg-muted{% endif %}">Users</a>
+                    <a href="/admin/outbox" class="px-3 py-2 text-sm rounded-md transition-colors {% if request.url.path.startswith('/admin/outbox') %}bg-primary text-primary-foreground{% else %}text-muted-foreground hover:text-foreground hover:bg-muted{% endif %}">Outbox</a>
                     {% endif %}
-                </ul>
-            </div>
-            <div class="uk-navbar-right">
-                <ul class="uk-navbar-nav">
+                </div>
+                
+                <!-- User Menu -->
+                <div class="flex items-center gap-2">
                     {% if request.session.get("user_name") %}
-                    <li>
-                        <a href="#">{{ request.session.user_name }}</a>
-                        <div uk-dropdown>
-                            <ul class="uk-nav uk-dropdown-nav">
-                                <li class="uk-nav-header">{{ request.session.user_role | title }}</li>
-                                <li class="uk-nav-divider"></li>
-                                <li><a href="/auth/change-password">Change Password</a></li>
-                                <li><a href="/auth/2fa-setup">Setup 2FA</a></li>
-                                <li class="uk-nav-divider"></li>
-                                <li><a href="/auth/logout">Logout</a></li>
+                    <div class="relative" id="user-menu-container">
+                        <button id="user-menu-button" class="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-muted transition-colors">
+                            <span>{{ request.session.user_name }}</span>
+                            <span class="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">{{ request.session.user_role | title }}</span>
+                            <uk-icon icon="chevron-down" width="14" height="14"></uk-icon>
+                        </button>
+                        <div id="user-menu-dropdown" class="hidden absolute right-0 mt-1 w-48 bg-background border border-border rounded-md shadow-lg" style="z-index: 9999;">
+                            <ul class="py-1">
+                                <li><a href="/auth/change-password" class="block px-4 py-2 text-sm hover:bg-muted">Change Password</a></li>
+                                <li><a href="/auth/2fa-setup" class="block px-4 py-2 text-sm hover:bg-muted">Setup 2FA</a></li>
+                                <li><a href="/auth/2fa" class="block px-4 py-2 text-sm hover:bg-muted">Verify 2FA</a></li>
+                                <li class="border-t border-border my-1"></li>
+                                <li>
+                                    <a href="#" id="theme-toggle" class="flex items-center gap-2 px-4 py-2 text-sm hover:bg-muted">
+                                        <uk-icon icon="moon" width="14" height="14"></uk-icon>
+                                        <span id="theme-label">Dark Mode</span>
+                                    </a>
+                                </li>
+                                <li class="border-t border-border my-1"></li>
+                                <li><a href="/auth/logout" class="block px-4 py-2 text-sm text-destructive hover:bg-muted">Logout</a></li>
                             </ul>
                         </div>
-                    </li>
+                    </div>
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            var button = document.getElementById('user-menu-button');
+                            var dropdown = document.getElementById('user-menu-dropdown');
+                            var container = document.getElementById('user-menu-container');
+                            
+                            button.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                                dropdown.classList.toggle('hidden');
+                            });
+                            
+                            document.addEventListener('click', function(e) {
+                                if (!container.contains(e.target)) {
+                                    dropdown.classList.add('hidden');
+                                }
+                            });
+                        });
+                    </script>
                     {% else %}
-                    <li><a href="/auth/login">Login</a></li>
+                    <a href="/auth/login" class="uk-btn uk-btn-primary uk-btn-sm">Login</a>
                     {% endif %}
-                </ul>
+                </div>
             </div>
         </div>
     </nav>
 
     <main class="uk-container uk-container-xlarge uk-padding-small">
-        <!-- Flash Messages -->
-        {% if request.session._flash %}
-        <div class="uk-alert-{{ request.session._flash.level }}" uk-alert>
-            <a class="uk-alert-close" uk-close></a>
-            <p>{{ request.session._flash.message }}</p>
-        </div>
-        {% endif %}
-
         {% block content %}{% endblock %}
     </main>
 
@@ -97,5 +139,30 @@
             <p class="uk-text-small">StaffPlan &copy; 2026</p>
         </div>
     </footer>
+
+    <!-- Theme Toggle Script -->
+    <script>
+        document.getElementById('theme-toggle')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            const html = document.documentElement;
+            const isDark = html.classList.contains('dark');
+            const __FRANKEN__ = JSON.parse(localStorage.getItem('__FRANKEN__') || '{}');
+            
+            if (isDark) {
+                html.classList.remove('dark');
+                __FRANKEN__.mode = 'light';
+                document.getElementById('theme-label').textContent = 'Dark Mode';
+            } else {
+                html.classList.add('dark');
+                __FRANKEN__.mode = 'dark';
+                document.getElementById('theme-label').textContent = 'Light Mode';
+            }
+            localStorage.setItem('__FRANKEN__', JSON.stringify(__FRANKEN__));
+        });
+    </script>
+    <!-- Franken UI JS (load after DOM) -->
+    <script src="https://cdn.jsdelivr.net/npm/franken-ui@2.1.2/dist/js/core.iife.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/franken-ui@2.1.2/dist/js/icon.iife.js"></script>
+    {% block extra_scripts %}{% endblock %}
 </body>
 </html>

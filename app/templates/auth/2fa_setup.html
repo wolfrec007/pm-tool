@@ -4,49 +4,47 @@
 {% block title %}Setup 2FA — StaffPlan{% endblock %}
 
 {% block content %}
-<div class="uk-card uk-card-default uk-card-body uk-margin" style="max-width:500px;">
-    <h2 class="uk-card-title">Setup Two-Factor Authentication</h2>
+<div class="uk-card uk-card-body uk-margin" style="max-width:500px;">
+    <h2 class="text-xl font-semibold">Setup Two-Factor Authentication</h2>
 
     {% if error %}
-    <div class="uk-alert-danger" uk-alert><p>{{ error }}</p></div>
+    <div class="uk-alert uk-alert-destructive mt-4" uk-alert><p>{{ error }}</p></div>
     {% endif %}
 
-    <div class="uk-margin">
-        <p class="uk-text-small">1. Open your authenticator app (Google Authenticator, Authy, etc.) and scan this QR code or enter the secret manually.</p>
+    <div class="mt-4 space-y-4">
+        <p class="text-sm text-muted-foreground">1. Open your authenticator app (Google Authenticator, Microsoft Authenticator, Authy, etc.) and scan this QR code or enter the secret manually.</p>
 
-        <div class="uk-text-center uk-margin">
-            <div class="uk-background-muted uk-padding-small uk-display-inline-block uk-border-rounded">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ totp_uri | urlencode }}" alt="QR Code" width="200" height="200">
+        <div class="text-center">
+            <div class="inline-block bg-muted p-4 rounded-lg">
+                <img src="data:image/png;base64,{{ qr_base64 }}" alt="QR Code" width="200" height="200">
             </div>
         </div>
 
-        <div class="uk-text-center uk-margin-small-bottom">
-            <span class="uk-text-small uk-text-muted">Manual entry secret:</span>
-            <code class="uk-text-bold" style="font-size:1.1em; letter-spacing:0.15em;">{{ secret }}</code>
+        <div class="text-center space-y-1">
+            <span class="text-sm text-muted-foreground">Manual entry secret:</span>
+            <code class="block font-bold" style="font-size:1.1em; letter-spacing:0.15em;">{{ secret }}</code>
         </div>
     </div>
 
-    <form method="POST" action="/auth/2fa-setup" class="uk-form-stacked">
+    <form method="POST" action="/auth/2fa-setup" class="space-y-4 mt-6">
         {{ csrf_field(csrf_token) }}
         <input type="hidden" name="secret" value="{{ secret }}">
 
-        <p class="uk-text-small uk-margin">2. Enter the 6-digit code from your app to confirm setup:</p>
+        <p class="text-sm text-muted-foreground">2. Enter the 6-digit code from your app to confirm setup:</p>
 
-        <div class="uk-margin">
+        <div class="space-y-2">
             <label class="uk-form-label" for="code">Verification Code</label>
-            <div class="uk-form-controls">
-                <input type="text" name="code" id="code" class="uk-input uk-text-center"
-                       placeholder="000000" maxlength="6" pattern="[0-9]{6}"
-                       autocomplete="one-time-code" required autofocus
-                       style="font-size:1.3em; letter-spacing:0.3em;">
-            </div>
+            <input type="text" name="code" id="code" class="uk-input w-full text-center"
+                   placeholder="000000" maxlength="6" pattern="[0-9]{6}"
+                   autocomplete="one-time-code" required autofocus
+                   style="font-size:1.3em; letter-spacing:0.3em;">
         </div>
 
-        <div class="uk-margin-top">
-            <button type="submit" class="uk-button uk-button-primary">
-                <span uk-icon="icon: check" class="uk-margin-small-right"></span>Enable 2FA
+        <div class="flex gap-2 mt-6">
+            <button type="submit" class="uk-btn uk-btn-primary">
+                <span uk-icon="icon: check" class="mr-2"></span>Enable 2FA
             </button>
-            <a href="/" class="uk-button uk-button-default uk-margin-small-left">Cancel</a>
+            <a href="/" class="uk-btn uk-btn-default">Cancel</a>
         </div>
     </form>
 </div>

@@ -6,21 +6,20 @@
 {% block title %}Team Members — StaffPlan{% endblock %}
 
 {% block content %}
-<div class="uk-card uk-card-default uk-card-body uk-margin">
-    <div class="uk-flex uk-flex-between uk-flex-middle uk-margin-bottom">
-        <h2 class="uk-card-title uk-margin-remove">Team Members</h2>
-        <div>
+<div class="uk-card uk-card-body uk-margin">
+    <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-semibold">Team Members</h2>
+        <div class="flex gap-2">
             {% if user.technical_role.value in ["admin", "moderator"] %}
-            <a href="/team-members/new" class="uk-button uk-button-primary uk-button-small uk-margin-small-right">
-                <span uk-icon="icon: plus" class="uk-margin-small-right"></span>Add Member
+            <a href="/team-members/new" class="uk-btn uk-btn-primary uk-btn-sm">
+                <uk-icon icon="plus" width="14" height="14" class="mr-1"></uk-icon>Add Member
             </a>
             {% endif %}
-            <form method="POST" action="/team-members/bulk-upload" enctype="multipart/form-data" class="uk-display-inline">
+            <form method="POST" action="/team-members/bulk-upload" enctype="multipart/form-data" class="inline">
                 {{ csrf_field(csrf_token) }}
-                <label class="uk-button uk-button-small uk-button-default">
-                    <span uk-icon="icon: upload"></span> Upload CSV
-                    <input type="file" name="file" accept=".csv" hidden
-                        onchange="this.form.submit()">
+                <label class="uk-btn uk-btn-default uk-btn-sm cursor-pointer">
+                    <uk-icon icon="upload" width="14" height="14"></uk-icon> Upload CSV
+                    <input type="file" name="file" accept=".csv" hidden onchange="this.form.submit()">
                 </label>
             </form>
         </div>
@@ -28,7 +27,7 @@
 
     {{ search_bar("/team-members", placeholder="Search name, email, or code...", q=q, params={"is_active": is_active}) }}
 
-    <div class="uk-overflow-auto">
+    <div class="overflow-auto">
         <table class="uk-table uk-table-hover uk-table-divider uk-table-small uk-table-striped">
             <thead>
                 <tr>
@@ -43,21 +42,21 @@
             </thead>
             <tbody>
                 {% for member in items %}
-                <tr>
-                    <td>{{ member.name }}</td>
-                    <td>{{ member.email }}</td>
+                <tr class="hover:bg-muted/50 transition-colors">
+                    <td class="font-medium">{{ member.name }}</td>
+                    <td class="text-muted-foreground">{{ member.email }}</td>
                     <td>{{ member.employee_code or "—" }}</td>
                     <td><span class="uk-badge">{{ member.business_role.value if member.business_role else member.business_role }}</span></td>
                     <td>
                         {% if member.is_active %}
-                        <span class="uk-badge" style="background:#32d296;">Active</span>
+                        <span class="uk-badge uk-badge-primary">Active</span>
                         {% else %}
-                        <span class="uk-badge" style="background:#f0506e;">Inactive</span>
+                        <span class="uk-badge uk-badge-destructive">Inactive</span>
                         {% endif %}
                     </td>
                     <td>{{ member.date_of_joining or "—" }}</td>
                     <td>
-                        <a href="/team-members/{{ member.id }}" class="uk-button uk-button-small uk-button-default" uk-tooltip="View">View</a>
+                        <a href="/team-members/{{ member.id }}" class="uk-btn uk-btn-default uk-btn-sm" uk-tooltip="View">View</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -66,12 +65,12 @@
     </div>
 
     {% if not items %}
-    <div class="uk-alert-warning" uk-alert>
+    <div class="uk-alert" uk-alert>
         <p>No team members found.</p>
     </div>
     {% endif %}
 
-    <div class="uk-text-small uk-text-muted uk-margin-small-top">
+    <div class="text-sm text-muted-foreground mt-2">
         Showing {{ offset + 1 }}–{{ [offset + limit, total]|min }} of {{ total }}
     </div>
 

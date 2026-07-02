@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard — StaffPlan{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Page Header -->
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-semibold text-foreground">Dashboard</h1>
+            <p class="text-muted-foreground">Welcome back, {{ request.session.user_name }}!</p>
+        </div>
+        <div class="text-sm text-muted-foreground">
+            {{ today if today is defined else "" }}
+        </div>
+    </div>
+
+    <!-- Metrics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Team Members -->
+        <div class="uk-card uk-card-body">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-muted-foreground">Team Members</p>
+                    <p class="text-2xl font-bold text-foreground">{{ total_members }}</p>
+                </div>
+                <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <uk-icon icon="users" width="24" height="24" class="text-primary"></uk-icon>
+                </div>
+            </div>
+            <p class="text-xs text-muted-foreground mt-2">{{ total_admins }} admin(s)</p>
+        </div>
+
+        <!-- Active Engagements -->
+        <div class="uk-card uk-card-body">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-muted-foreground">Active Engagements</p>
+                    <p class="text-2xl font-bold text-foreground">{{ active_engagements }}</p>
+                </div>
+                <div class="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center">
+                    <uk-icon icon="briefcase" width="24" height="24" class="text-green-500"></uk-icon>
+                </div>
+            </div>
+            <p class="text-xs text-muted-foreground mt-2">{{ total_clients }} client(s)</p>
+        </div>
+
+        <!-- Current Assignments -->
+        <div class="uk-card uk-card-body">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-muted-foreground">Current Assignments</p>
+                    <p class="text-2xl font-bold text-foreground">{{ current_assignments }}</p>
+                </div>
+                <div class="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                    <uk-icon icon="calendar" width="24" height="24" class="text-blue-500"></uk-icon>
+                </div>
+            </div>
+            <p class="text-xs text-muted-foreground mt-2">{{ bench_count }} on bench</p>
+        </div>
+
+        <!-- Pending Leaves -->
+        <div class="uk-card uk-card-body">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-muted-foreground">Pending Leaves</p>
+                    <p class="text-2xl font-bold text-foreground">{{ pending_leaves }}</p>
+                </div>
+                <div class="w-12 h-12 rounded-lg bg-orange-500/10 flex items-center justify-center">
+                    <uk-icon icon="calendar-clock" width="24" height="24" class="text-orange-500"></uk-icon>
+                </div>
+            </div>
+            <p class="text-xs text-muted-foreground mt-2">{{ upcoming_leaves }} upcoming</p>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="uk-card uk-card-body">
+        <h2 class="text-lg font-semibold text-foreground mb-4">Quick Actions</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <a href="/team-members/new" class="uk-btn uk-btn-default flex flex-col items-center gap-2 py-6">
+                <uk-icon icon="user-plus" width="24" height="24"></uk-icon>
+                <span class="text-sm">Add Team Member</span>
+            </a>
+            <a href="/clients/new" class="uk-btn uk-btn-default flex flex-col items-center gap-2 py-6">
+                <uk-icon icon="building" width="24" height="24"></uk-icon>
+                <span class="text-sm">Add Client</span>
+            </a>
+            <a href="/engagements/new" class="uk-btn uk-btn-default flex flex-col items-center gap-2 py-6">
+                <uk-icon icon="folder-plus" width="24" height="24"></uk-icon>
+                <span class="text-sm">Add Engagement</span>
+            </a>
+            <a href="/assignments/new" class="uk-btn uk-btn-default flex flex-col items-center gap-2 py-6">
+                <uk-icon icon="link" width="24" height="24"></uk-icon>
+                <span class="text-sm">New Assignment</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Two Column Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Recent Assignments -->
+        <div class="uk-card uk-card-body">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-foreground">Recent Assignments</h2>
+                <a href="/assignments" class="text-sm text-primary hover:underline">View all</a>
+            </div>
+            {% if recent_assignments %}
+            <div class="space-y-3">
+                {% for assignment in recent_assignments %}
+                <div class="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                    <div>
+                        <p class="font-medium text-foreground">{{ assignment.team_member.name }}</p>
+                        <p class="text-sm text-muted-foreground">
+                            {{ assignment.engagement_instance.engagement.name if assignment.engagement_instance else "N/A" }}
+                            - {{ assignment.allocation_percent }}%
+                        </p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm text-muted-foreground">{{ assignment.start_date }}</p>
+                        <p class="text-xs text-muted-foreground">to {{ assignment.end_date }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted-foreground text-center py-8">No recent assignments</p>
+            {% endif %}
+        </div>
+
+        <!-- Bench Overview -->
+        <div class="uk-card uk-card-body">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-foreground">Bench Overview</h2>
+                <a href="/dashboard/bench" class="text-sm text-primary hover:underline">View all</a>
+            </div>
+            <div class="flex items-center justify-center py-8">
+                <div class="text-center">
+                    <div class="w-24 h-24 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+                        <span class="text-3xl font-bold text-foreground">{{ bench_count }}</span>
+                    </div>
+                    <p class="text-muted-foreground">Team members on bench</p>
+                    <p class="text-sm text-muted-foreground mt-1">Available for assignment</p>
+                </div>
+            </div>
+            <div class="flex gap-2 mt-4">
+                <a href="/assignments/new" class="uk-btn uk-btn-primary uk-btn-sm flex-1">Assign Staff</a>
+                <a href="/dashboard/bench" class="uk-btn uk-btn-default uk-btn-sm flex-1">View Bench</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

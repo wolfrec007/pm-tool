@@ -6,19 +6,19 @@
 {% block title %}Clients — StaffPlan{% endblock %}
 
 {% block content %}
-<div class="uk-card uk-card-default uk-card-body uk-margin">
-    <div class="uk-flex uk-flex-between uk-flex-middle uk-margin-bottom">
-        <h2 class="uk-card-title uk-margin-remove">Clients</h2>
+<div class="uk-card uk-card-body uk-margin">
+    <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-semibold">Clients</h2>
         {% if user.technical_role.value in ["admin", "moderator"] %}
-        <a href="/clients/new" class="uk-button uk-button-primary uk-button-small">
-            <span uk-icon="icon: plus" class="uk-margin-small-right"></span>Add Client
+        <a href="/clients/new" class="uk-btn uk-btn-primary uk-btn-sm">
+            <span uk-icon="icon: plus; ratio: 0.8" class="mr-1"></span>Add Client
         </a>
         {% endif %}
     </div>
 
     {{ search_bar("/clients", placeholder="Search name or code...", q=q, params={"is_active": is_active}) }}
 
-    <div class="uk-overflow-auto">
+    <div class="overflow-auto">
         <table class="uk-table uk-table-hover uk-table-divider uk-table-small uk-table-striped">
             <thead>
                 <tr>
@@ -34,29 +34,29 @@
             </thead>
             <tbody>
                 {% for client in items %}
-                <tr>
-                    <td>{{ client.name }}</td>
+                <tr class="hover:bg-muted/50 transition-colors">
+                    <td class="font-medium">{{ client.name }}</td>
                     <td>{{ client.code or "—" }}</td>
                     <td>{{ client.industry or "—" }}</td>
                     <td>
                         {% if client.is_active %}
-                        <span class="uk-badge" style="background:#32d296;">Active</span>
+                        <span class="uk-badge uk-badge-primary">Active</span>
                         {% else %}
-                        <span class="uk-badge" style="background:#f0506e;">Inactive</span>
+                        <span class="uk-badge uk-badge-destructive">Inactive</span>
                         {% endif %}
                     </td>
                     <td>{{ client.created_at.strftime('%Y-%m-%d') if client.created_at else "—" }}</td>
                     {% if user.technical_role.value in ["admin", "moderator"] %}
-                    <td>
-                        <a href="/clients/{{ client.id }}/edit" class="uk-button uk-button-small uk-button-default" uk-tooltip="Edit">
-                            <span uk-icon="icon: pencil"></span>
+                    <td class="flex gap-1">
+                        <a href="/clients/{{ client.id }}/edit" class="uk-btn uk-btn-default uk-btn-sm uk-btn-icon" uk-tooltip="Edit">
+                            <uk-icon icon="pencil" width="14" height="14"></uk-icon>
                         </a>
                         {% if user.technical_role.value == "admin" and client.is_active %}
-                        <form method="POST" action="/clients/{{ client.id }}/deactivate" class="uk-display-inline"
+                        <form method="POST" action="/clients/{{ client.id }}/deactivate" class="inline"
                               onsubmit="return confirm('Deactivate this client?')">
                             {{ csrf_field(csrf_token) }}
-                            <button type="submit" class="uk-button uk-button-small uk-button-danger" uk-tooltip="Deactivate">
-                                <span uk-icon="icon: ban"></span>
+                            <button type="submit" class="uk-btn uk-btn-destructive uk-btn-sm uk-btn-icon" uk-tooltip="Deactivate">
+                                <uk-icon icon="ban" width="14" height="14"></uk-icon>
                             </button>
                         </form>
                         {% endif %}
@@ -69,10 +69,10 @@
     </div>
 
     {% if not items %}
-    <div class="uk-alert-warning" uk-alert><p>No clients found.</p></div>
+    <div class="uk-alert uk-alert-warning" uk-alert><p>No clients found.</p></div>
     {% endif %}
 
-    <div class="uk-text-small uk-text-muted uk-margin-small-top">
+    <div class="text-sm text-muted-foreground mt-2">
         Showing {{ offset + 1 }}–{{ [offset + limit, total]|min }} of {{ total }}
     </div>
     {{ pagination(total, limit, offset, "/clients", {"q": q}) }}

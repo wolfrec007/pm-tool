@@ -5,24 +5,23 @@
 {% block title %}{{ "Edit" if client else "New" }} Client — StaffPlan{% endblock %}
 
 {% block content %}
-<div class="uk-card uk-card-default uk-card-body uk-margin" style="max-width:600px;">
-    <h2 class="uk-card-title">{{ "Edit Client" if client else "New Client" }}</h2>
+<div class="uk-card uk-card-body uk-margin" style="max-width:600px;">
+    <h2 class="text-xl font-semibold">{{ "Edit Client" if client else "New Client" }}</h2>
 
     {{ form_errors(errors) }}
 
-    <form method="POST" action="{{ action }}" class="uk-form-stacked">
+    <form method="POST" action="{{ action }}" class="space-y-4 mt-4">
         {{ csrf_field(csrf_token) }}
 
         {{ form_field("name", "Client Name", value=client.name if client else "", required=true) }}
         {{ form_field("code", "Client Code", value=client.code if client else "", placeholder="Optional unique code") }}
         {{ form_field("industry", "Industry", value=client.industry if client else "", placeholder="e.g. Manufacturing, IT") }}
 
-        <div class="uk-margin-top">
-            <button type="submit" class="uk-button uk-button-primary">
-                <span uk-icon="icon: check" class="uk-margin-small-right"></span>
-                {{ "Update" if client else "Create" }} Client
+        <div class="flex gap-2 mt-6 pt-4 border-t border-border">
+            <button type="submit" class="uk-btn uk-btn-primary">
+                <span uk-icon="icon: check; ratio: 0.8" class="mr-2"></span>{{ "Update" if client else "Create" }} Client
             </button>
-            <a href="/clients" class="uk-button uk-button-default uk-margin-small-left">Cancel</a>
+            <a href="/clients" class="uk-btn uk-btn-default">Cancel</a>
         </div>
     </form>
 </div>

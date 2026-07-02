@@ -5,67 +5,52 @@
 {% block title %}{{ "Edit" if assignment else "New" }} Assignment — StaffPlan{% endblock %}
 
 {% block content %}
-<div class="uk-card uk-card-default uk-card-body uk-margin" style="max-width:700px;">
-    <h2 class="uk-card-title">{{ "Edit Assignment" if assignment else "New Assignment" }}</h2>
+<div class="uk-card uk-card-body uk-margin" style="max-width:700px;">
+    <h2 class="text-xl font-semibold">{{ "Edit Assignment" if assignment else "New Assignment" }}</h2>
 
     {{ form_errors(errors) }}
 
-    <form method="POST" action="{{ action }}" class="uk-form-stacked">
+    <form method="POST" action="{{ action }}" class="space-y-4 mt-4">
         {{ csrf_field(csrf_token) }}
 
-        <div class="uk-grid-small uk-child-width-1-2@s" uk-grid>
-            <div>
-                <div class="uk-margin">
-                    <label class="uk-form-label" for="team_member_id">Team Member <span class="uk-text-danger">*</span></label>
-                    <div class="uk-form-controls">
-                        <select name="team_member_id" id="team_member_id" class="uk-select uk-form-small" required>
-                            <option value="">Select member...</option>
-                            {% for m in members %}
-                            <option value="{{ m.id }}" {% if assignment and assignment.team_member_id == m.id %}selected{% endif %}>{{ m.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="space-y-2">
+                <label class="uk-form-label" for="team_member_id">Team Member <span class="text-destructive">*</span></label>
+                <select name="team_member_id" id="team_member_id" class="uk-select w-full" required>
+                    <option value="">Select member...</option>
+                    {% for m in members %}
+                    <option value="{{ m.id }}" {% if assignment and assignment.team_member_id == m.id %}selected{% endif %}>{{ m.name }}</option>
+                    {% endfor %}
+                </select>
             </div>
-            <div>
-                <div class="uk-margin">
-                    <label class="uk-form-label" for="engagement_instance_id">Engagement Instance <span class="uk-text-danger">*</span></label>
-                    <div class="uk-form-controls">
-                        <select name="engagement_instance_id" id="engagement_instance_id" class="uk-select uk-form-small" required>
-                            <option value="">Select instance...</option>
-                            {% for inst in instances %}
-                            <option value="{{ inst.id }}" {% if assignment and assignment.engagement_instance_id == inst.id %}selected{% endif %}>{{ inst.period_label }} ({{ inst.engagement.name if inst.engagement else "—" }})</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
+            <div class="space-y-2">
+                <label class="uk-form-label" for="engagement_instance_id">Engagement Instance <span class="text-destructive">*</span></label>
+                <select name="engagement_instance_id" id="engagement_instance_id" class="uk-select w-full" required>
+                    <option value="">Select instance...</option>
+                    {% for inst in instances %}
+                    <option value="{{ inst.id }}" {% if assignment and assignment.engagement_instance_id == inst.id %}selected{% endif %}>{{ inst.period_label }} ({{ inst.engagement.name if inst.engagement else "—" }})</option>
+                    {% endfor %}
+                </select>
             </div>
         </div>
 
         {{ form_field("role_on_engagement", "Role on Engagement", value=assignment.role_on_engagement if assignment else "", placeholder="e.g. Lead, Reviewer") }}
 
-        <div class="uk-grid-small uk-child-width-1-3@s" uk-grid>
-            <div>
-                {{ form_field("allocation_percent", "Allocation %", value=assignment.allocation_percent if assignment else "", type="number", required=true, placeholder="1-100") }}
-            </div>
-            <div>
-                {{ form_field("start_date", "Start Date", value=assignment.start_date if assignment else "", type="date", required=true) }}
-            </div>
-            <div>
-                {{ form_field("end_date", "End Date", value=assignment.end_date if assignment else "", type="date", required=true) }}
-            </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {{ form_field("allocation_percent", "Allocation %", value=assignment.allocation_percent if assignment else "", type="number", required=true, placeholder="1-100") }}
+            {{ form_field("start_date", "Start Date", value=assignment.start_date if assignment else "", type="date", required=true) }}
+            {{ form_field("end_date", "End Date", value=assignment.end_date if assignment else "", type="date", required=true) }}
         </div>
 
-        <div class="uk-alert-warning uk-margin" uk-alert>
-            <p class="uk-text-small">Allocation will be validated: total across overlapping assignments cannot exceed 100%, and approved leave conflicts will be rejected.</p>
+        <div class="uk-alert uk-alert-warning" uk-alert>
+            <p class="text-sm">Allocation will be validated: total across overlapping assignments cannot exceed 100%, and approved leave conflicts will be rejected.</p>
         </div>
 
-        <div class="uk-margin-top">
-            <button type="submit" class="uk-button uk-button-primary">
-                <span uk-icon="icon: check" class="uk-margin-small-right"></span>
-                {{ "Update" if assignment else "Create" }} Assignment
+        <div class="flex gap-2 mt-6 pt-4 border-t border-border">
+            <button type="submit" class="uk-btn uk-btn-primary">
+                <span uk-icon="icon: check; ratio: 0.8" class="mr-2"></span>{{ "Update" if assignment else "Create" }} Assignment
             </button>
-            <a href="/assignments" class="uk-button uk-button-default uk-margin-small-left">Cancel</a>
+            <a href="/assignments" class="uk-btn uk-btn-default">Cancel</a>
         </div>
     </form>
 </div>

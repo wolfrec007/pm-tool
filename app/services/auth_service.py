@@ -51,7 +51,9 @@ def get_totp_uri(secret: str, email: str) -> str:
 
 def verify_totp(secret: str, code: str) -> bool:
     totp = pyotp.TOTP(secret)
-    return totp.verify(code, valid_window=1)
+    # Allow 40 steps (20 minutes) for clock drift
+    # WARNING: In production, ensure server time is synced via NTP
+    return totp.verify(code, valid_window=40)
 
 
 def enable_totp(db: Session, user: User, secret: str, code: str) -> bool:

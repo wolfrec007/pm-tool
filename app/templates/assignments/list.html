@@ -4,17 +4,17 @@
 {% block title %}Assignments — StaffPlan{% endblock %}
 
 {% block content %}
-<div class="uk-card uk-card-default uk-card-body uk-margin">
-    <div class="uk-flex uk-flex-between uk-flex-middle uk-margin-bottom">
-        <h2 class="uk-card-title uk-margin-remove">Assignments</h2>
+<div class="uk-card uk-card-body uk-margin">
+    <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-semibold">Assignments</h2>
         {% if user.technical_role.value in ["admin", "moderator"] %}
-        <a href="/assignments/new" class="uk-button uk-button-primary uk-button-small">
-            <span uk-icon="icon: plus" class="uk-margin-small-right"></span>Add Assignment
+        <a href="/assignments/new" class="uk-btn uk-btn-primary uk-btn-sm">
+            <span uk-icon="icon: plus; ratio: 0.8" class="mr-1"></span>Add Assignment
         </a>
         {% endif %}
     </div>
 
-    <div class="uk-overflow-auto">
+    <div class="overflow-auto">
         <table class="uk-table uk-table-hover uk-table-divider uk-table-small uk-table-striped">
             <thead>
                 <tr>
@@ -29,14 +29,14 @@
             </thead>
             <tbody>
                 {% for a in items %}
-                <tr>
-                    <td>{{ a.team_member.name if a.team_member else "—" }}</td>
+                <tr class="hover:bg-muted/50 transition-colors">
+                    <td class="font-medium">{{ a.team_member.name if a.team_member else "—" }}</td>
                     <td>{{ a.engagement_instance.engagement.name if a.engagement_instance and a.engagement_instance.engagement else "—" }}</td>
                     <td>{{ a.engagement_instance.period_label if a.engagement_instance else "—" }}</td>
                     <td>{{ a.role_on_engagement or "—" }}</td>
-                    <td>
-                        <progress class="uk-progress" value="{{ a.allocation_percent }}" max="100" style="width:100px;display:inline-block;vertical-align:middle;"></progress>
-                        <span class="uk-text-small uk-text-bold uk-margin-small-left">{{ a.allocation_percent }}%</span>
+                    <td class="flex items-center gap-2">
+                        <progress class="uk-progress flex-1" value="{{ a.allocation_percent }}" max="100"></progress>
+                        <span class="text-sm font-medium w-12 text-right">{{ a.allocation_percent }}%</span>
                     </td>
                     <td>{{ a.start_date }}</td>
                     <td>{{ a.end_date }}</td>
@@ -47,10 +47,10 @@
     </div>
 
     {% if not items %}
-    <div class="uk-alert-warning" uk-alert><p>No assignments found.</p></div>
+    <div class="uk-alert uk-alert-warning" uk-alert><p>No assignments found.</p></div>
     {% endif %}
 
-    <div class="uk-text-small uk-text-muted uk-margin-small-top">
+    <div class="text-sm text-muted-foreground mt-2">
         Showing {{ offset + 1 }}–{{ [offset + limit, total]|min }} of {{ total }}
     </div>
     {{ pagination(total, limit, offset, "/assignments") }}

@@ -3,37 +3,35 @@
 {% block title %}Admin Settings — StaffPlan{% endblock %}
 
 {% block content %}
-<div class="uk-card uk-card-default uk-card-body uk-margin" style="max-width:700px;">
-    <h2 class="uk-card-title">Admin Settings</h2>
+<div class="uk-card uk-card-body uk-margin" style="max-width:700px;">
+    <h2 class="text-xl font-semibold">Admin Settings</h2>
 
     {% if saved %}
-    <div class="uk-alert-success" uk-alert><p>Settings saved successfully.</p></div>
+    <div class="uk-alert uk-alert-success mt-4" uk-alert><p>Settings saved successfully.</p></div>
     {% endif %}
     {% if error %}
-    <div class="uk-alert-danger" uk-alert><p>{{ error }}</p></div>
+    <div class="uk-alert uk-alert-destructive mt-4" uk-alert><p>{{ error }}</p></div>
     {% endif %}
 
-    <form method="POST" action="/admin/settings" class="uk-form-stacked">
+    <form method="POST" action="/admin/settings" class="space-y-4 mt-4">
         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
 
         {% for setting in settings %}
-        <div class="uk-margin">
+        <div class="space-y-2">
             <label class="uk-form-label" for="{{ setting.key }}">
                 {{ setting.key | replace('_', ' ') | title }}
             </label>
-            <div class="uk-form-controls">
-                <input type="text" name="{{ setting.key }}" id="{{ setting.key }}"
-                    value="{{ setting.value }}" class="uk-input uk-form-small">
-            </div>
+            <input type="text" name="{{ setting.key }}" id="{{ setting.key }}"
+                value="{{ setting.value }}" class="uk-input w-full">
             {% if setting.description %}
-            <div class="uk-text-small uk-text-muted uk-margin-small-top">{{ setting.description }}</div>
+            <p class="text-sm text-muted-foreground mt-1">{{ setting.description }}</p>
             {% endif %}
         </div>
         {% endfor %}
 
-        <div class="uk-margin-top">
-            <button type="submit" class="uk-button uk-button-primary">
-                <span uk-icon="icon: check" class="uk-margin-small-right"></span> Save Settings
+        <div class="pt-4 border-t border-border mt-6">
+            <button type="submit" class="uk-btn uk-btn-primary">
+                <span uk-icon="icon: check; ratio: 0.8" class="mr-2"></span> Save Settings
             </button>
         </div>
     </form>

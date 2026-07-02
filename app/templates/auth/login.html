@@ -4,45 +4,89 @@
 {% block title %}Login — StaffPlan{% endblock %}
 
 {% block content %}
-<div class="uk-flex uk-flex-center uk-flex-middle" style="min-height:60vh;">
-    <div class="uk-card uk-card-default uk-card-body" style="width:400px;">
-        <h2 class="uk-card-title uk-text-center">Sign in to StaffPlan</h2>
-
-        {% if error %}
-        <div class="uk-alert-danger" uk-alert><p>{{ error }}</p></div>
-        {% endif %}
-
-        <form method="POST" action="/auth/login" class="uk-form-stacked">
-            {{ csrf_field(csrf_token) }}
-
-            <div class="uk-margin">
-                <label class="uk-form-label" for="email">Email</label>
-                <div class="uk-form-controls">
-                    <input type="email" name="email" id="email" class="uk-input" placeholder="you@company.com" required autofocus>
-                </div>
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 px-4 py-12">
+    <div class="w-full max-w-md">
+        <!-- Logo & Header -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary text-white text-2xl font-bold mb-4">
+                SP
             </div>
-
-            <div class="uk-margin">
-                <label class="uk-form-label" for="password">Password</label>
-                <div class="uk-form-controls">
-                    <input type="password" name="password" id="password" class="uk-input" placeholder="Your password" required>
-                </div>
-            </div>
-
-            <div class="uk-margin">
-                <button type="submit" class="uk-button uk-button-primary uk-width-1-1">Sign In</button>
-            </div>
-        </form>
-
-        {% if ms365_enabled %}
-        <div class="uk-text-center uk-margin">
-            <div class="uk-text-small uk-text-muted uk-margin-small-bottom">or</div>
-            <a href="/auth/ms365" class="uk-button uk-button-default uk-width-1-1">
-                <span uk-icon="icon: microsoft" class="uk-margin-small-right"></span>
-                Sign in with Microsoft 365
-            </a>
+            <h1 class="text-2xl font-semibold text-foreground">Welcome back</h1>
+            <p class="text-muted-foreground mt-1">Sign in to your StaffPlan account</p>
         </div>
-        {% endif %}
+
+        <!-- Login Card -->
+        <div class="uk-card uk-card-body">
+            {% if error %}
+            <div class="uk-alert uk-alert-destructive mb-6" uk-alert>
+                <div class="flex items-center gap-2">
+                    <uk-icon icon="alert-circle" width="16" height="16"></uk-icon>
+                    <span>{{ error }}</span>
+                </div>
+            </div>
+            {% endif %}
+
+            <form method="POST" action="/auth/login" class="space-y-5">
+                {{ csrf_field(csrf_token) }}
+
+                <div class="space-y-2">
+                    <label for="email" class="uk-form-label">Email</label>
+                    <input 
+                        type="email" 
+                        name="email" 
+                        id="email" 
+                        class="uk-input w-full"
+                        placeholder="you@company.com" 
+                        required 
+                        autofocus
+                    >
+                </div>
+
+                <div class="space-y-2">
+                    <label for="password" class="uk-form-label">Password</label>
+                    <input 
+                        type="password" 
+                        name="password" 
+                        id="password" 
+                        class="uk-input w-full"
+                        placeholder="Enter your password" 
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="uk-btn uk-btn-primary w-full">
+                    Sign In
+                </button>
+            </form>
+
+            {% if ms365_enabled %}
+            <div class="mt-6">
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-border"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-4 bg-background text-muted-foreground">or continue with</span>
+                    </div>
+                </div>
+
+                <a href="/auth/ms365" class="uk-btn uk-btn-default w-full mt-4 flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24">
+                        <path fill="#F25022" d="M1 1h10v10H1z"/>
+                        <path fill="#00A4EF" d="M1 13h10v10H1z"/>
+                        <path fill="#7FBA00" d="M13 1h10v10H13z"/>
+                        <path fill="#FFB900" d="M13 13h10v10H13z"/>
+                    </svg>
+                    Sign in with Microsoft 365
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Footer -->
+        <p class="text-center text-sm text-muted-foreground mt-6">
+            StaffPlan &copy; 2026
+        </p>
     </div>
 </div>
 {% endblock %}

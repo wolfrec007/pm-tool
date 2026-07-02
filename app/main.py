@@ -87,9 +87,14 @@ app.include_router(users.router)
 app.include_router(outbox.router)
 
 
+@app.get("/test")
+def test_page(request: Request):
+    return templates.TemplateResponse(request, "test.html")
+
+
 @app.get("/")
 def root():
-    return RedirectResponse(url="/team-members", status_code=303)
+    return RedirectResponse(url="/dashboard", status_code=303)
 
 
 # Global exception handlers
