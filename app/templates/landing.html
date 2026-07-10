@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StaffPlan — Resource Planning for CA Firms</title>
+    <link rel="preconnect" href="https://rsms.me/">
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/franken-ui@2.1.2/dist/css/core.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/franken-ui@2.1.2/dist/css/utilities.min.css">
+    <link rel="stylesheet" href="/static/custom-theme.css">
+    <script>
+        const htmlElement = document.documentElement;
+        const __FRANKEN__ = JSON.parse(localStorage.getItem("__FRANKEN__") || "{}");
+        if (__FRANKEN__.mode === "dark" || (!__FRANKEN__.mode && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+            htmlElement.classList.add("dark");
+        } else {
+            htmlElement.classList.remove("dark");
+        }
+        htmlElement.classList.add(__FRANKEN__.theme || "uk-theme-zinc");
+        htmlElement.classList.add(__FRANKEN__.radii || "uk-radii-md");
+        htmlElement.classList.add(__FRANKEN__.shadows || "uk-shadows-sm");
+        htmlElement.classList.add(__FRANKEN__.palette || "uk-palette-light-blue");
+    </script>
+    <style>
+        :root {
+            font-family: Inter, sans-serif;
+            font-feature-settings: "liga" 1, "calt" 1;
+        }
+        @supports (font-variation-settings: normal) {
+            :root { font-family: InterVariable, sans-serif; }
+        }
+        .hero-gradient {
+            background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 50%, hsl(var(--primary) / 0.6) 100%);
+        }
+        .feature-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -8px hsl(var(--primary) / 0.15);
+        }
+        .stat-card {
+            background: hsl(var(--card));
+            border: 1px solid hsl(var(--border));
+        }
+    </style>
+</head>
+<body class="bg-background text-foreground min-h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <nav class="bg-background/80 backdrop-blur-md border-b border-border sticky top-0" style="z-index: 100;">
+        <div class="uk-container uk-container-xlarge">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">SP</div>
+                    <span class="font-semibold text-lg text-foreground">StaffPlan</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <a href="/auth/login" class="uk-btn uk-btn-ghost uk-btn-sm">Sign In</a>
+                    <a href="/auth/login" class="uk-btn uk-btn-primary uk-btn-sm">Get Started</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-gradient text-primary-foreground py-20 px-4">
+        <div class="uk-container uk-container-xlarge text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/15 text-sm font-medium mb-6">
+                <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                Trusted by CA firms across India
+            </div>
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
+                Smart Resource Planning<br>
+                <span class="text-white/80">for Modern CA Firms</span>
+            </h1>
+            <p class="text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-10">
+                Allocate staff, track engagements, prevent over-allocation, and manage leave conflicts — all in one intuitive platform built for chartered accountant firms.
+            </p>
+            <div class="flex items-center justify-center gap-4">
+                <a href="/auth/login" class="uk-btn uk-btn-lg bg-white text-primary hover:bg-white/90 border-0 px-8">
+                    Start Free Trial
+                </a>
+                <a href="#features" class="uk-btn uk-btn-lg border border-white/30 text-white hover:bg-white/10 px-8">
+                    Learn More
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Bar -->
+    <section class="bg-background border-b border-border py-8 px-4">
+        <div class="uk-container uk-container-xlarge">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                <div>
+                    <div class="text-3xl font-bold text-primary">500+</div>
+                    <div class="text-sm text-muted-foreground mt-1">Team Members Managed</div>
+                </div>
+                <div>
+                    <div class="text-3xl font-bold text-primary">1,200+</div>
+                    <div class="text-sm text-muted-foreground mt-1">Engagements Tracked</div>
+                </div>
+                <div>
+                    <div class="text-3xl font-bold text-primary">99.9%</div>
+                    <div class="text-sm text-muted-foreground mt-1">Uptime Reliability</div>
+                </div>
+                <div>
+                    <div class="text-3xl font-bold text-primary">50+</div>
+                    <div class="text-sm text-muted-foreground mt-1">Firms Using StaffPlan</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 px-4 bg-background">
+        <div class="uk-container uk-container-xlarge">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-foreground mb-4">Everything You Need</h2>
+                <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
+                    Purpose-built for CA firms, StaffPlan handles the complexities of resource management so you can focus on what matters.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Feature 1 -->
+                <div class="feature-card uk-card uk-card-body uk-card-default p-6">
+                    <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                        <uk-icon icon="users" width="24" height="24" class="text-primary"></uk-icon>
+                    </div>
+                    <h3 class="text-lg font-semibold text-foreground mb-2">Team Management</h3>
+                    <p class="text-sm text-muted-foreground">
+                        Maintain a complete roster of partners, directors, managers, staff, and articles with roles, seniority, and availability tracking.
+                    </p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="feature-card uk-card uk-card-body uk-card-default p-6">
+                    <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                        <uk-icon icon="briefcase" width="24" height="24" class="text-primary"></uk-icon>
+                    </div>
+                    <h3 class="text-lg font-semibold text-foreground mb-2">Engagement Tracking</h3>
+                    <p class="text-sm text-muted-foreground">
+                        Manage audits, tax filings, consulting projects, and special assignments with recurrence patterns and instance-based scheduling.
+                    </p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="feature-card uk-card uk-card-body uk-card-default p-6">
+                    <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                        <uk-icon icon="git-branch" width="24" height="24" class="text-primary"></uk-icon>
+                    </div>
+                    <h3 class="text-lg font-semibold text-foreground mb-2">Smart Allocation</h3>
+                    <p class="text-sm text-muted-foreground">
+                        Assign staff to engagements with automatic over-allocation prevention. The system blocks conflicts before they happen.
+                    </p>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="feature-card uk-card uk-card-body uk-card-default p-6">
+                    <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                        <uk-icon icon="calendar" width="24" height="24" class="text-primary"></uk-icon>
+                    </div>
+                    <h3 class="text-lg font-semibold text-foreground mb-2">Leave Management</h3>
+                    <p class="text-sm text-muted-foreground">
+                        Track vacation, sick leave, and exam leave. Approved leaves automatically block conflicting assignments.
+                    </p>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="feature-card uk-card uk-card-body uk-card-default p-6">
+                    <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                        <uk-icon icon="layout-dashboard" width="24" height="24" class="text-primary"></uk-icon>
+                    </div>
+                    <h3 class="text-lg font-semibold text-foreground mb-2">Bench Dashboard</h3>
+                    <p class="text-sm text-muted-foreground">
+                        Instantly see who's on the bench now and who's rolling off soon. Configurable windows for proactive planning.
+                    </p>
+                </div>
+
+                <!-- Feature 6 -->
+                <div class="feature-card uk-card uk-card-body uk-card-default p-6">
+                    <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                        <uk-icon icon="shield" width="24" height="24" class="text-primary"></uk-icon>
+                    </div>
+                    <h3 class="text-lg font-semibold text-foreground mb-2">Role-Based Access</h3>
+                    <p class="text-sm text-muted-foreground">
+                        Admin, moderator, and viewer roles with Microsoft 365 SSO and two-factor authentication for enterprise security.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="py-20 px-4 bg-muted/30">
+        <div class="uk-container uk-container-xlarge">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-foreground mb-4">How It Works</h2>
+                <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
+                    Get started in minutes with a simple three-step process.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="text-center">
+                    <div class="w-16 h-16 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-2xl font-bold mx-auto mb-6">1</div>
+                    <h3 class="text-lg font-semibold text-foreground mb-2">Add Your Team</h3>
+                    <p class="text-sm text-muted-foreground">
+                        Import your team via CSV or add members individually. Set roles, seniority, and join dates.
+                    </p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-2xl font-bold mx-auto mb-6">2</div>
+                    <h3 class="text-lg font-semibold text-foreground mb-2">Create Engagements</h3>
+                    <p class="text-sm text-muted-foreground">
+                        Set up client engagements with recurrence patterns. Create instances for each period.
+                    </p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-2xl font-bold mx-auto mb-6">3</div>
+                    <h3 class="text-lg font-semibold text-foreground mb-2">Assign & Track</h3>
+                    <p class="text-sm text-muted-foreground">
+                        Allocate staff with smart conflict detection. Monitor utilization and bench status in real-time.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 px-4 bg-background">
+        <div class="uk-container uk-container-xlarge">
+            <div class="uk-card uk-card-body p-12 text-center bg-primary text-primary-foreground rounded-2xl">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Ready to Transform Your Resource Planning?</h2>
+                <p class="text-lg text-primary-foreground/80 max-w-2xl mx-auto mb-8">
+                    Join CA firms that have already streamlined their staffing operations with StaffPlan.
+                </p>
+                <a href="/auth/login" class="uk-btn uk-btn-lg bg-white text-primary hover:bg-white/90 border-0 px-10">
+                    Get Started Now
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-muted/50 border-t border-border py-12 px-4 mt-auto">
+        <div class="uk-container uk-container-xlarge">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold text-xs">SP</div>
+                        <span class="font-semibold text-foreground">StaffPlan</span>
+                    </div>
+                    <p class="text-sm text-muted-foreground">
+                        Smart resource planning for modern CA firms.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-foreground mb-3">Product</h4>
+                    <ul class="space-y-2 text-sm text-muted-foreground">
+                        <li><a href="#features" class="hover:text-foreground transition-colors">Features</a></li>
+                        <li><a href="#" class="hover:text-foreground transition-colors">Pricing</a></li>
+                        <li><a href="#" class="hover:text-foreground transition-colors">Documentation</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-foreground mb-3">Company</h4>
+                    <ul class="space-y-2 text-sm text-muted-foreground">
+                        <li><a href="#" class="hover:text-foreground transition-colors">About Us</a></li>
+                        <li><a href="#" class="hover:text-foreground transition-colors">Contact</a></li>
+                        <li><a href="#" class="hover:text-foreground transition-colors">Support</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-foreground mb-3">Legal</h4>
+                    <ul class="space-y-2 text-sm text-muted-foreground">
+                        <li><a href="#" class="hover:text-foreground transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-foreground transition-colors">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-border mt-8 pt-8 text-center text-sm text-muted-foreground">
+                <p>StaffPlan &copy; 2026 PKF Sridhar & Santhanam LLP. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/franken-ui@2.1.2/dist/js/core.iife.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/franken-ui@2.1.2/dist/js/icon.iife.js"></script>
+</body>
+</html>

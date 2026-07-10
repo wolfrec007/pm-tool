@@ -98,8 +98,8 @@ def test_page(request: Request):
 
 
 @app.get("/")
-def root():
-    return RedirectResponse(url="/dashboard", status_code=303)
+def root(request: Request):
+    return templates.TemplateResponse(request, "landing.html")
 
 
 # Global exception handlers
@@ -141,6 +141,8 @@ def validation_handler(request: Request, exc: ValidationError):
 
 @app.exception_handler(HTTPException)
 def http_exception_handler(request: Request, exc: HTTPException):
+    if exc.status_code == 401 and "text/html" in request.headers.get("accept", ""):
+        return RedirectResponse(url="/auth/login", status_code=303)
     if "text/html" in request.headers.get("accept", ""):
         return templates.TemplateResponse(request, "errors/error.html", {
             "status_code": exc.status_code, "detail": exc.detail,
