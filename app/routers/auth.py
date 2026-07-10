@@ -1,5 +1,6 @@
 """Auth router — password login, 2FA, MS365 OAuth, password change."""
 
+import logging
 from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.orm import Session
@@ -21,6 +22,8 @@ from app.services.auth_service import (
     verify_totp,
 )
 from app.templates_setup import templates
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -133,25 +136,57 @@ async def ms365_login(request: Request):
 async def ms365_callback(request: Request, db: Session = Depends(get_db)):
     ms365 = get_ms365_oauth_client()
     if not ms365:
+        logger.error("MS365 OAuth callback called but OAuth is not configured")
         raise HTTPException(status_code=501, detail="MS365 OAuth not configured")
 
-    token = await ms365.authorize_access_token(request)
+    try:
+        token = await ms365.authorize_access_token(request)
+    except Exception as e:
+        logger.error(f"MS365 OAuth token exchange failed: {e}")
+        return templates.TemplateResponse(request, "auth/login.html", {
+            "csrf_token": get_csrf_token(request),
+            "error": "Authentication failed. Please try again.",
+            "ms365_enabled": True,
+        })
+
+    if not token:
+        logger.warning("MS365 OAuth returned empty token")
+        return templates.TemplateResponse(request, "auth/login.html", {
+            "csrf_token": get_csrf_token(request),
+            "error": "Authentication failed. Please try again.",
+            "ms365_enabled": True,
+        })
+
     claims = token.get("userinfo") or {}
     if not claims:
         # Fetch user info manually if not in token
-        resp = await ms365.get("https://graph.microsoft.com/v1.0/me", token=token)
-        if resp.status_code == 200:
-            profile = resp.json()
-            claims = {
-                "oid": profile.get("id"),
-                "email": profile.get("mail") or profile.get("userPrincipalName"),
-                "name": profile.get("displayName"),
-            }
+        try:
+            resp = await ms365.get("https://graph.microsoft.com/v1.0/me", token=token)
+            if resp.status_code == 200:
+                profile = resp.json()
+                claims = {
+                    "oid": profile.get("id"),
+                    "email": profile.get("mail") or profile.get("userPrincipalName"),
+                    "name": profile.get("displayName"),
+                }
+            else:
+                logger.warning(f"MS365 Graph API returned status {resp.status_code}")
+        except Exception as e:
+            logger.error(f"Failed to fetch user info from MS365 Graph API: {e}")
+
+    if not claims or not (claims.get("oid") or claims.get("email")):
+        logger.warning(f"MS365 OAuth returned insufficient claims: {claims}")
+        return templates.TemplateResponse(request, "auth/login.html", {
+            "csrf_token": get_csrf_token(request),
+            "error": "Could not retrieve user information from Microsoft. Please try again.",
+            "ms365_enabled": True,
+        })
 
     from app.services.auth_service import find_or_create_oauth_user
 
     user = find_or_create_oauth_user(db, claims)
     if not user:
+        logger.warning(f"MS365 OAuth: could not find or create user for claims: {claims}")
         return templates.TemplateResponse(request, "auth/login.html", {
             "csrf_token": get_csrf_token(request),
             "error": "Could not find or create user from MS365 account",
@@ -159,11 +194,14 @@ async def ms365_callback(request: Request, db: Session = Depends(get_db)):
         })
 
     if not user.is_active:
+        logger.info(f"MS365 OAuth: deactivated user attempted login: {user.email}")
         return templates.TemplateResponse(request, "auth/login.html", {
             "csrf_token": get_csrf_token(request),
             "error": "Your account has been deactivated",
             "ms365_enabled": True,
         })
+
+    logger.info(f"MS365 OAuth: successful login for user {user.email} (ID: {user.id})")
 
     # 2FA check for OAuth users too
     if user.totp_enabled:

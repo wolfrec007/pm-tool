@@ -1,5 +1,6 @@
 """Auth service — password hashing, TOTP 2FA, MS365 OAuth."""
 
+import logging
 import secrets
 from typing import Optional
 
@@ -9,6 +10,8 @@ from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.models.models import User
+
+logger = logging.getLogger(__name__)
 
 
 # ── Password ──
@@ -74,11 +77,18 @@ def disable_totp(db: Session, user: User) -> None:
 
 # ── MS365 OAuth ──
 
+_ms365_client = None
+
+
 def get_ms365_oauth_client():
-    """Create an OAuth client for Microsoft 365 / Entra ID.
+    """Get cached OAuth client for Microsoft 365 / Entra ID.
 
     Returns None if OAuth is not configured.
     """
+    global _ms365_client
+    if _ms365_client is not None:
+        return _ms365_client
+
     if not settings.MS365_CLIENT_ID or not settings.MS365_CLIENT_SECRET:
         return None
 
@@ -95,7 +105,8 @@ def get_ms365_oauth_client():
         ),
         client_kwargs={"scope": "openid email profile"},
     )
-    return oauth.microsoft
+    _ms365_client = oauth.microsoft
+    return _ms365_client
 
 
 def find_or_create_oauth_user(db: Session, claims: dict) -> Optional[User]:
@@ -107,6 +118,7 @@ def find_or_create_oauth_user(db: Session, claims: dict) -> Optional[User]:
     if oid:
         user = db.query(User).filter(User.azure_oid == oid).first()
         if user:
+            logger.debug(f"Found user by azure_oid: {user.email} (ID: {user.id})")
             return user
 
     # Try by email
@@ -117,6 +129,7 @@ def find_or_create_oauth_user(db: Session, claims: dict) -> Optional[User]:
             if oid and not user.azure_oid:
                 user.azure_oid = oid
                 db.commit()
+                logger.info(f"Linked azure_oid to existing user: {user.email} (ID: {user.id})")
             return user
 
     # Create new user if email present
@@ -131,6 +144,8 @@ def find_or_create_oauth_user(db: Session, claims: dict) -> Optional[User]:
         db.add(user)
         db.commit()
         db.refresh(user)
+        logger.info(f"Created new user from OAuth: {user.email} (ID: {user.id}, role: {user.technical_role})")
         return user
 
+    logger.warning(f"Could not find or create user from claims: {claims}")
     return None

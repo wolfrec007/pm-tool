@@ -10,6 +10,8 @@
     <!-- Franken UI CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/franken-ui@2.1.2/dist/css/core.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/franken-ui@2.1.2/dist/css/utilities.min.css">
+    <!-- Custom Theme Overrides -->
+    <link rel="stylesheet" href="/static/custom-theme.css">
     <!-- Theme Setup -->
     <script>
         const htmlElement = document.documentElement;
@@ -22,7 +24,7 @@
         htmlElement.classList.add(__FRANKEN__.theme || "uk-theme-zinc");
         htmlElement.classList.add(__FRANKEN__.radii || "uk-radii-md");
         htmlElement.classList.add(__FRANKEN__.shadows || "uk-shadows-sm");
-        htmlElement.classList.add(__FRANKEN__.font || "uk-font-sm");
+        htmlElement.classList.add(__FRANKEN__.palette || "uk-palette-light-blue");
     </script>
     <style>
         :root {
@@ -75,6 +77,7 @@
                     {% if request.session.get("user_role") == "admin" %}
                     <a href="/users" class="px-3 py-2 text-sm rounded-md transition-colors {% if request.url.path.startswith('/users') %}bg-primary text-primary-foreground{% else %}text-muted-foreground hover:text-foreground hover:bg-muted{% endif %}">Users</a>
                     <a href="/admin/outbox" class="px-3 py-2 text-sm rounded-md transition-colors {% if request.url.path.startswith('/admin/outbox') %}bg-primary text-primary-foreground{% else %}text-muted-foreground hover:text-foreground hover:bg-muted{% endif %}">Outbox</a>
+                    <a href="/admin/settings" class="px-3 py-2 text-sm rounded-md transition-colors {% if request.url.path.startswith('/admin/settings') %}bg-primary text-primary-foreground{% else %}text-muted-foreground hover:text-foreground hover:bg-muted{% endif %}">Settings</a>
                     {% endif %}
                 </div>
                 
@@ -99,6 +102,13 @@
                                         <span id="theme-label">Dark Mode</span>
                                     </a>
                                 </li>
+                                <li class="border-t border-border my-1"></li>
+                                <li class="px-4 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Theme Color</li>
+                                <li><a href="#" class="palette-option flex items-center gap-2 px-4 py-2 text-sm hover:bg-muted" data-palette="uk-palette-light-blue"><span class="inline-block w-3 h-3 rounded-full" style="background:hsl(188 42% 44%)"></span>Light Blue</a></li>
+                                <li><a href="#" class="palette-option flex items-center gap-2 px-4 py-2 text-sm hover:bg-muted" data-palette="uk-palette-frozen-water"><span class="inline-block w-3 h-3 rounded-full" style="background:hsl(157 50% 38%)"></span>Frozen Water</a></li>
+                                <li><a href="#" class="palette-option flex items-center gap-2 px-4 py-2 text-sm hover:bg-muted" data-palette="uk-palette-warm-teal"><span class="inline-block w-3 h-3 rounded-full" style="background:hsl(170 50% 34%)"></span>Warm Teal</a></li>
+                                <li><a href="#" class="palette-option flex items-center gap-2 px-4 py-2 text-sm hover:bg-muted" data-palette="uk-palette-slate-indigo"><span class="inline-block w-3 h-3 rounded-full" style="background:hsl(235 58% 48%)"></span>Slate Indigo</a></li>
+                                <li><a href="#" class="palette-option flex items-center gap-2 px-4 py-2 text-sm hover:bg-muted" data-palette="uk-palette-zinc"><span class="inline-block w-3 h-3 rounded-full" style="background:hsl(240 5.9% 10%)"></span>Zinc</a></li>
                                 <li class="border-t border-border my-1"></li>
                                 <li><a href="/auth/logout" class="block px-4 py-2 text-sm text-destructive hover:bg-muted">Logout</a></li>
                             </ul>
@@ -158,6 +168,25 @@
                 document.getElementById('theme-label').textContent = 'Light Mode';
             }
             localStorage.setItem('__FRANKEN__', JSON.stringify(__FRANKEN__));
+        });
+
+        document.querySelectorAll('.palette-option').forEach(function(el) {
+            el.addEventListener('click', function(e) {
+                e.preventDefault();
+                var palette = this.dataset.palette;
+                var html = document.documentElement;
+                html.classList.remove(
+                    'uk-palette-light-blue',
+                    'uk-palette-frozen-water',
+                    'uk-palette-warm-teal',
+                    'uk-palette-slate-indigo',
+                    'uk-palette-zinc'
+                );
+                html.classList.add(palette);
+                var __FRANKEN__ = JSON.parse(localStorage.getItem('__FRANKEN__') || '{}');
+                __FRANKEN__.palette = palette;
+                localStorage.setItem('__FRANKEN__', JSON.stringify(__FRANKEN__));
+            });
         });
     </script>
     <!-- Franken UI JS (load after DOM) -->

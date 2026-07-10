@@ -1,0 +1,827 @@
+/*
+ * StaffPlan — FrankenUI Theme Overrides
+ * Four palettes with full semantic color roles.
+ * Each palette includes status, role, and domain colors that shift with the palette.
+ */
+
+/* ============================================================
+   LIGHT BLUE  (hue ~188 — soft professional teal-blue)
+   ============================================================ */
+:root.uk-palette-light-blue {
+  --background: 188 20% 97.5%;
+  --foreground: 188 40% 8%;
+  --card: 188 25% 99%;
+  --card-foreground: 188 40% 8%;
+  --popover: 188 25% 100%;
+  --popover-foreground: 188 40% 8%;
+  --primary: 188 42% 44%;
+  --primary-foreground: 188 40% 97%;
+  --secondary: 188 20% 93%;
+  --secondary-foreground: 188 30% 18%;
+  --muted: 188 16% 93%;
+  --muted-foreground: 188 10% 42%;
+  --accent: 188 20% 91%;
+  --accent-foreground: 188 30% 18%;
+  --destructive: 357 85% 48%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 188 16% 87%;
+  --input: 188 16% 87%;
+  --ring: 188 42% 55%;
+  --chart-1: 188 42% 44%;
+  --chart-2: 188 42% 55%;
+  --chart-3: 188 35% 65%;
+  --chart-4: 188 30% 75%;
+  --chart-5: 188 25% 85%;
+
+  /* Status colors — tinted toward primary hue */
+  --success: 170 45% 42%;
+  --success-muted: 170 35% 90%;
+  --success-foreground: 170 40% 15%;
+  --warning: 38 90% 52%;
+  --warning-muted: 38 80% 92%;
+  --warning-foreground: 30 60% 22%;
+  --info: 188 50% 48%;
+  --info-muted: 188 40% 92%;
+  --info-foreground: 188 40% 18%;
+  --error-muted: 0 65% 92%;
+  --error-foreground: 0 65% 30%;
+
+  /* Domain role colors */
+  --role-partner: 200 50% 40%;
+  --role-partner-muted: 200 40% 90%;
+  --role-director: 210 48% 42%;
+  --role-director-muted: 210 38% 90%;
+  --role-manager: 30 65% 42%;
+  --role-manager-muted: 30 55% 90%;
+  --role-staff: 340 55% 42%;
+  --role-staff-muted: 340 45% 92%;
+  --role-article: 260 50% 45%;
+  --role-article-muted: 260 40% 92%;
+}
+.dark.uk-palette-light-blue {
+  --background: 188 35% 4.5%;
+  --foreground: 188 20% 94%;
+  --card: 188 28% 9.5%;
+  --card-foreground: 188 20% 94%;
+  --popover: 188 28% 12%;
+  --popover-foreground: 188 20% 94%;
+  --primary: 188 42% 58%;
+  --primary-foreground: 188 40% 6%;
+  --secondary: 188 18% 14%;
+  --secondary-foreground: 188 20% 88%;
+  --muted: 188 15% 14%;
+  --muted-foreground: 188 10% 55%;
+  --accent: 188 18% 18%;
+  --accent-foreground: 188 20% 94%;
+  --destructive: 357 85% 55%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 188 15% 16%;
+  --input: 188 15% 16%;
+  --ring: 188 42% 44%;
+  --chart-1: 188 42% 58%;
+  --chart-2: 188 42% 44%;
+  --chart-3: 188 35% 35%;
+  --chart-4: 188 30% 25%;
+  --chart-5: 188 25% 18%;
+
+  --success: 170 45% 50%;
+  --success-muted: 170 30% 14%;
+  --success-foreground: 170 35% 78%;
+  --warning: 38 85% 58%;
+  --warning-muted: 38 50% 14%;
+  --warning-foreground: 38 70% 78%;
+  --info: 188 45% 55%;
+  --info-muted: 188 30% 14%;
+  --info-foreground: 188 35% 78%;
+  --error-muted: 0 45% 14%;
+  --error-foreground: 0 60% 75%;
+
+  --role-partner: 200 50% 55%;
+  --role-partner-muted: 200 30% 14%;
+  --role-director: 210 48% 55%;
+  --role-director-muted: 210 28% 14%;
+  --role-manager: 30 60% 55%;
+  --role-manager-muted: 30 35% 14%;
+  --role-staff: 340 50% 55%;
+  --role-staff-muted: 340 30% 14%;
+  --role-article: 260 50% 55%;
+  --role-article-muted: 260 30% 14%;
+}
+
+/* ============================================================
+   FROZEN WATER  (hue ~157 — fresh mint green)
+   ============================================================ */
+:root.uk-palette-frozen-water {
+  --background: 157 22% 97.5%;
+  --foreground: 157 50% 7%;
+  --card: 157 28% 99%;
+  --card-foreground: 157 50% 7%;
+  --popover: 157 28% 100%;
+  --popover-foreground: 157 50% 7%;
+  --primary: 157 50% 38%;
+  --primary-foreground: 157 40% 97%;
+  --secondary: 157 20% 93%;
+  --secondary-foreground: 157 35% 18%;
+  --muted: 157 18% 93%;
+  --muted-foreground: 157 12% 42%;
+  --accent: 157 20% 91%;
+  --accent-foreground: 157 35% 18%;
+  --destructive: 357 85% 48%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 157 18% 87%;
+  --input: 157 18% 87%;
+  --ring: 157 50% 50%;
+  --chart-1: 157 50% 38%;
+  --chart-2: 157 50% 50%;
+  --chart-3: 157 40% 60%;
+  --chart-4: 157 35% 72%;
+  --chart-5: 157 28% 82%;
+
+  --success: 155 48% 38%;
+  --success-muted: 155 38% 90%;
+  --success-foreground: 155 40% 15%;
+  --warning: 38 90% 52%;
+  --warning-muted: 38 80% 92%;
+  --warning-foreground: 30 60% 22%;
+  --info: 157 55% 42%;
+  --info-muted: 157 40% 90%;
+  --info-foreground: 157 40% 18%;
+  --error-muted: 0 65% 92%;
+  --error-foreground: 0 65% 30%;
+
+  --role-partner: 180 45% 38%;
+  --role-partner-muted: 180 35% 90%;
+  --role-director: 190 45% 40%;
+  --role-director-muted: 190 35% 90%;
+  --role-manager: 45 55% 42%;
+  --role-manager-muted: 45 45% 90%;
+  --role-staff: 330 50% 42%;
+  --role-staff-muted: 330 40% 92%;
+  --role-article: 270 45% 45%;
+  --role-article-muted: 270 35% 92%;
+}
+.dark.uk-palette-frozen-water {
+  --background: 157 38% 4.5%;
+  --foreground: 157 22% 94%;
+  --card: 157 30% 9.5%;
+  --card-foreground: 157 22% 94%;
+  --popover: 157 30% 12%;
+  --popover-foreground: 157 22% 94%;
+  --primary: 157 48% 52%;
+  --primary-foreground: 157 40% 6%;
+  --secondary: 157 20% 14%;
+  --secondary-foreground: 157 22% 88%;
+  --muted: 157 16% 14%;
+  --muted-foreground: 157 12% 55%;
+  --accent: 157 20% 18%;
+  --accent-foreground: 157 22% 94%;
+  --destructive: 357 85% 55%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 157 16% 16%;
+  --input: 157 16% 16%;
+  --ring: 157 50% 38%;
+  --chart-1: 157 48% 52%;
+  --chart-2: 157 50% 38%;
+  --chart-3: 157 40% 30%;
+  --chart-4: 157 35% 22%;
+  --chart-5: 157 28% 16%;
+
+  --success: 155 45% 50%;
+  --success-muted: 155 30% 14%;
+  --success-foreground: 155 35% 78%;
+  --warning: 38 85% 58%;
+  --warning-muted: 38 50% 14%;
+  --warning-foreground: 38 70% 78%;
+  --info: 157 50% 55%;
+  --info-muted: 157 30% 14%;
+  --info-foreground: 157 35% 78%;
+  --error-muted: 0 45% 14%;
+  --error-foreground: 0 60% 75%;
+
+  --role-partner: 180 45% 55%;
+  --role-partner-muted: 180 30% 14%;
+  --role-director: 190 45% 55%;
+  --role-director-muted: 190 30% 14%;
+  --role-manager: 45 50% 55%;
+  --role-manager-muted: 45 30% 14%;
+  --role-staff: 330 45% 55%;
+  --role-staff-muted: 330 30% 14%;
+  --role-article: 270 45% 55%;
+  --role-article-muted: 270 30% 14%;
+}
+
+/* ============================================================
+   WARM TEAL  (hue ~170 — warm professional teal)
+   ============================================================ */
+:root.uk-palette-warm-teal {
+  --background: 170 22% 97.5%;
+  --foreground: 170 35% 7%;
+  --card: 170 25% 99%;
+  --card-foreground: 170 35% 7%;
+  --popover: 170 25% 100%;
+  --popover-foreground: 170 35% 7%;
+  --primary: 170 50% 34%;
+  --primary-foreground: 170 30% 97%;
+  --secondary: 170 18% 93%;
+  --secondary-foreground: 170 25% 18%;
+  --muted: 170 16% 93%;
+  --muted-foreground: 170 10% 42%;
+  --accent: 170 18% 91%;
+  --accent-foreground: 170 25% 18%;
+  --destructive: 357 85% 48%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 170 16% 87%;
+  --input: 170 16% 87%;
+  --ring: 170 50% 48%;
+  --chart-1: 170 50% 34%;
+  --chart-2: 170 50% 48%;
+  --chart-3: 170 40% 58%;
+  --chart-4: 170 35% 70%;
+  --chart-5: 170 28% 80%;
+
+  --success: 160 45% 38%;
+  --success-muted: 160 35% 90%;
+  --success-foreground: 160 40% 15%;
+  --warning: 36 88% 50%;
+  --warning-muted: 36 75% 92%;
+  --warning-foreground: 28 55% 22%;
+  --info: 170 52% 42%;
+  --info-muted: 170 38% 90%;
+  --info-foreground: 170 38% 18%;
+  --error-muted: 0 65% 92%;
+  --error-foreground: 0 65% 30%;
+
+  --role-partner: 185 48% 38%;
+  --role-partner-muted: 185 38% 90%;
+  --role-director: 195 46% 40%;
+  --role-director-muted: 195 36% 90%;
+  --role-manager: 35 60% 42%;
+  --role-manager-muted: 35 50% 90%;
+  --role-staff: 345 52% 42%;
+  --role-staff-muted: 345 42% 92%;
+  --role-article: 265 48% 45%;
+  --role-article-muted: 265 38% 92%;
+}
+.dark.uk-palette-warm-teal {
+  --background: 170 32% 4.5%;
+  --foreground: 170 22% 94%;
+  --card: 170 26% 9.5%;
+  --card-foreground: 170 22% 94%;
+  --popover: 170 26% 12%;
+  --popover-foreground: 170 22% 94%;
+  --primary: 170 45% 50%;
+  --primary-foreground: 170 30% 6%;
+  --secondary: 170 18% 14%;
+  --secondary-foreground: 170 22% 88%;
+  --muted: 170 14% 14%;
+  --muted-foreground: 170 10% 55%;
+  --accent: 170 18% 18%;
+  --accent-foreground: 170 22% 94%;
+  --destructive: 357 85% 55%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 170 14% 16%;
+  --input: 170 14% 16%;
+  --ring: 170 50% 34%;
+  --chart-1: 170 45% 50%;
+  --chart-2: 170 50% 34%;
+  --chart-3: 170 40% 28%;
+  --chart-4: 170 35% 22%;
+  --chart-5: 170 28% 16%;
+
+  --success: 160 42% 50%;
+  --success-muted: 160 28% 14%;
+  --success-foreground: 160 35% 78%;
+  --warning: 36 82% 56%;
+  --warning-muted: 36 48% 14%;
+  --warning-foreground: 36 65% 78%;
+  --info: 170 48% 52%;
+  --info-muted: 170 30% 14%;
+  --info-foreground: 170 35% 78%;
+  --error-muted: 0 45% 14%;
+  --error-foreground: 0 60% 75%;
+
+  --role-partner: 185 48% 55%;
+  --role-partner-muted: 185 30% 14%;
+  --role-director: 195 46% 55%;
+  --role-director-muted: 195 28% 14%;
+  --role-manager: 35 55% 55%;
+  --role-manager-muted: 35 32% 14%;
+  --role-staff: 345 48% 55%;
+  --role-staff-muted: 345 30% 14%;
+  --role-article: 265 48% 55%;
+  --role-article-muted: 265 30% 14%;
+}
+
+/* ============================================================
+   SLATE INDIGO  (hue ~235 — deep slate with indigo primary)
+   ============================================================ */
+:root.uk-palette-slate-indigo {
+  --background: 230 22% 97.5%;
+  --foreground: 230 35% 7%;
+  --card: 230 25% 99%;
+  --card-foreground: 230 35% 7%;
+  --popover: 230 25% 100%;
+  --popover-foreground: 230 35% 7%;
+  --primary: 235 58% 48%;
+  --primary-foreground: 230 40% 97%;
+  --secondary: 230 18% 93%;
+  --secondary-foreground: 230 25% 18%;
+  --muted: 230 16% 93%;
+  --muted-foreground: 230 10% 42%;
+  --accent: 230 18% 91%;
+  --accent-foreground: 230 25% 18%;
+  --destructive: 357 85% 48%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 230 16% 87%;
+  --input: 230 16% 87%;
+  --ring: 235 58% 60%;
+  --chart-1: 235 58% 48%;
+  --chart-2: 235 55% 58%;
+  --chart-3: 235 48% 68%;
+  --chart-4: 235 40% 78%;
+  --chart-5: 235 32% 86%;
+
+  --success: 152 48% 40%;
+  --success-muted: 152 38% 90%;
+  --success-foreground: 152 40% 15%;
+  --warning: 38 90% 52%;
+  --warning-muted: 38 80% 92%;
+  --warning-foreground: 30 60% 22%;
+  --info: 220 55% 50%;
+  --info-muted: 220 40% 92%;
+  --info-foreground: 220 40% 18%;
+  --error-muted: 0 65% 92%;
+  --error-foreground: 0 65% 30%;
+
+  --role-partner: 220 50% 42%;
+  --role-partner-muted: 220 40% 90%;
+  --role-director: 230 48% 44%;
+  --role-director-muted: 230 38% 90%;
+  --role-manager: 25 62% 42%;
+  --role-manager-muted: 25 50% 90%;
+  --role-staff: 340 55% 44%;
+  --role-staff-muted: 340 42% 92%;
+  --role-article: 260 52% 46%;
+  --role-article-muted: 260 40% 92%;
+}
+.dark.uk-palette-slate-indigo {
+  --background: 230 35% 4.5%;
+  --foreground: 230 22% 94%;
+  --card: 230 28% 9.5%;
+  --card-foreground: 230 22% 94%;
+  --popover: 230 28% 12%;
+  --popover-foreground: 230 22% 94%;
+  --primary: 235 55% 62%;
+  --primary-foreground: 230 40% 6%;
+  --secondary: 230 18% 14%;
+  --secondary-foreground: 230 22% 88%;
+  --muted: 230 15% 14%;
+  --muted-foreground: 230 10% 55%;
+  --accent: 230 18% 18%;
+  --accent-foreground: 230 22% 94%;
+  --destructive: 357 85% 55%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 230 15% 16%;
+  --input: 230 15% 16%;
+  --ring: 235 58% 48%;
+  --chart-1: 235 55% 62%;
+  --chart-2: 235 58% 48%;
+  --chart-3: 235 48% 38%;
+  --chart-4: 235 40% 28%;
+  --chart-5: 230 32% 20%;
+
+  --success: 152 45% 50%;
+  --success-muted: 152 30% 14%;
+  --success-foreground: 152 35% 78%;
+  --warning: 38 85% 58%;
+  --warning-muted: 38 50% 14%;
+  --warning-foreground: 38 70% 78%;
+  --info: 220 50% 58%;
+  --info-muted: 220 32% 14%;
+  --info-foreground: 220 38% 78%;
+  --error-muted: 0 45% 14%;
+  --error-foreground: 0 60% 75%;
+
+  --role-partner: 220 50% 58%;
+  --role-partner-muted: 220 30% 14%;
+  --role-director: 230 48% 58%;
+  --role-director-muted: 230 28% 14%;
+  --role-manager: 25 58% 55%;
+  --role-manager-muted: 25 32% 14%;
+  --role-staff: 340 50% 56%;
+  --role-staff-muted: 340 30% 14%;
+  --role-article: 260 50% 56%;
+  --role-article-muted: 260 30% 14%;
+}
+
+/* ============================================================
+   PURE BLACK  (full black dark theme, no color tint)
+   ============================================================ */
+:root.uk-palette-pure-black {
+  --background: 0 0% 0%;
+  --foreground: 0 0% 95%;
+  --card: 0 0% 5%;
+  --card-foreground: 0 0% 95%;
+  --popover: 0 0% 8%;
+  --popover-foreground: 0 0% 95%;
+  --primary: 0 0% 100%;
+  --primary-foreground: 0 0% 0%;
+  --secondary: 0 0% 12%;
+  --secondary-foreground: 0 0% 88%;
+  --muted: 0 0% 10%;
+  --muted-foreground: 0 0% 55%;
+  --accent: 0 0% 15%;
+  --accent-foreground: 0 0% 95%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 18%;
+  --input: 0 0% 18%;
+  --ring: 0 0% 50%;
+  --chart-1: 0 0% 100%;
+  --chart-2: 0 0% 80%;
+  --chart-3: 0 0% 60%;
+  --chart-4: 0 0% 40%;
+  --chart-5: 0 0% 20%;
+
+  --success: 142 71% 45%;
+  --success-muted: 0 0% 10%;
+  --success-foreground: 142 71% 70%;
+  --warning: 38 92% 50%;
+  --warning-muted: 0 0% 10%;
+  --warning-foreground: 38 92% 70%;
+  --info: 217 91% 60%;
+  --info-muted: 0 0% 10%;
+  --info-foreground: 217 91% 75%;
+  --error-muted: 0 0% 10%;
+  --error-foreground: 0 72% 70%;
+
+  --role-partner: 217 91% 60%;
+  --role-partner-muted: 0 0% 10%;
+  --role-director: 262 83% 58%;
+  --role-director-muted: 0 0% 10%;
+  --role-manager: 38 92% 50%;
+  --role-manager-muted: 0 0% 10%;
+  --role-staff: 340 82% 52%;
+  --role-staff-muted: 0 0% 10%;
+  --role-article: 142 71% 45%;
+  --role-article-muted: 0 0% 10%;
+}
+.dark.uk-palette-pure-black {
+  --background: 0 0% 0%;
+  --foreground: 0 0% 95%;
+  --card: 0 0% 5%;
+  --card-foreground: 0 0% 95%;
+  --popover: 0 0% 8%;
+  --popover-foreground: 0 0% 95%;
+  --primary: 0 0% 100%;
+  --primary-foreground: 0 0% 0%;
+  --secondary: 0 0% 12%;
+  --secondary-foreground: 0 0% 88%;
+  --muted: 0 0% 10%;
+  --muted-foreground: 0 0% 55%;
+  --accent: 0 0% 15%;
+  --accent-foreground: 0 0% 95%;
+  --destructive: 0 72% 55%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 18%;
+  --input: 0 0% 18%;
+  --ring: 0 0% 50%;
+  --chart-1: 0 0% 100%;
+  --chart-2: 0 0% 80%;
+  --chart-3: 0 0% 60%;
+  --chart-4: 0 0% 40%;
+  --chart-5: 0 0% 20%;
+
+  --success: 142 71% 50%;
+  --success-muted: 0 0% 10%;
+  --success-foreground: 142 71% 75%;
+  --warning: 38 92% 55%;
+  --warning-muted: 0 0% 10%;
+  --warning-foreground: 38 92% 75%;
+  --info: 217 91% 65%;
+  --info-muted: 0 0% 10%;
+  --info-foreground: 217 91% 80%;
+  --error-muted: 0 0% 10%;
+  --error-foreground: 0 72% 75%;
+
+  --role-partner: 217 91% 65%;
+  --role-partner-muted: 0 0% 10%;
+  --role-director: 262 83% 63%;
+  --role-director-muted: 0 0% 10%;
+  --role-manager: 38 92% 55%;
+  --role-manager-muted: 0 0% 10%;
+  --role-staff: 340 82% 57%;
+  --role-staff-muted: 0 0% 10%;
+  --role-article: 142 71% 50%;
+  --role-article-muted: 0 0% 10%;
+}
+
+/* ============================================================
+   REGULAR  (black & white base with colored accents)
+   ============================================================ */
+:root.uk-palette-regular {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 5%;
+  --card: 0 0% 99%;
+  --card-foreground: 0 0% 5%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 5%;
+  --primary: 0 0% 10%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 95%;
+  --secondary-foreground: 0 0% 12%;
+  --muted: 0 0% 94%;
+  --muted-foreground: 0 0% 40%;
+  --accent: 0 0% 92%;
+  --accent-foreground: 0 0% 12%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 88%;
+  --input: 0 0% 88%;
+  --ring: 0 0% 30%;
+  --chart-1: 0 0% 10%;
+  --chart-2: 0 0% 30%;
+  --chart-3: 0 0% 50%;
+  --chart-4: 0 0% 70%;
+  --chart-5: 0 0% 85%;
+
+  --success: 142 71% 35%;
+  --success-muted: 142 40% 92%;
+  --success-foreground: 142 71% 18%;
+  --warning: 38 92% 42%;
+  --warning-muted: 38 70% 92%;
+  --warning-foreground: 30 60% 18%;
+  --info: 217 91% 45%;
+  --info-muted: 217 60% 92%;
+  --info-foreground: 217 91% 18%;
+  --error-muted: 0 60% 92%;
+  --error-foreground: 0 72% 25%;
+
+  --role-partner: 217 91% 45%;
+  --role-partner-muted: 217 60% 92%;
+  --role-director: 262 83% 50%;
+  --role-director-muted: 262 50% 93%;
+  --role-manager: 38 92% 42%;
+  --role-manager-muted: 38 70% 92%;
+  --role-staff: 340 82% 45%;
+  --role-staff-muted: 340 50% 93%;
+  --role-article: 142 71% 35%;
+  --role-article-muted: 142 40% 92%;
+}
+.dark.uk-palette-regular {
+  --background: 0 0% 6%;
+  --foreground: 0 0% 95%;
+  --card: 0 0% 10%;
+  --card-foreground: 0 0% 95%;
+  --popover: 0 0% 12%;
+  --popover-foreground: 0 0% 95%;
+  --primary: 0 0% 90%;
+  --primary-foreground: 0 0% 6%;
+  --secondary: 0 0% 14%;
+  --secondary-foreground: 0 0% 88%;
+  --muted: 0 0% 12%;
+  --muted-foreground: 0 0% 55%;
+  --accent: 0 0% 16%;
+  --accent-foreground: 0 0% 95%;
+  --destructive: 0 72% 55%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 18%;
+  --input: 0 0% 18%;
+  --ring: 0 0% 50%;
+  --chart-1: 0 0% 90%;
+  --chart-2: 0 0% 70%;
+  --chart-3: 0 0% 50%;
+  --chart-4: 0 0% 35%;
+  --chart-5: 0 0% 20%;
+
+  --success: 142 71% 50%;
+  --success-muted: 0 0% 12%;
+  --success-foreground: 142 71% 72%;
+  --warning: 38 92% 55%;
+  --warning-muted: 0 0% 12%;
+  --warning-foreground: 38 92% 72%;
+  --info: 217 91% 60%;
+  --info-muted: 0 0% 12%;
+  --info-foreground: 217 91% 78%;
+  --error-muted: 0 0% 12%;
+  --error-foreground: 0 72% 72%;
+
+  --role-partner: 217 91% 60%;
+  --role-partner-muted: 0 0% 12%;
+  --role-director: 262 83% 60%;
+  --role-director-muted: 0 0% 12%;
+  --role-manager: 38 92% 55%;
+  --role-manager-muted: 0 0% 12%;
+  --role-staff: 340 82% 55%;
+  --role-staff-muted: 0 0% 12%;
+  --role-article: 142 71% 50%;
+  --role-article-muted: 0 0% 12%;
+}
+
+/* ============================================================
+   MONO ACCENT  (pure grayscale, no colored accents)
+   ============================================================ */
+:root.uk-palette-mono-accent {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 5%;
+  --card: 0 0% 99%;
+  --card-foreground: 0 0% 5%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 5%;
+  --primary: 0 0% 10%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 95%;
+  --secondary-foreground: 0 0% 12%;
+  --muted: 0 0% 94%;
+  --muted-foreground: 0 0% 40%;
+  --accent: 0 0% 92%;
+  --accent-foreground: 0 0% 12%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 88%;
+  --input: 0 0% 88%;
+  --ring: 0 0% 30%;
+  --chart-1: 0 0% 10%;
+  --chart-2: 0 0% 30%;
+  --chart-3: 0 0% 50%;
+  --chart-4: 0 0% 70%;
+  --chart-5: 0 0% 85%;
+
+  /* All semantic colors are grayscale */
+  --success: 0 0% 45%;
+  --success-muted: 0 0% 92%;
+  --success-foreground: 0 0% 15%;
+  --warning: 0 0% 50%;
+  --warning-muted: 0 0% 92%;
+  --warning-foreground: 0 0% 15%;
+  --info: 0 0% 45%;
+  --info-muted: 0 0% 92%;
+  --info-foreground: 0 0% 15%;
+  --error-muted: 0 0% 92%;
+  --error-foreground: 0 0% 25%;
+
+  /* All role colors are grayscale */
+  --role-partner: 0 0% 40%;
+  --role-partner-muted: 0 0% 92%;
+  --role-director: 0 0% 45%;
+  --role-director-muted: 0 0% 92%;
+  --role-manager: 0 0% 50%;
+  --role-manager-muted: 0 0% 92%;
+  --role-staff: 0 0% 45%;
+  --role-staff-muted: 0 0% 92%;
+  --role-article: 0 0% 40%;
+  --role-article-muted: 0 0% 92%;
+}
+.dark.uk-palette-mono-accent {
+  --background: 0 0% 6%;
+  --foreground: 0 0% 95%;
+  --card: 0 0% 10%;
+  --card-foreground: 0 0% 95%;
+  --popover: 0 0% 12%;
+  --popover-foreground: 0 0% 95%;
+  --primary: 0 0% 90%;
+  --primary-foreground: 0 0% 6%;
+  --secondary: 0 0% 14%;
+  --secondary-foreground: 0 0% 88%;
+  --muted: 0 0% 12%;
+  --muted-foreground: 0 0% 55%;
+  --accent: 0 0% 16%;
+  --accent-foreground: 0 0% 95%;
+  --destructive: 0 72% 55%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 18%;
+  --input: 0 0% 18%;
+  --ring: 0 0% 50%;
+  --chart-1: 0 0% 90%;
+  --chart-2: 0 0% 70%;
+  --chart-3: 0 0% 50%;
+  --chart-4: 0 0% 35%;
+  --chart-5: 0 0% 20%;
+
+  /* All semantic colors are grayscale */
+  --success: 0 0% 55%;
+  --success-muted: 0 0% 12%;
+  --success-foreground: 0 0% 80%;
+  --warning: 0 0% 60%;
+  --warning-muted: 0 0% 12%;
+  --warning-foreground: 0 0% 80%;
+  --info: 0 0% 55%;
+  --info-muted: 0 0% 12%;
+  --info-foreground: 0 0% 80%;
+  --error-muted: 0 0% 12%;
+  --error-foreground: 0 0% 80%;
+
+  /* All role colors are grayscale */
+  --role-partner: 0 0% 55%;
+  --role-partner-muted: 0 0% 12%;
+  --role-director: 0 0% 60%;
+  --role-director-muted: 0 0% 12%;
+  --role-manager: 0 0% 55%;
+  --role-manager-muted: 0 0% 12%;
+  --role-staff: 0 0% 55%;
+  --role-staff-muted: 0 0% 12%;
+  --role-article: 0 0% 50%;
+  --role-article-muted: 0 0% 12%;
+}
+
+/* ============================================================
+   ZINC  (default Franken UI zinc theme - cool gray tones)
+   ============================================================ */
+:root.uk-palette-zinc {
+  --background: 0 0% 100%;
+  --foreground: 240 10% 3.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 240 10% 3.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 240 10% 3.9%;
+  --primary: 240 5.9% 10%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 240 4.8% 95.9%;
+  --secondary-foreground: 240 5.9% 10%;
+  --muted: 240 4.8% 95.9%;
+  --muted-foreground: 240 3.8% 46.1%;
+  --accent: 240 4.8% 95.9%;
+  --accent-foreground: 240 5.9% 10%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 5.9% 90%;
+  --input: 240 5.9% 90%;
+  --ring: 240 5.9% 10%;
+  --chart-1: 12 76% 61%;
+  --chart-2: 173 58% 39%;
+  --chart-3: 197 37% 24%;
+  --chart-4: 43 74% 66%;
+  --chart-5: 27 87% 67%;
+
+  --success: 142 76% 36%;
+  --success-muted: 142 40% 92%;
+  --success-foreground: 142 76% 15%;
+  --warning: 38 92% 50%;
+  --warning-muted: 38 70% 92%;
+  --warning-foreground: 30 60% 20%;
+  --info: 217 91% 45%;
+  --info-muted: 217 60% 92%;
+  --info-foreground: 217 91% 20%;
+  --error-muted: 0 60% 92%;
+  --error-foreground: 0 72% 28%;
+
+  --role-partner: 217 91% 45%;
+  --role-partner-muted: 217 60% 92%;
+  --role-director: 262 83% 50%;
+  --role-director-muted: 262 50% 93%;
+  --role-manager: 38 92% 42%;
+  --role-manager-muted: 38 70% 92%;
+  --role-staff: 340 82% 45%;
+  --role-staff-muted: 340 50% 93%;
+  --role-article: 142 76% 36%;
+  --role-article-muted: 142 40% 92%;
+}
+.dark.uk-palette-zinc {
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+  --card: 240 10% 3.9%;
+  --card-foreground: 0 0% 98%;
+  --popover: 240 10% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 0 0% 98%;
+  --primary-foreground: 240 5.9% 10%;
+  --secondary: 240 3.7% 15.9%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 240 3.7% 15.9%;
+  --muted-foreground: 240 5% 64.9%;
+  --accent: 240 3.7% 15.9%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 3.7% 15.9%;
+  --input: 240 3.7% 15.9%;
+  --ring: 240 4.9% 83.9%;
+  --chart-1: 220 70% 50%;
+  --chart-2: 160 60% 45%;
+  --chart-3: 30 80% 55%;
+  --chart-4: 280 65% 60%;
+  --chart-5: 340 75% 55%;
+
+  --success: 142 71% 45%;
+  --success-muted: 240 3.7% 15.9%;
+  --success-foreground: 142 71% 70%;
+  --warning: 38 92% 50%;
+  --warning-muted: 240 3.7% 15.9%;
+  --warning-foreground: 38 92% 70%;
+  --info: 217 91% 55%;
+  --info-muted: 240 3.7% 15.9%;
+  --info-foreground: 217 91% 75%;
+  --error-muted: 240 3.7% 15.9%;
+  --error-foreground: 0 62.8% 60%;
+
+  --role-partner: 217 91% 60%;
+  --role-partner-muted: 240 3.7% 15.9%;
+  --role-director: 262 83% 60%;
+  --role-director-muted: 240 3.7% 15.9%;
+  --role-manager: 38 92% 55%;
+  --role-manager-muted: 240 3.7% 15.9%;
+  --role-staff: 340 82% 55%;
+  --role-staff-muted: 240 3.7% 15.9%;
+  --role-article: 142 71% 50%;
+  --role-article-muted: 240 3.7% 15.9%;
+}
