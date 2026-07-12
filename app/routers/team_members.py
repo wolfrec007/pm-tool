@@ -91,6 +91,15 @@ async def create_team_member_form(
     data["is_oversight_only"] = form_data.get("is_oversight_only") == "true"
 
     try:
+        # Check if approval is required
+        from app.approval_check import check_approval
+        from app.models.models import ResourceType, OperationType
+        firm_id = request.session.get("firm_id")
+        result = check_approval(db, firm_id, user.id, ResourceType.team_member, OperationType.create, data)
+        if result:
+            set_flash(request, "Team member creation pending approval")
+            return RedirectResponse(url="/users", status_code=303)
+
         service.create_team_member(db, data)
         set_flash(request, f"Team member '{data['name']}' created successfully.")
         return RedirectResponse(url="/team-members", status_code=303)
