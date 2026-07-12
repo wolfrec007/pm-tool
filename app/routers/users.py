@@ -35,6 +35,15 @@ def list_users(
     from app.services.firm_service import get_user_role_in_firm
     for u in items:
         u.firm_role = get_user_role_in_firm(db, u.id, firm_id).value if firm_id and get_user_role_in_firm(db, u.id, firm_id) else "viewer"
+
+    # Get pending approval requests
+    from app.services.approval_service import list_pending_requests
+    pending_approvals = list_pending_requests(db, firm_id) if firm_id else []
+
+    # Get pending extension requests
+    from app.services.extension_service import list_extension_requests
+    pending_extensions = list_extension_requests(db, firm_id, status="pending") if firm_id else []
+
     return templates.TemplateResponse(request, "users/list.html", {
         "items": items,
         "total": total,
@@ -43,6 +52,8 @@ def list_users(
         "q": q or "",
         "is_active": is_active,
         "user": user,
+        "pending_approvals": pending_approvals,
+        "pending_extensions": pending_extensions,
     })
 
 

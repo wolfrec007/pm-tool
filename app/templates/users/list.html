@@ -7,84 +7,194 @@
 
 {% block content %}
 <div class="uk-card uk-card-body uk-margin">
-    <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-semibold">Users</h2>
-        <a href="/users/new" class="uk-btn uk-btn-primary uk-btn-sm">
-            <span uk-icon="icon: plus; ratio: 0.8" class="mr-1"></span>Add User
-        </a>
+    <h2 class="text-xl font-semibold mb-4">Users</h2>
+
+    <!-- Tabs -->
+    <div class="flex gap-1 border-b border-border mb-4">
+        <button onclick="showTab('users')" id="tab-users" class="users-tab px-4 py-2 text-sm font-medium rounded-t-md border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors">
+            <uk-icon icon="users" width="14" height="14" class="mr-1"></uk-icon> All Users
+            <span class="ml-1 text-xs bg-muted px-1.5 py-0.5 rounded">{{ total }}</span>
+        </button>
+        <button onclick="showTab('approvals')" id="tab-approvals" class="users-tab px-4 py-2 text-sm font-medium rounded-t-md border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors">
+            <uk-icon icon="check-circle" width="14" height="14" class="mr-1"></uk-icon> Pending Approvals
+            {% if pending_approvals %}
+            <span class="ml-1 text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded">{{ pending_approvals | length }}</span>
+            {% endif %}
+        </button>
+        <button onclick="showTab('extensions')" id="tab-extensions" class="users-tab px-4 py-2 text-sm font-medium rounded-t-md border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors">
+            <uk-icon icon="git-branch" width="14" height="14" class="mr-1"></uk-icon> Extension Requests
+            {% if pending_extensions %}
+            <span class="ml-1 text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded">{{ pending_extensions | length }}</span>
+            {% endif %}
+        </button>
     </div>
 
-    {{ search_bar("/users", placeholder="Search name or email...", q=q, params={"technical_role": technical_role or "", "is_active": is_active if is_active is not none else ""}) }}
+    <!-- Users Section -->
+    <div id="section-users" class="users-section">
+        <div class="flex items-center justify-between mb-4">
+            <div></div>
+            <a href="/users/new" class="uk-btn uk-btn-primary uk-btn-sm">
+                <span uk-icon="icon: plus; ratio: 0.8" class="mr-1"></span>Add User
+            </a>
+        </div>
 
-    <div class="mb-3 flex items-center gap-2">
-        <select name="technical_role_filter" class="uk-select w-40" onchange="window.location.href='/users?q={{ q }}&technical_role='+this.value">
-            <option value="">All Roles</option>
-            <option value="admin" {% if technical_role == 'admin' %}selected{% endif %}>Admin</option>
-            <option value="moderator" {% if technical_role == 'moderator' %}selected{% endif %}>Moderator</option>
-            <option value="viewer" {% if technical_role == 'viewer' %}selected{% endif %}>Viewer</option>
-        </select>
+        {{ search_bar("/users", placeholder="Search name or email...", q=q, params={"is_active": is_active if is_active is not none else ""}) }}
+
+        <div class="overflow-auto">
+            <table class="uk-table uk-table-hover uk-table-divider uk-table-small uk-table-striped">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Active</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in items %}
+                    <tr class="hover:bg-muted/50 transition-colors">
+                        <td class="font-medium">{{ u.display_name }}</td>
+                        <td class="text-muted-foreground">{{ u.email }}</td>
+                        <td>
+                            {% if u.firm_role == 'admin' %}
+                            <span class="uk-badge uk-badge-primary">Admin</span>
+                            {% elif u.firm_role == 'moderator' %}
+                            <span class="uk-badge uk-badge-secondary">Moderator</span>
+                            {% else %}
+                            <span class="uk-badge">Viewer</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if u.is_active %}
+                            <span class="uk-badge uk-badge-primary">Active</span>
+                            {% else %}
+                            <span class="uk-badge uk-badge-destructive">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td class="flex gap-1">
+                            <a href="/users/{{ u.id }}/edit" class="uk-btn uk-btn-default uk-btn-sm uk-btn-icon" uk-tooltip="Edit">
+                                <uk-icon icon="pencil" width="14" height="14"></uk-icon>
+                            </a>
+                            {% if u.is_active and u.id != user.id %}
+                            <form method="POST" action="/users/{{ u.id }}/deactivate" class="inline" onsubmit="return confirm('Deactivate this user?')">
+                                {{ csrf_field(csrf_token) }}
+                                <button type="submit" class="uk-btn uk-btn-destructive uk-btn-sm uk-btn-icon" uk-tooltip="Deactivate">
+                                    <uk-icon icon="ban" width="14" height="14"></uk-icon>
+                                </button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if not items %}
+        <div class="uk-alert uk-alert-warning" uk-alert><p>No users found.</p></div>
+        {% endif %}
+
+        <div class="text-sm text-muted-foreground mt-2">
+            Showing {{ offset + 1 }}–{{ [offset + limit, total]|min }} of {{ total }}
+        </div>
+        {{ pagination(total, limit, offset, "/users", {"q": q}) }}
     </div>
 
-    <div class="overflow-auto">
-        <table class="uk-table uk-table-hover uk-table-divider uk-table-small uk-table-striped">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Active</th>
-                    <th>Created</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for u in items %}
-                <tr class="hover:bg-muted/50 transition-colors">
-                    <td class="font-medium">{{ u.display_name }}</td>
-                    <td class="text-muted-foreground">{{ u.email }}</td>
-                    <td>
-                        {% if u.firm_role == 'admin' %}
-                        <span class="uk-badge uk-badge-primary">Admin</span>
-                        {% elif u.firm_role == 'moderator' %}
-                        <span class="uk-badge uk-badge-secondary">Moderator</span>
-                        {% else %}
-                        <span class="uk-badge">Viewer</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if u.is_active %}
-                        <span class="uk-badge uk-badge-primary">Active</span>
-                        {% else %}
-                        <span class="uk-badge uk-badge-destructive">Inactive</span>
-                        {% endif %}
-                    </td>
-                    <td>{{ u.created_at.strftime('%Y-%m-%d') if u.created_at else "—" }}</td>
-                    <td class="flex gap-1">
-                        <a href="/users/{{ u.id }}/edit" class="uk-btn uk-btn-default uk-btn-sm uk-btn-icon" uk-tooltip="Edit">
-                            <uk-icon icon="pencil" width="14" height="14"></uk-icon>
-                        </a>
-                        {% if u.is_active and u.id != user.id %}
-                        <form method="POST" action="/users/{{ u.id }}/deactivate" class="inline" onsubmit="return confirm('Deactivate this user?')">
-                            {{ csrf_field(csrf_token) }}
-                            <button type="submit" class="uk-btn uk-btn-destructive uk-btn-sm uk-btn-icon" uk-tooltip="Deactivate">
-                                <uk-icon icon="ban" width="14" height="14"></uk-icon>
-                            </button>
-                        </form>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <!-- Pending Approvals Section -->
+    <div id="section-approvals" class="users-section hidden">
+        {% if pending_approvals %}
+        <div class="overflow-auto">
+            <table class="uk-table uk-table-hover uk-table-divider uk-table-small uk-table-striped">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Operation</th>
+                        <th>Requested By</th>
+                        <th>Payload</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in pending_approvals %}
+                    <tr class="hover:bg-muted/50 transition-colors">
+                        <td><span class="uk-badge">{{ r.resource_type.value | replace("_", " ") | title }}</span></td>
+                        <td>{{ r.operation.value | title }}</td>
+                        <td>{{ r.requested_by_user_id }}</td>
+                        <td class="text-xs text-muted-foreground max-w-xs truncate">{{ r.payload }}</td>
+                        <td class="flex gap-1">
+                            <form method="POST" action="/api/v1/approval-requests/{{ r.id }}/approve" class="inline">
+                                <button type="submit" class="uk-btn uk-btn-primary uk-btn-sm">Approve</button>
+                            </form>
+                            <form method="POST" action="/api/v1/approval-requests/{{ r.id }}/reject" class="inline">
+                                <button type="submit" class="uk-btn uk-btn-destructive uk-btn-sm">Reject</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="uk-alert uk-alert-success" uk-alert><p>No pending approval requests.</p></div>
+        {% endif %}
     </div>
 
-    {% if not items %}
-    <div class="uk-alert uk-alert-warning" uk-alert><p>No users found.</p></div>
-    {% endif %}
-
-    <div class="text-sm text-muted-foreground mt-2">
-        Showing {{ offset + 1 }}–{{ [offset + limit, total]|min }} of {{ total }}
+    <!-- Extension Requests Section -->
+    <div id="section-extensions" class="users-section hidden">
+        {% if pending_extensions %}
+        <div class="overflow-auto">
+            <table class="uk-table uk-table-hover uk-table-divider uk-table-small uk-table-striped">
+                <thead>
+                    <tr>
+                        <th>Team Member</th>
+                        <th>Allocation</th>
+                        <th>Dates</th>
+                        <th>Reason</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for e in pending_extensions %}
+                    <tr class="hover:bg-muted/50 transition-colors">
+                        <td class="font-medium">{{ e.team_member.name if e.team_member else "—" }}</td>
+                        <td><span class="uk-badge">{{ e.allocation_percent }}%</span></td>
+                        <td class="text-sm">{{ e.start_date }} — {{ e.end_date }}</td>
+                        <td class="text-xs text-muted-foreground max-w-xs truncate">{{ e.reason or "—" }}</td>
+                        <td class="flex gap-1">
+                            <form method="POST" action="/api/v1/extensions/{{ e.id }}/approve" class="inline">
+                                <button type="submit" class="uk-btn uk-btn-primary uk-btn-sm">Approve</button>
+                            </form>
+                            <form method="POST" action="/api/v1/extensions/{{ e.id }}/reject" class="inline">
+                                <button type="submit" class="uk-btn uk-btn-destructive uk-btn-sm">Reject</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="uk-alert uk-alert-success" uk-alert><p>No pending extension requests.</p></div>
+        {% endif %}
     </div>
-    {{ pagination(total, limit, offset, "/users", {"q": q, "technical_role": technical_role or ""}) }}
 </div>
+
+<style>
+    .users-tab.active {
+        color: hsl(var(--foreground));
+        border-bottom-color: hsl(var(--primary));
+        font-weight: 600;
+    }
+</style>
+
+<script>
+function showTab(tab) {
+    document.querySelectorAll('.users-section').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('.users-tab').forEach(el => el.classList.remove('active'));
+    document.getElementById('section-' + tab).classList.remove('hidden');
+    document.getElementById('tab-' + tab).classList.add('active');
+}
+showTab('users');
+</script>
 {% endblock %}
