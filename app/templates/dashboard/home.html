@@ -82,27 +82,27 @@
         <!-- Quick Insights -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
             {% if over_allocated_count > 0 %}
-            <div class="flex items-center gap-2 p-3 rounded-lg border border-red-200 bg-red-50 dark:bg-red-950/20 dark:border-red-900">
+            <div class="flex items-center gap-2 p-3 rounded-lg border border-border bg-muted/50">
                 <uk-icon icon="alert-triangle" width="16" height="16" class="text-red-500 flex-shrink-0"></uk-icon>
-                <p class="text-sm text-red-700 dark:text-red-400">{{ over_allocated_count }} member{{ 's' if over_allocated_count != 1 }} need rebalancing</p>
+                <p class="text-sm text-red-600 dark:text-red-400">{{ over_allocated_count }} member{{ 's' if over_allocated_count != 1 }} need rebalancing</p>
             </div>
             {% endif %}
             {% if bench_count > 0 %}
-            <div class="flex items-center gap-2 p-3 rounded-lg border border-yellow-200 bg-yellow-50 dark:bg-yellow-950/20 dark:border-yellow-900">
+            <div class="flex items-center gap-2 p-3 rounded-lg border border-border bg-muted/50">
                 <uk-icon icon="info" width="16" height="16" class="text-yellow-600 flex-shrink-0"></uk-icon>
-                <p class="text-sm text-yellow-700 dark:text-yellow-400">{{ bench_count }} member{{ 's' if bench_count != 1 }} available for assignment</p>
+                <p class="text-sm text-yellow-600 dark:text-yellow-400">{{ bench_count }} member{{ 's' if bench_count != 1 }} available for assignment</p>
             </div>
             {% endif %}
             {% if pending_leaves > 0 %}
-            <div class="flex items-center gap-2 p-3 rounded-lg border border-blue-200 bg-blue-50 dark:bg-blue-950/20 dark:border-blue-900">
+            <div class="flex items-center gap-2 p-3 rounded-lg border border-border bg-muted/50">
                 <uk-icon icon="calendar-clock" width="16" height="16" class="text-blue-500 flex-shrink-0"></uk-icon>
-                <p class="text-sm text-blue-700 dark:text-blue-400">{{ pending_leaves }} pending leave request{{ 's' if pending_leaves != 1 }} to review</p>
+                <p class="text-sm text-blue-600 dark:text-blue-400">{{ pending_leaves }} pending leave request{{ 's' if pending_leaves != 1 }} to review</p>
             </div>
             {% endif %}
             {% if over_allocated_count == 0 and bench_count == 0 and pending_leaves == 0 %}
-            <div class="flex items-center gap-2 p-3 rounded-lg border border-green-200 bg-green-50 dark:bg-green-950/20 dark:border-green-900 md:col-span-3">
+            <div class="flex items-center gap-2 p-3 rounded-lg border border-border bg-muted/50 md:col-span-3">
                 <uk-icon icon="check-circle" width="16" height="16" class="text-green-500 flex-shrink-0"></uk-icon>
-                <p class="text-sm text-green-700 dark:text-green-400">All good — no action items right now</p>
+                <p class="text-sm text-green-600 dark:text-green-400">All good — no action items right now</p>
             </div>
             {% endif %}
         </div>
@@ -124,7 +124,7 @@
                 {% for a in timeline_data if a.member_id == u.id %}
                     {% set _ = member_assignments.append(a) %}
                 {% endfor %}
-                <div class="flex items-center justify-between p-3 rounded-lg border border-red-100 dark:border-red-900/30 bg-muted/50">
+                <div class="flex items-center justify-between p-3 rounded-lg border border-border bg-muted/50">
                     <div class="flex items-center gap-3">
                         <div class="w-9 h-9 rounded-full bg-red-500/10 flex items-center justify-center flex-shrink-0">
                             <span class="text-xs font-bold text-red-600">{{ u.name[0] }}{{ u.name.split(' ')[-1][0] if u.name.split(' ') | length > 1 else '' }}</span>

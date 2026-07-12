@@ -101,28 +101,137 @@
     <!-- Registration Domains -->
     <div id="section-domains" class="settings-section hidden">
         <div class="uk-card uk-card-body">
-            <p class="text-sm text-muted-foreground mb-4">Restrict registration to specific email domains. Comma-separated. Leave empty to allow all domains.</p>
+            <p class="text-sm text-muted-foreground mb-4">Restrict registration to specific email domains. Add domains one by one. Leave empty to allow all domains.</p>
 
             {% if domains_saved %}
             <div class="uk-alert uk-alert-success mb-4" uk-alert><p>Domain settings saved.</p></div>
             {% endif %}
 
-            <form method="POST" action="/admin/settings/domains" class="space-y-3">
+            <form method="POST" action="/admin/settings/domains" id="domain-form">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                <div class="space-y-2">
-                    <label class="uk-form-label">Allowed Email Domains</label>
-                    <input type="text" name="allowed_domains" class="uk-input w-full"
-                        value="{{ firm_domains or '' }}" placeholder="pkfindia.com,pkf.in">
-                    <p class="text-xs text-muted-foreground">Comma-separated. Only users with these email domains can register.</p>
+                <input type="hidden" name="allowed_domains" id="domains-hidden" value="{{ firm_domains or '' }}">
+
+                <!-- Add domain input -->
+                <div class="flex gap-2 mb-4">
+                    <div class="flex-1">
+                        <input type="text" id="domain-input" class="uk-input" placeholder="e.g. pkfindia.com"
+                            style="border-radius:0.375rem;">
+                    </div>
+                    <button type="button" onclick="addDomain()" class="uk-btn uk-btn-primary" style="border-radius:0.375rem;">
+                        <uk-icon icon="plus" width="16" height="16" class="mr-1"></uk-icon>Add
+                    </button>
                 </div>
+
+                <!-- Domain list -->
+                <div id="domain-list" class="space-y-2 mb-4">
+                    <!-- Populated by JS -->
+                </div>
+
+                <p id="domain-empty" class="text-sm text-muted-foreground text-center py-4" style="display:none;">No domains added. All email domains are allowed.</p>
+
                 <div class="pt-4 border-t border-border">
                     <button type="submit" class="uk-btn uk-btn-primary">
-                        <span uk-icon="icon: check; ratio: 0.8" class="mr-2"></span> Save Domain Settings
+                        <uk-icon icon="check" width="16" height="16" class="mr-1"></uk-icon> Save Domain Settings
                     </button>
                 </div>
             </form>
         </div>
     </div>
+
+    <script>
+    var domainList = [];
+
+    function initDomains() {
+        var val = document.getElementById('domains-hidden').value;
+        if (val.trim()) {
+            domainList = val.split(',').map(function(d) { return d.trim().toLowerCase(); }).filter(function(d) { return d; });
+        }
+        renderDomains();
+    }
+
+    function isValidDomain(d) {
+        if (!d || d.length < 3) return false;
+        if (d.includes(' ')) return false;
+        if (!d.includes('.')) return false;
+        if (d.startsWith('.') || d.endsWith('.')) return false;
+        if (d.startsWith('-') || d.endsWith('-')) return false;
+        var parts = d.split('.');
+        if (parts.length < 2) return false;
+        for (var i = 0; i < parts.length; i++) {
+            if (!/^[a-z0-9-]+$/.test(parts[i])) return false;
+            if (parts[i].length === 0) return false;
+        }
+        return true;
+    }
+
+    function addDomain() {
+        var input = document.getElementById('domain-input');
+        var raw = input.value.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+        var msg = document.getElementById('domain-msg');
+
+        if (!raw) { showDomainMsg('Please enter a domain', 'error'); return; }
+        if (!isValidDomain(raw)) { showDomainMsg('Invalid domain format (e.g. pkfindia.com)', 'error'); return; }
+        if (domainList.indexOf(raw) !== -1) { showDomainMsg('Domain already added', 'error'); return; }
+
+        domainList.push(raw);
+        input.value = '';
+        syncDomains();
+        renderDomains();
+        showDomainMsg('');
+        input.focus();
+    }
+
+    function removeDomain(idx) {
+        domainList.splice(idx, 1);
+        syncDomains();
+        renderDomains();
+    }
+
+    function syncDomains() {
+        document.getElementById('domains-hidden').value = domainList.join(',');
+    }
+
+    function renderDomains() {
+        var container = document.getElementById('domain-list');
+        var empty = document.getElementById('domain-empty');
+        container.innerHTML = '';
+
+        if (domainList.length === 0) {
+            empty.style.display = 'block';
+            return;
+        }
+        empty.style.display = 'none';
+
+        domainList.forEach(function(d, i) {
+            var row = document.createElement('div');
+            row.className = 'flex items-center justify-between p-2.5 rounded-lg border border-border bg-muted/30';
+            row.innerHTML =
+                '<div class="flex items-center gap-2">' +
+                    '<uk-icon icon="globe" width="14" height="14" class="text-muted-foreground"></uk-icon>' +
+                    '<span class="text-sm font-medium text-foreground">' + d + '</span>' +
+                '</div>' +
+                '<button type="button" onclick="removeDomain(' + i + ')" class="flex items-center justify-center w-6 h-6 rounded hover:bg-muted transition-colors">' +
+                    '<uk-icon icon="x" width="14" height="14" class="text-muted-foreground"></uk-icon>' +
+                '</button>';
+            container.appendChild(row);
+        });
+    }
+
+    function showDomainMsg(msg, type) {
+        var el = document.getElementById('domain-msg');
+        if (!msg) { el.style.display = 'none'; return; }
+        el.style.display = 'block';
+        el.textContent = msg;
+        el.className = 'text-xs mt-1 ' + (type === 'error' ? 'text-red-500' : 'text-green-500');
+    }
+
+    document.getElementById('domain-input').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') { e.preventDefault(); addDomain(); }
+    });
+
+    initDomains();
+    </script>
+    <div id="domain-msg" class="text-xs mt-1" style="display:none;"></div>
 </div>
 
 <style>
