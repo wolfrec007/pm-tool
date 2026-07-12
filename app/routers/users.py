@@ -44,7 +44,7 @@ def list_users(
     from app.services.extension_service import list_extension_requests
     pending_extensions = list_extension_requests(db, firm_id, status="pending") if firm_id else []
 
-    # Get approval logs (last 25, paginated)
+    # Get approval logs (last 25, paginated) with user names
     from app.models.models import ApprovalRequest as ApprovalRequestModel
     log_offset_val = int(request.query_params.get("log_offset", 0))
     log_limit = 25
@@ -52,9 +52,32 @@ def list_users(
         log_total = db.query(ApprovalRequestModel).filter(
             ApprovalRequestModel.firm_id == firm_id
         ).count()
-        approval_logs = db.query(ApprovalRequestModel).filter(
+        logs_raw = db.query(ApprovalRequestModel).filter(
             ApprovalRequestModel.firm_id == firm_id
         ).order_by(ApprovalRequestModel.created_at.desc()).offset(log_offset_val).limit(log_limit).all()
+
+        user_ids = set()
+        for log in logs_raw:
+            user_ids.add(log.requested_by_user_id)
+            if log.reviewed_by_user_id:
+                user_ids.add(log.reviewed_by_user_id)
+        users_map = {}
+        if user_ids:
+            from app.models.models import User as UserModel
+            for u in db.query(UserModel).filter(UserModel.id.in_(user_ids)).all():
+                users_map[u.id] = u
+
+        approval_logs = []
+        for log in logs_raw:
+            log.requested_by_name = users_map[log.requested_by_user_id].display_name if log.requested_by_user_id in users_map else str(log.requested_by_user_id)
+            log.requested_by_id = log.requested_by_user_id
+            if log.reviewed_by_user_id and log.reviewed_by_user_id in users_map:
+                log.reviewed_by_name = users_map[log.reviewed_by_user_id].display_name
+                log.reviewed_by_id = log.reviewed_by_user_id
+            else:
+                log.reviewed_by_name = "—"
+                log.reviewed_by_id = None
+            approval_logs.append(log)
     else:
         log_total = 0
         approval_logs = []

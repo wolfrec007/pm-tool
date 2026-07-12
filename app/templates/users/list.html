@@ -215,8 +215,20 @@
                             <span class="uk-badge">Pending</span>
                             {% endif %}
                         </td>
-                        <td class="text-sm">{{ r.requested_by_user_id }}</td>
-                        <td class="text-sm">{{ r.reviewed_by_user_id or "—" }}</td>
+                        <td class="text-sm">
+                            {% if log.requested_by_id %}
+                            <a href="/users/{{ log.requested_by_id }}/edit" class="text-primary hover:underline">{{ log.requested_by_name }}</a>
+                            {% else %}
+                            {{ log.requested_by_name }}
+                            {% endif %}
+                        </td>
+                        <td class="text-sm">
+                            {% if log.reviewed_by_id %}
+                            <a href="/users/{{ log.reviewed_by_id }}/edit" class="text-primary hover:underline">{{ log.reviewed_by_name }}</a>
+                            {% else %}
+                            {{ log.reviewed_by_name }}
+                            {% endif %}
+                        </td>
                         <td class="text-xs text-muted-foreground max-w-xs truncate">{{ r.review_note or "—" }}</td>
                     </tr>
                     {% endfor %}
