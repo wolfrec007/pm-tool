@@ -14,10 +14,10 @@ from app.models.models import Assignment, EngagementInstance, Leave, LeaveStatus
 from app.services.email_service import queue_assignment_notification
 
 
-def get_member_allocations(db: Session) -> dict:
+def get_member_allocations(db: Session, firm_id: int | None = None) -> dict:
     """Get current allocation percentage for all active team members."""
     today = date.today()
-    results = (
+    query = (
         db.query(
             Assignment.team_member_id,
             func.coalesce(func.sum(Assignment.allocation_percent), 0).label("total"),
@@ -26,9 +26,11 @@ def get_member_allocations(db: Session) -> dict:
             Assignment.start_date <= today,
             Assignment.end_date >= today,
         )
-        .group_by(Assignment.team_member_id)
-        .all()
     )
+    if firm_id is not None:
+        query = query.join(TeamMember, Assignment.team_member_id == TeamMember.id)
+        query = query.filter(TeamMember.firm_id == firm_id)
+    results = query.group_by(Assignment.team_member_id).all()
     return {r.team_member_id: r.total for r in results}
 
 
@@ -225,6 +227,7 @@ def update_assignment(
 
 def list_assignments(
     db: Session,
+    firm_id: int,
     limit: int = 50,
     offset: int = 0,
     team_member_id: Optional[int] = None,
@@ -236,6 +239,8 @@ def list_assignments(
             joinedload(Assignment.team_member),
             joinedload(Assignment.engagement_instance),
         )
+        .join(TeamMember, Assignment.team_member_id == TeamMember.id)
+        .filter(TeamMember.firm_id == firm_id)
     )
     if team_member_id:
         query = query.filter(Assignment.team_member_id == team_member_id)

@@ -28,11 +28,23 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-def _set_session(request: Request, user: User) -> None:
+def _set_session(request: Request, user: User, firm_id: int | None = None) -> None:
     request.session["user_id"] = user.id
     request.session["user_email"] = user.email
     request.session["user_name"] = user.display_name
-    request.session["user_role"] = user.technical_role.value
+    if firm_id:
+        request.session["firm_id"] = firm_id
+        # Get role from FirmUser
+        from app.services.firm_service import get_user_role_in_firm
+        from app.database import SessionLocal
+        db = SessionLocal()
+        try:
+            role = get_user_role_in_firm(db, user.id, firm_id)
+            request.session["user_role"] = role.value if role else "viewer"
+        finally:
+            db.close()
+    else:
+        request.session["user_role"] = "viewer"
 
 
 @router.get("/login", response_class=HTMLResponse)
@@ -77,7 +89,12 @@ async def login(request: Request, db: Session = Depends(get_db)):
         request.session["pending_2fa_user_id"] = user.id
         return RedirectResponse(url="/auth/2fa", status_code=303)
 
-    _set_session(request, user)
+    # Get user's firms and set firm_id
+    from app.services.firm_service import get_user_firms
+    firms = get_user_firms(db, user.id)
+    firm_id = firms[0].id if firms else None
+
+    _set_session(request, user, firm_id)
     set_flash(request, f"Welcome back, {user.display_name}!")
     return RedirectResponse(url="/dashboard", status_code=303)
 
@@ -116,7 +133,10 @@ async def twofa_verify(request: Request, db: Session = Depends(get_db)):
         })
 
     request.session.pop("pending_2fa_user_id", None)
-    _set_session(request, user)
+    from app.services.firm_service import get_user_firms
+    firms = get_user_firms(db, user.id)
+    firm_id = firms[0].id if firms else None
+    _set_session(request, user, firm_id)
     set_flash(request, f"Welcome back, {user.display_name}!")
     return RedirectResponse(url="/dashboard", status_code=303)
 
@@ -208,7 +228,10 @@ async def ms365_callback(request: Request, db: Session = Depends(get_db)):
         request.session["pending_2fa_user_id"] = user.id
         return RedirectResponse(url="/auth/2fa", status_code=303)
 
-    _set_session(request, user)
+    from app.services.firm_service import get_user_firms
+    firms = get_user_firms(db, user.id)
+    firm_id = firms[0].id if firms else None
+    _set_session(request, user, firm_id)
     set_flash(request, f"Welcome, {user.display_name}!")
     return RedirectResponse(url="/dashboard", status_code=303)
 

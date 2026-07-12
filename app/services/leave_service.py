@@ -4,17 +4,23 @@ from sqlalchemy import or_
 from sqlalchemy.orm import Session, joinedload
 
 from app.exceptions import NotFoundError
-from app.models.models import Leave, LeaveStatus
+from app.models.models import Leave, LeaveStatus, TeamMember
 
 
 def list_leaves(
     db: Session,
+    firm_id: int,
     limit: int = 50,
     offset: int = 0,
     team_member_id: Optional[int] = None,
     status: Optional[str] = None,
 ):
-    query = db.query(Leave).options(joinedload(Leave.team_member))
+    query = (
+        db.query(Leave)
+        .options(joinedload(Leave.team_member))
+        .join(TeamMember, Leave.team_member_id == TeamMember.id)
+        .filter(TeamMember.firm_id == firm_id)
+    )
     if team_member_id:
         query = query.filter(Leave.team_member_id == team_member_id)
     if status:

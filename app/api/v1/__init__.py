@@ -2,8 +2,14 @@
 
 from fastapi import APIRouter
 
-from app.api.v1 import auth
+from app.api.v1 import auth, dashboard, team_members, clients, engagements, assignments, leaves
 
 router = APIRouter(prefix="/api/v1")
 
 router.include_router(auth.router)
+router.include_router(dashboard.router)
+router.include_router(team_members.router)
+router.include_router(clients.router)
+router.include_router(engagements.router)
+router.include_router(assignments.router)
+router.include_router(leaves.router)

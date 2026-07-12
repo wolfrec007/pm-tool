@@ -9,12 +9,13 @@ from app.models.models import Client
 
 def list_clients(
     db: Session,
+    firm_id: int,
     limit: int = 50,
     offset: int = 0,
     q: Optional[str] = None,
     is_active: Optional[bool] = None,
 ):
-    query = db.query(Client)
+    query = db.query(Client).filter(Client.firm_id == firm_id)
     if q:
         query = query.filter(
             or_(
@@ -29,8 +30,11 @@ def list_clients(
     return items, total
 
 
-def get_client(db: Session, client_id: int) -> Client:
-    client = db.query(Client).filter(Client.id == client_id).first()
+def get_client(db: Session, client_id: int, firm_id: int | None = None) -> Client:
+    query = db.query(Client).filter(Client.id == client_id)
+    if firm_id is not None:
+        query = query.filter(Client.firm_id == firm_id)
+    client = query.first()
     if not client:
         raise NotFoundError(f"Client {client_id} not found")
     return client

@@ -4,11 +4,12 @@ from sqlalchemy import or_
 from sqlalchemy.orm import Session, joinedload
 
 from app.exceptions import NotFoundError
-from app.models.models import Engagement, EngagementInstance
+from app.models.models import Engagement, EngagementInstance, Client
 
 
 def list_engagements(
     db: Session,
+    firm_id: int,
     limit: int = 50,
     offset: int = 0,
     q: Optional[str] = None,
@@ -16,6 +17,8 @@ def list_engagements(
     status: Optional[str] = None,
 ):
     query = db.query(Engagement).options(joinedload(Engagement.client))
+    query = query.join(Client, Engagement.client_id == Client.id)
+    query = query.filter(Client.firm_id == firm_id)
     if q:
         query = query.filter(Engagement.name.ilike(f"%{q}%"))
     if is_active is not None:
@@ -27,13 +30,16 @@ def list_engagements(
     return items, total
 
 
-def get_engagement(db: Session, engagement_id: int) -> Engagement:
-    eng = (
+def get_engagement(db: Session, engagement_id: int, firm_id: int | None = None) -> Engagement:
+    query = (
         db.query(Engagement)
         .options(joinedload(Engagement.client))
         .filter(Engagement.id == engagement_id)
-        .first()
     )
+    if firm_id is not None:
+        query = query.join(Client, Engagement.client_id == Client.id)
+        query = query.filter(Client.firm_id == firm_id)
+    eng = query.first()
     if not eng:
         raise NotFoundError(f"Engagement {engagement_id} not found")
     return eng
@@ -70,12 +76,16 @@ def soft_delete_engagement(db: Session, engagement_id: int) -> Engagement:
 
 def list_instances(
     db: Session,
+    firm_id: int,
     limit: int = 50,
     offset: int = 0,
     engagement_id: Optional[int] = None,
     status: Optional[str] = None,
 ):
     query = db.query(EngagementInstance).options(joinedload(EngagementInstance.engagement))
+    query = query.join(Engagement, EngagementInstance.engagement_id == Engagement.id)
+    query = query.join(Client, Engagement.client_id == Client.id)
+    query = query.filter(Client.firm_id == firm_id)
     if engagement_id:
         query = query.filter(EngagementInstance.engagement_id == engagement_id)
     if status:
