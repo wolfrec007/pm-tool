@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    APP_NAME: str = "StaffPlan"
+    APP_NAME: str = "splanly"
     ENV: str = "development"
 
     DATABASE_URL: str = ""
@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "change-me-in-production"
     ALLOWED_ORIGINS: str = "*"
 
-    SESSION_COOKIE_NAME: str = "staffplan_session"
+    SESSION_COOKIE_NAME: str = "splanly_session"
     SESSION_MAX_AGE_SECONDS: int = 86400  # 24 hours
 
     # MS365 OAuth (Entra ID)
@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     SMTP_PORT: int = 587
     SMTP_USER: str = ""
     SMTP_PASSWORD: str = ""
-    SMTP_FROM_EMAIL: str = "noreply@staffplan.local"
+    SMTP_FROM_EMAIL: str = "noreply@splanly.local"
     SMTP_USE_TLS: bool = True
     EMAIL_WORKER_INTERVAL_SECONDS: int = 30
     EMAIL_MAX_RETRIES: int = 3

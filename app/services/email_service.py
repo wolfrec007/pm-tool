@@ -57,7 +57,7 @@ def queue_assignment_notification(
         lines.append(f"  Role: {assignment.role_on_engagement}")
     if created_by_name:
         lines.append(f"  Assigned by: {created_by_name}")
-    lines.extend(["", "Please review your schedule in StaffPlan.", "", "— StaffPlan"])
+    lines.extend(["", "Please review your schedule in splanly.", "", "— splanly"])
     body = "\n".join(lines)
 
     return queue_email(
