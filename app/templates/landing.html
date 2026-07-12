@@ -93,6 +93,16 @@
   ::selection{background:var(--steel-light); color:var(--heading);}
   :focus-visible{outline:2.5px solid var(--steel); outline-offset:3px; border-radius:6px;}
 
+  /* ---------- Brand ---------- */
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand-mark{width:34px; height:34px; border-radius:10px; position:relative; overflow:hidden; background:var(--navy); flex-shrink:0;}
+  html[data-theme="dark"] .brand-mark{background:#0e2032;}
+  .brand-mark span{position:absolute; border-radius:50%;}
+  .brand-mark .b1{width:26px; height:26px; background:var(--steel); opacity:.88; left:2px; top:12px;}
+  .brand-mark .b2{width:22px; height:22px; background:#eef5fc; right:3px; top:4px;}
+  html[data-theme="dark"] .brand-mark .b2{background:#0b1a29;}
+  .brand-word{font-family:'Plus Jakarta Sans'; font-weight:700; font-size:20px; color:var(--heading); letter-spacing:-0.01em;}
+
   /* ---------- Buttons ---------- */
   .btn{
     display:inline-flex; align-items:center; justify-content:center; gap:8px;
