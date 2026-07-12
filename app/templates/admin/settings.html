@@ -3,106 +3,141 @@
 {% block title %}Admin Settings — StaffPlan{% endblock %}
 
 {% block content %}
-<div class="uk-card uk-card-body uk-margin" style="max-width:700px;">
-    <h2 class="text-xl font-semibold">Admin Settings</h2>
+<div style="max-width:700px;">
+    <h2 class="text-xl font-semibold mb-4">Admin Settings</h2>
 
-    {% if saved %}
-    <div class="uk-alert uk-alert-success mt-4" uk-alert><p>Settings saved successfully.</p></div>
-    {% endif %}
-    {% if error %}
-    <div class="uk-alert uk-alert-destructive mt-4" uk-alert><p>{{ error }}</p></div>
-    {% endif %}
+    <!-- Tabs -->
+    <div class="flex gap-1 border-b border-border mb-4">
+        <button onclick="showTab('general')" id="tab-general" class="settings-tab px-4 py-2 text-sm font-medium rounded-t-md border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors">
+            <uk-icon icon="settings" width="14" height="14" class="mr-1"></uk-icon> General
+        </button>
+        <button onclick="showTab('approval')" id="tab-approval" class="settings-tab px-4 py-2 text-sm font-medium rounded-t-md border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors">
+            <uk-icon icon="check-circle" width="14" height="14" class="mr-1"></uk-icon> Approval Rules
+        </button>
+        <button onclick="showTab('domains')" id="tab-domains" class="settings-tab px-4 py-2 text-sm font-medium rounded-t-md border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors">
+            <uk-icon icon="shield" width="14" height="14" class="mr-1"></uk-icon> Domains
+        </button>
+    </div>
 
-    <form method="POST" action="/admin/settings" class="space-y-4 mt-4">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-
-        {% for setting in settings %}
-        <div class="space-y-2">
-            <label class="uk-form-label" for="{{ setting.key }}">
-                {{ setting.key | replace('_', ' ') | title }}
-            </label>
-            <input type="text" name="{{ setting.key }}" id="{{ setting.key }}"
-                value="{{ setting.value }}" class="uk-input w-full">
-            {% if setting.description %}
-            <p class="text-sm text-muted-foreground mt-1">{{ setting.description }}</p>
+    <!-- General Settings -->
+    <div id="section-general" class="settings-section">
+        <div class="uk-card uk-card-body">
+            {% if saved %}
+            <div class="uk-alert uk-alert-success mb-4" uk-alert><p>Settings saved successfully.</p></div>
             {% endif %}
-        </div>
-        {% endfor %}
+            {% if error %}
+            <div class="uk-alert uk-alert-destructive mb-4" uk-alert><p>{{ error }}</p></div>
+            {% endif %}
 
-        <div class="pt-4 border-t border-border mt-6">
-            <button type="submit" class="uk-btn uk-btn-primary">
-                <span uk-icon="icon: check; ratio: 0.8" class="mr-2"></span> Save Settings
-            </button>
-        </div>
-    </form>
-</div>
-
-<!-- Approval Rules -->
-<div class="uk-card uk-card-body mt-4" style="max-width:700px;">
-    <h2 class="text-xl font-semibold mb-2">Approval Rules</h2>
-    <p class="text-sm text-muted-foreground mb-4">Toggle which operations require admin approval before taking effect.</p>
-
-    {% if approval_saved %}
-    <div class="uk-alert uk-alert-success mt-4" uk-alert><p>Approval rules saved.</p></div>
-    {% endif %}
-
-    <form method="POST" action="/admin/settings/approval" class="space-y-3">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-
-        <table class="uk-table uk-table-divider uk-table-small">
-            <thead>
-                <tr>
-                    <th>Resource</th>
-                    <th>Operation</th>
-                    <th class="uk-text-center">Require Approval</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for resource in ["assignment", "engagement", "client", "team_member", "leave"] %}
-                {% for operation in ["create", "update", "delete"] %}
-                <tr>
-                    <td class="font-medium">{{ resource | replace("_", " ") | title }}</td>
-                    <td>{{ operation | title }}</td>
-                    <td class="uk-text-center">
-                        <input type="checkbox" name="rule_{{ resource }}_{{ operation }}" class="uk-checkbox"
-                            {% if approval_rules.get(resource ~ "_" ~ operation) %}checked{% endif %}>
-                    </td>
-                </tr>
+            <form method="POST" action="/admin/settings" class="space-y-4">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                {% for setting in settings %}
+                <div class="space-y-2">
+                    <label class="uk-form-label" for="{{ setting.key }}">
+                        {{ setting.key | replace('_', ' ') | title }}
+                    </label>
+                    <input type="text" name="{{ setting.key }}" id="{{ setting.key }}"
+                        value="{{ setting.value }}" class="uk-input w-full">
+                    {% if setting.description %}
+                    <p class="text-sm text-muted-foreground mt-1">{{ setting.description }}</p>
+                    {% endif %}
+                </div>
                 {% endfor %}
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <div class="pt-4 border-t border-border">
-            <button type="submit" class="uk-btn uk-btn-primary">
-                <span uk-icon="icon: check; ratio: 0.8" class="mr-2"></span> Save Approval Rules
-            </button>
+                <div class="pt-4 border-t border-border">
+                    <button type="submit" class="uk-btn uk-btn-primary">
+                        <span uk-icon="icon: check; ratio: 0.8" class="mr-2"></span> Save Settings
+                    </button>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
+
+    <!-- Approval Rules -->
+    <div id="section-approval" class="settings-section hidden">
+        <div class="uk-card uk-card-body">
+            <p class="text-sm text-muted-foreground mb-4">Toggle which operations require admin approval before taking effect.</p>
+
+            {% if approval_saved %}
+            <div class="uk-alert uk-alert-success mb-4" uk-alert><p>Approval rules saved.</p></div>
+            {% endif %}
+
+            <form method="POST" action="/admin/settings/approval" class="space-y-3">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <table class="uk-table uk-table-divider uk-table-small">
+                    <thead>
+                        <tr>
+                            <th>Resource</th>
+                            <th>Operation</th>
+                            <th class="uk-text-center">Require Approval</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for resource in ["assignment", "engagement", "client", "team_member", "leave"] %}
+                        {% for operation in ["create", "update", "delete"] %}
+                        <tr>
+                            <td class="font-medium">{{ resource | replace("_", " ") | title }}</td>
+                            <td>{{ operation | title }}</td>
+                            <td class="uk-text-center">
+                                <input type="checkbox" name="rule_{{ resource }}_{{ operation }}" class="uk-checkbox"
+                                    {% if approval_rules.get(resource ~ "_" ~ operation) %}checked{% endif %}>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="pt-4 border-t border-border">
+                    <button type="submit" class="uk-btn uk-btn-primary">
+                        <span uk-icon="icon: check; ratio: 0.8" class="mr-2"></span> Save Approval Rules
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Registration Domains -->
+    <div id="section-domains" class="settings-section hidden">
+        <div class="uk-card uk-card-body">
+            <p class="text-sm text-muted-foreground mb-4">Restrict registration to specific email domains. Comma-separated. Leave empty to allow all domains.</p>
+
+            {% if domains_saved %}
+            <div class="uk-alert uk-alert-success mb-4" uk-alert><p>Domain settings saved.</p></div>
+            {% endif %}
+
+            <form method="POST" action="/admin/settings/domains" class="space-y-3">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <div class="space-y-2">
+                    <label class="uk-form-label">Allowed Email Domains</label>
+                    <input type="text" name="allowed_domains" class="uk-input w-full"
+                        value="{{ firm_domains or '' }}" placeholder="pkfindia.com,pkf.in">
+                    <p class="text-xs text-muted-foreground">Comma-separated. Only users with these email domains can register.</p>
+                </div>
+                <div class="pt-4 border-t border-border">
+                    <button type="submit" class="uk-btn uk-btn-primary">
+                        <span uk-icon="icon: check; ratio: 0.8" class="mr-2"></span> Save Domain Settings
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
-<!-- Firm Domain Settings -->
-<div class="uk-card uk-card-body mt-4" style="max-width:700px;">
-    <h2 class="text-xl font-semibold mb-2">Registration Domains</h2>
-    <p class="text-sm text-muted-foreground mb-4">Restrict registration to specific email domains. Comma-separated (e.g., pkfindia.com,pkf.in). Leave empty to allow all domains.</p>
+<style>
+    .settings-tab.active {
+        color: hsl(var(--foreground));
+        border-bottom-color: hsl(var(--primary));
+        font-weight: 600;
+    }
+</style>
 
-    {% if domains_saved %}
-    <div class="uk-alert uk-alert-success mt-4" uk-alert><p>Domain settings saved.</p></div>
-    {% endif %}
-
-    <form method="POST" action="/admin/settings/domains" class="space-y-3">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-        <div class="space-y-2">
-            <label class="uk-form-label">Allowed Email Domains</label>
-            <input type="text" name="allowed_domains" class="uk-input w-full"
-                value="{{ firm_domains or '' }}" placeholder="pkfindia.com,pkf.in">
-            <p class="text-xs text-muted-foreground">Comma-separated. Only users with these email domains can register.</p>
-        </div>
-        <div class="pt-4 border-t border-border">
-            <button type="submit" class="uk-btn uk-btn-primary">
-                <span uk-icon="icon: check; ratio: 0.8" class="mr-2"></span> Save Domain Settings
-            </button>
-        </div>
-    </form>
-</div>
+<script>
+function showTab(tab) {
+    document.querySelectorAll('.settings-section').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('.settings-tab').forEach(el => el.classList.remove('active'));
+    document.getElementById('section-' + tab).classList.remove('hidden');
+    document.getElementById('tab-' + tab).classList.add('active');
+}
+// Default to general tab
+showTab('general');
+</script>
 {% endblock %}
