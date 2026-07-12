@@ -14,6 +14,10 @@ from app.models.models import Assignment, EngagementInstance, Leave, LeaveStatus
 from app.services.email_service import queue_assignment_notification
 
 
+def get_assignment(db: Session, assignment_id: int) -> Assignment | None:
+    return db.query(Assignment).filter(Assignment.id == assignment_id).first()
+
+
 def get_member_allocations(db: Session, firm_id: int | None = None) -> dict:
     """Get current allocation percentage for all active team members."""
     today = date.today()

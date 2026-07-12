@@ -54,7 +54,8 @@ def list_engagements_json(
 
 @router.get("/new", response_class=HTMLResponse)
 def new_engagement_form(request: Request, db: Session = Depends(get_db), _=Depends(require_role(TechnicalRole.admin, TechnicalRole.moderator))):
-    clients, _ = client_service.list_clients(db, limit=200, is_active=True)
+    firm_id = request.session.get("firm_id")
+    clients, _ = client_service.list_clients(db, firm_id=firm_id, limit=200, is_active=True)
     return templates.TemplateResponse(request, "engagements/form.html", {
         "engagement": None, "action": "/engagements/new", "errors": [],
         "clients": clients, "csrf_token": get_csrf_token(request),
@@ -87,15 +88,16 @@ async def create_engagement_form(
         firm_id = request.session.get("firm_id")
         result = check_approval(db, firm_id, _.id, ResourceType.engagement, OperationType.create, data)
         if result:
-            set_flash(request, "Engagement creation pending approval")
-            return RedirectResponse(url="/users", status_code=303)
+            set_flash(request, "Engagement creation submitted for admin approval.")
+            referer = request.headers.get("referer", "/engagements")
+            return RedirectResponse(url=referer, status_code=303)
 
         service.create_engagement(db, data)
         return RedirectResponse(url="/engagements", status_code=303)
     except (ValidationError, Exception) as e:
         errors.append(str(e))
 
-    clients, _ = client_service.list_clients(db, limit=200, is_active=True)
+    clients, _ = client_service.list_clients(db, firm_id=firm_id, limit=200, is_active=True)
     return templates.TemplateResponse(request, "engagements/form.html", {
         "engagement": None, "action": "/engagements/new", "errors": errors,
         "clients": clients, "csrf_token": get_csrf_token(request),
@@ -107,8 +109,9 @@ def engagement_detail(
     request: Request, engagement_id: int,
     db: Session = Depends(get_db), user=Depends(get_current_user),
 ):
+    firm_id = request.session.get("firm_id")
     engagement = service.get_engagement(db, engagement_id)
-    instances, _ = service.list_instances(db, limit=200, engagement_id=engagement_id)
+    instances, _ = service.list_instances(db, firm_id=firm_id, limit=200, engagement_id=engagement_id)
     return templates.TemplateResponse(request, "engagements/detail.html", {
         "engagement": engagement,
         "instances": instances,
@@ -143,8 +146,9 @@ async def create_instance_form(
     except Exception as e:
         errors.append(str(e))
 
+    firm_id = request.session.get("firm_id")
     engagement = service.get_engagement(db, engagement_id)
-    instances, _ = service.list_instances(db, limit=200, engagement_id=engagement_id)
+    instances, _ = service.list_instances(db, firm_id=firm_id, limit=200, engagement_id=engagement_id)
     return templates.TemplateResponse(request, "engagements/detail.html", {
         "engagement": engagement,
         "instances": instances,
@@ -160,7 +164,8 @@ def edit_engagement_form(
     db: Session = Depends(get_db), _=Depends(require_role(TechnicalRole.admin, TechnicalRole.moderator)),
 ):
     engagement = service.get_engagement(db, engagement_id)
-    clients, _ = client_service.list_clients(db, limit=200, is_active=True)
+    firm_id = request.session.get("firm_id")
+    clients, _ = client_service.list_clients(db, firm_id=firm_id, limit=200, is_active=True)
     return templates.TemplateResponse(request, "engagements/form.html", {
         "engagement": engagement, "action": f"/engagements/{engagement_id}/edit", "errors": [],
         "clients": clients, "csrf_token": get_csrf_token(request),
@@ -193,7 +198,8 @@ async def update_engagement_form(
         errors.append(str(e))
 
     engagement = service.get_engagement(db, engagement_id)
-    clients, _ = client_service.list_clients(db, limit=200, is_active=True)
+    firm_id = request.session.get("firm_id")
+    clients, _ = client_service.list_clients(db, firm_id=firm_id, limit=200, is_active=True)
     return templates.TemplateResponse(request, "engagements/form.html", {
         "engagement": engagement, "action": f"/engagements/{engagement_id}/edit", "errors": errors,
         "clients": [str(c.id) for c in clients], "csrf_token": get_csrf_token(request),

@@ -97,8 +97,9 @@ async def create_team_member_form(
         firm_id = request.session.get("firm_id")
         result = check_approval(db, firm_id, user.id, ResourceType.team_member, OperationType.create, data)
         if result:
-            set_flash(request, "Team member creation pending approval")
-            return RedirectResponse(url="/users", status_code=303)
+            set_flash(request, "Team member creation submitted for admin approval.")
+            referer = request.headers.get("referer", "/team-members")
+            return RedirectResponse(url=referer, status_code=303)
 
         service.create_team_member(db, data)
         set_flash(request, f"Team member '{data['name']}' created successfully.")

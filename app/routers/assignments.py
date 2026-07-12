@@ -81,16 +81,18 @@ def list_assignments_json(
 @router.get("/new", response_class=HTMLResponse)
 def new_assignment_form(
     request: Request, db: Session = Depends(get_db),
-    member_id: Optional[int] = None,
+    member_id: Optional[str] = Query(None),
     _=Depends(require_role(TechnicalRole.admin, TechnicalRole.moderator)),
 ):
-    members, _ = team_member_service.list_team_members(db, limit=200, is_active=True)
-    instances, _ = engagement_service.list_instances(db, limit=200)
+    firm_id = request.session.get("firm_id")
+    mid = int(member_id) if member_id and member_id.isdigit() else None
+    members, _ = team_member_service.list_team_members(db, firm_id=firm_id, limit=200, is_active=True)
+    instances, _ = engagement_service.list_instances(db, firm_id=firm_id, limit=200)
     return templates.TemplateResponse(request, "assignments/form.html", {
         "assignment": None, "action": "/assignments/new", "errors": [],
         "members": members,
         "instances": instances,
-        "preselected_member_id": member_id,
+        "preselected_member_id": mid,
         "csrf_token": get_csrf_token(request),
     })
 
@@ -120,8 +122,9 @@ async def create_assignment_form(
         }
         result = check_approval(db, firm_id, user.id, ResourceType.assignment, OperationType.create, payload)
         if result:
-            set_flash(request, "Assignment pending approval")
-            return RedirectResponse(url="/users", status_code=303)
+            set_flash(request, "Assignment submitted for admin approval. You will be notified once it is reviewed.")
+            referer = request.headers.get("referer", "/assignments")
+            return RedirectResponse(url=referer, status_code=303)
 
         result = service.create_assignment(
             db,
@@ -140,8 +143,8 @@ async def create_assignment_form(
     except Exception as e:
         errors.append(str(e))
 
-    members, _ = team_member_service.list_team_members(db, limit=200, is_active=True)
-    instances, _ = engagement_service.list_instances(db, limit=200)
+    members, _ = team_member_service.list_team_members(db, firm_id=firm_id, limit=200, is_active=True)
+    instances, _ = engagement_service.list_instances(db, firm_id=firm_id, limit=200)
     return templates.TemplateResponse(request, "assignments/form.html", {
         "assignment": None, "action": "/assignments/new", "errors": errors,
         "members": members, "instances": instances,
@@ -164,6 +167,70 @@ def create_assignment_api(
         return AssignmentRead.model_validate(result)
     except Exception as e:
         _handle_conflict(e)
+
+
+@router.get("/{assignment_id}/edit", response_class=HTMLResponse)
+def edit_assignment_form(
+    request: Request, assignment_id: int,
+    db: Session = Depends(get_db),
+    _=Depends(require_role(TechnicalRole.admin, TechnicalRole.moderator)),
+):
+    assignment = service.get_assignment(db, assignment_id)
+    if not assignment:
+        raise HTTPException(status_code=404, detail="Assignment not found")
+    firm_id = request.session.get("firm_id")
+    members, _ = team_member_service.list_team_members(db, firm_id=firm_id, limit=200, is_active=True)
+    instances, _ = engagement_service.list_instances(db, firm_id=firm_id, limit=200)
+    return templates.TemplateResponse(request, "assignments/form.html", {
+        "assignment": assignment,
+        "action": f"/assignments/{assignment_id}/edit",
+        "errors": [],
+        "members": members,
+        "instances": instances,
+        "preselected_member_id": assignment.team_member_id,
+        "csrf_token": get_csrf_token(request),
+    })
+
+
+@router.post("/{assignment_id}/edit")
+async def update_assignment_form(
+    request: Request, assignment_id: int,
+    db: Session = Depends(get_db),
+    user=Depends(require_role(TechnicalRole.admin, TechnicalRole.moderator)),
+):
+    form_data = await request.form()
+    if not validate_csrf(request, form_data.get("csrf_token")):
+        raise HTTPException(status_code=403, detail="Invalid CSRF token")
+
+    errors = []
+    try:
+        result = service.update_assignment(
+            db, assignment_id=assignment_id,
+            allocation_percent=int(form_data["allocation_percent"]),
+            start_date=form_data["start_date"],
+            end_date=form_data["end_date"],
+            role_on_engagement=form_data.get("role_on_engagement", "").strip() or None,
+        )
+        set_flash(request, f"Assignment updated ({result.allocation_percent}% allocation).")
+        return RedirectResponse(url="/dashboard", status_code=303)
+    except (OverAllocationError, ConflictWithLeaveError, ValidationError, NotFoundError) as e:
+        errors.append(str(e))
+    except Exception as e:
+        errors.append(str(e))
+
+    assignment = service.get_assignment(db, assignment_id)
+    firm_id = request.session.get("firm_id")
+    members, _ = team_member_service.list_team_members(db, firm_id=firm_id, limit=200, is_active=True)
+    instances, _ = engagement_service.list_instances(db, firm_id=firm_id, limit=200)
+    return templates.TemplateResponse(request, "assignments/form.html", {
+        "assignment": assignment,
+        "action": f"/assignments/{assignment_id}/edit",
+        "errors": errors,
+        "members": members,
+        "instances": instances,
+        "preselected_member_id": assignment.team_member_id if assignment else None,
+        "csrf_token": get_csrf_token(request),
+    })
 
 
 @router.patch("/{assignment_id}", response_model=AssignmentRead)

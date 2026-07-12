@@ -82,8 +82,9 @@ async def create_leave_form(
         firm_id = request.session.get("firm_id")
         result = check_approval(db, firm_id, _.id, ResourceType.leave, OperationType.create, data)
         if result:
-            set_flash(request, "Leave request pending approval")
-            return RedirectResponse(url="/users", status_code=303)
+            set_flash(request, "Leave request submitted for admin approval.")
+            referer = request.headers.get("referer", "/leaves")
+            return RedirectResponse(url=referer, status_code=303)
 
         service.create_leave(db, data)
         return RedirectResponse(url="/leaves", status_code=303)

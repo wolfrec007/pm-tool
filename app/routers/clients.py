@@ -77,8 +77,9 @@ async def create_client_form(
         firm_id = request.session.get("firm_id")
         result = check_approval(db, firm_id, _.id, ResourceType.client, OperationType.create, data)
         if result:
-            set_flash(request, "Client creation pending approval")
-            return RedirectResponse(url="/users", status_code=303)
+            set_flash(request, "Client creation submitted for admin approval.")
+            referer = request.headers.get("referer", "/clients")
+            return RedirectResponse(url=referer, status_code=303)
 
         service.create_client(db, data)
         return RedirectResponse(url="/clients", status_code=303)

@@ -116,30 +116,32 @@
                 <thead>
                     <tr>
                         <th>Type</th>
-                        <th>Operation</th>
-                        <th>Payload</th>
+                        <th>Info</th>
+                        <th>Requested By</th>
+                        <th>Date</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for r in pending_approvals %}
-                    <tr class="hover:bg-muted/50 transition-colors">
+                    <tr id="approval-row-{{ r.id }}" class="hover:bg-muted/50 transition-colors">
                         <td><span class="uk-badge">{{ r.resource_type.value | replace("_", " ") | title }}</span></td>
-                        <td>{{ r.operation.value | title }}</td>
-                        <td class="text-xs text-muted-foreground max-w-xs truncate">{{ r.payload }}</td>
+                        <td class="text-sm text-muted-foreground max-w-xs">{{ r.info_text or "—" }}</td>
+                        <td class="text-sm font-medium">{{ r.requestor_name }}</td>
+                        <td class="text-sm text-muted-foreground whitespace-nowrap">{{ r.created_at.strftime('%d %b %H:%M') if r.created_at else "—" }}</td>
                         <td class="flex gap-1">
-                            <form method="POST" action="/api/v1/approval-requests/{{ r.id }}/approve" class="inline">
-                                <button type="submit" class="uk-btn uk-btn-primary uk-btn-sm">Approve</button>
-                            </form>
-                            <form method="POST" action="/api/v1/approval-requests/{{ r.id }}/reject" class="inline">
-                                <button type="submit" class="uk-btn uk-btn-destructive uk-btn-sm">Reject</button>
-                            </form>
+                            <button onclick="approveRequest({{ r.id }})" class="uk-btn uk-btn-primary uk-btn-sm">Approve</button>
+                            <button onclick="rejectRequest({{ r.id }})" class="uk-btn uk-btn-destructive uk-btn-sm">Reject</button>
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
+
+        <!-- Success/Error toast -->
+        <div id="approval-toast" class="hidden fixed bottom-6 right-6 z-50 p-4 rounded-lg shadow-lg text-sm font-medium" style="max-width:400px;"></div>
+
         {% else %}
         <div class="uk-alert uk-alert-success" uk-alert><p>No pending approval requests.</p></div>
         {% endif %}
@@ -273,5 +275,45 @@ function showTab(tab) {
     document.getElementById('tab-' + tab).classList.add('active');
 }
 showTab('users');
+
+function showToast(message, type) {
+    var toast = document.getElementById('approval-toast');
+    toast.textContent = message;
+    toast.className = '';
+    toast.style.display = 'block';
+    toast.style.background = type === 'success' ? 'hsl(142 70% 45%)' : 'hsl(0 84% 55%)';
+    toast.style.color = '#fff';
+    setTimeout(function() { toast.style.display = 'none'; }, 3000);
+}
+
+function approveRequest(id) {
+    fetch('/api/v1/approval-requests/' + id + '/approve', { method: 'POST', credentials: 'same-origin' })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            var row = document.getElementById('approval-row-' + id);
+            if (row) {
+                row.style.transition = 'opacity 0.3s';
+                row.style.opacity = '0';
+                setTimeout(function() { row.remove(); }, 300);
+            }
+            showToast('Request approved and applied', 'success');
+        })
+        .catch(function() { showToast('Failed to approve request', 'error'); });
+}
+
+function rejectRequest(id) {
+    fetch('/api/v1/approval-requests/' + id + '/reject', { method: 'POST', credentials: 'same-origin' })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            var row = document.getElementById('approval-row-' + id);
+            if (row) {
+                row.style.transition = 'opacity 0.3s';
+                row.style.opacity = '0';
+                setTimeout(function() { row.remove(); }, 300);
+            }
+            showToast('Request rejected', 'success');
+        })
+        .catch(function() { showToast('Failed to reject request', 'error'); });
+}
 </script>
 {% endblock %}

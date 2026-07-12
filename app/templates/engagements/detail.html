@@ -131,9 +131,11 @@
                         <td>{{ inst.end_date }}</td>
                         <td>{{ inst.due_date or "—" }}</td>
                         <td>
-                            <a href="/assignments/new?member_id=&engagement_instance_id={{ inst.id }}" class="uk-btn uk-btn-default uk-btn-xs">
-                                <uk-icon icon="plus" width="12" height="12" class="mr-1"></uk-icon>Assign Staff
-                            </a>
+                            {% if request.session.get("user_role") in ["admin", "moderator"] %}
+                            <button onclick="openAssignModal({{ inst.id }}, '{{ inst.period_label | e }}')" class="uk-btn uk-btn-primary uk-btn-xs">
+                                <uk-icon icon="user-plus" width="12" height="12" class="mr-1"></uk-icon>Assign
+                            </button>
+                            {% endif %}
                         </td>
                     </tr>
                     {% endfor %}
@@ -147,4 +149,96 @@
         {% endif %}
     </div>
 </div>
+
+<!-- Assign Staff Modal -->
+<div id="assign-modal" class="hidden fixed inset-0 flex items-center justify-center" style="z-index:300;">
+    <div class="absolute inset-0 bg-black/50" onclick="closeAssignModal()"></div>
+    <div class="relative bg-background border border-border rounded-lg shadow-xl w-full max-w-md mx-4 p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-foreground">Assign Staff</h3>
+            <button onclick="closeAssignModal()" class="w-8 h-8 flex items-center justify-center rounded-md hover:bg-muted transition-colors">
+                <uk-icon icon="x" width="18" height="18"></uk-icon>
+            </button>
+        </div>
+        <p class="text-sm text-muted-foreground mb-4">Instance: <strong id="assign-instance-label"></strong></p>
+        <form method="POST" action="/assignments/new" class="space-y-4">
+            {{ csrf_field(csrf_token) }}
+            <input type="hidden" name="engagement_instance_id" id="assign-instance-id">
+
+            <div class="space-y-2">
+                <label class="text-sm font-medium text-foreground">Team Member <span class="text-destructive">*</span></label>
+                <input type="text" id="assign-member-search" class="uk-input w-full" placeholder="Search member..." autocomplete="off">
+                <input type="hidden" name="team_member_id" id="assign-team-member-id" required>
+                <div id="assign-member-dropdown" class="hidden absolute left-0 right-0 mt-1 bg-background border border-border rounded-md shadow-lg max-h-48 overflow-y-auto" style="z-index:301;">
+                    {% for m in members %}
+                    <div class="assign-member-option px-3 py-2 text-sm cursor-pointer hover:bg-muted" data-id="{{ m.id }}" data-name="{{ m.name }}">
+                        {{ m.name }} <span class="text-muted-foreground text-xs">({{ m.business_role.value | replace('_', ' ') | title if m.business_role else '' }})</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-sm font-medium text-foreground">Role on Engagement</label>
+                <input type="text" name="role_on_engagement" class="uk-input w-full" placeholder="e.g. Lead, Reviewer">
+            </div>
+
+            <div class="grid grid-cols-3 gap-3">
+                <div class="space-y-2">
+                    <label class="text-sm font-medium text-foreground">Allocation % <span class="text-destructive">*</span></label>
+                    <input type="number" name="allocation_percent" class="uk-input w-full" min="1" max="100" placeholder="e.g. 50" required>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-medium text-foreground">Start <span class="text-destructive">*</span></label>
+                    <input type="date" name="start_date" class="uk-input w-full" required>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-medium text-foreground">End <span class="text-destructive">*</span></label>
+                    <input type="date" name="end_date" class="uk-input w-full" required>
+                </div>
+            </div>
+
+            <div class="flex gap-2 pt-2">
+                <button type="submit" class="uk-btn uk-btn-primary flex-1">Create Assignment</button>
+                <button type="button" onclick="closeAssignModal()" class="uk-btn uk-btn-default">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openAssignModal(instanceId, instanceLabel) {
+    document.getElementById('assign-instance-id').value = instanceId;
+    document.getElementById('assign-instance-label').textContent = instanceLabel;
+    document.getElementById('assign-modal').classList.remove('hidden');
+    document.getElementById('assign-member-id').value = '';
+    document.getElementById('assign-member-search').value = '';
+}
+function closeAssignModal() {
+    document.getElementById('assign-modal').classList.add('hidden');
+}
+document.addEventListener('DOMContentLoaded', function() {
+    var search = document.getElementById('assign-member-search');
+    var dropdown = document.getElementById('assign-member-dropdown');
+    var hidden = document.getElementById('assign-team-member-id');
+    var options = dropdown.querySelectorAll('.assign-member-option');
+
+    search.addEventListener('focus', function() { dropdown.classList.remove('hidden'); });
+    search.addEventListener('input', function() {
+        var q = this.value.toLowerCase();
+        dropdown.classList.remove('hidden');
+        options.forEach(function(opt) { opt.style.display = opt.textContent.toLowerCase().includes(q) ? '' : 'none'; });
+    });
+    options.forEach(function(opt) {
+        opt.addEventListener('click', function() {
+            search.value = this.dataset.name;
+            hidden.value = this.dataset.id;
+            dropdown.classList.add('hidden');
+        });
+    });
+    document.addEventListener('click', function(e) {
+        if (!search.contains(e.target) && !dropdown.contains(e.target)) dropdown.classList.add('hidden');
+    });
+});
+</script>
 {% endblock %}

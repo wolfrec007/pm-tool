@@ -36,9 +36,58 @@ def list_users(
     for u in items:
         u.firm_role = get_user_role_in_firm(db, u.id, firm_id).value if firm_id and get_user_role_in_firm(db, u.id, firm_id) else "viewer"
 
-    # Get pending approval requests
+    # Get pending approval requests with resolved info
     from app.services.approval_service import list_pending_requests
+    from app.models.models import ApprovalRequest as ApprovalRequestModel
+    from app.models.models import TeamMember, Client, EngagementInstance, User as UserModel
     pending_approvals = list_pending_requests(db, firm_id) if firm_id else []
+
+    # Resolve payload IDs to names for each pending approval
+    for req in pending_approvals:
+        payload = req.payload or {}
+        info_parts = []
+        if req.resource_type.value == "assignment":
+            if "team_member_id" in payload:
+                m = db.query(TeamMember).get(payload["team_member_id"])
+                info_parts.append(f"Member: {m.name}" if m else f"Member #{payload['team_member_id']}")
+            if "engagement_instance_id" in payload:
+                inst = db.query(EngagementInstance).get(payload["engagement_instance_id"])
+                label = inst.period_label if inst else f"#{payload['engagement_instance_id']}"
+                eng_name = inst.engagement.name if inst and inst.engagement else ""
+                info_parts.append(f"Instance: {label}" + (f" ({eng_name})" if eng_name else ""))
+            if "allocation_percent" in payload:
+                info_parts.append(f"Allocation: {payload['allocation_percent']}%")
+            if "start_date" in payload and "end_date" in payload:
+                info_parts.append(f"{payload['start_date']} → {payload['end_date']}")
+        elif req.resource_type.value == "client":
+            if "name" in payload:
+                info_parts.append(payload["name"])
+        elif req.resource_type.value == "engagement":
+            if "name" in payload:
+                info_parts.append(payload["name"])
+            if "client_id" in payload:
+                c = db.query(Client).get(payload["client_id"])
+                info_parts.append(f"Client: {c.name}" if c else "")
+        elif req.resource_type.value == "team_member":
+            if "name" in payload:
+                info_parts.append(payload["name"])
+            if "business_role" in payload:
+                info_parts.append(str(payload["business_role"]))
+        elif req.resource_type.value == "leave":
+            if "start_date" in payload and "end_date" in payload:
+                info_parts.append(f"{payload['start_date']} → {payload['end_date']}")
+            if "leave_type" in payload:
+                info_parts.append(str(payload["leave_type"]))
+        req.info_text = " · ".join([p for p in info_parts if p])
+
+    # Resolve requestor names for pending approvals
+    req_user_ids = set(r.requested_by_user_id for r in pending_approvals)
+    req_users_map = {}
+    if req_user_ids:
+        for u in db.query(UserModel).filter(UserModel.id.in_(req_user_ids)).all():
+            req_users_map[u.id] = u
+    for req in pending_approvals:
+        req.requestor_name = req_users_map[req.requested_by_user_id].display_name if req.requested_by_user_id in req_users_map else "Unknown"
 
     # Get pending extension requests
     from app.services.extension_service import list_extension_requests
