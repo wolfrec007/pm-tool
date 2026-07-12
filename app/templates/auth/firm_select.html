@@ -18,10 +18,10 @@
             <a href="/auth/firm/switch/{{ fu.firm_id }}"
                class="uk-card uk-card-body flex items-center gap-4 hover:border-primary transition-colors cursor-pointer block">
                 <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-lg">
-                    {{ fu.firm.name[0] }}
+                    {{ fu.firm_name[0] }}
                 </div>
                 <div class="flex-1">
-                    <div class="font-semibold text-foreground">{{ fu.firm.name }}</div>
+                    <div class="font-semibold text-foreground">{{ fu.firm_name }}</div>
                     <div class="text-sm text-muted-foreground">{{ fu.role | title }}</div>
                 </div>
                 <uk-icon icon="chevron-right" width="16" height="16" class="text-muted-foreground"></uk-icon>

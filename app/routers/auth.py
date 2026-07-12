@@ -108,12 +108,12 @@ async def login(request: Request, db: Session = Depends(get_db)):
     request.session["user_id"] = user.id
     request.session["user_email"] = user.email
     request.session["user_name"] = user.display_name
-    # Store firm_users data for the selector page
+    # Store firm_users data for the selector page (plain dicts only, no ORM objects)
     firm_users = []
     for f in firms:
         fu = get_firm_user(db, user.id, f.id)
         if fu:
-            firm_users.append({"firm": f, "firm_id": f.id, "role": fu.technical_role.value, "firm_name": f.name})
+            firm_users.append({"firm_id": f.id, "role": fu.technical_role.value, "firm_name": f.name})
     request.session["pending_firm_users"] = firm_users
     return RedirectResponse(url="/auth/firm-select", status_code=303)
 
