@@ -117,6 +117,15 @@ async def update_approval_rules(
 
     firm_id = request.session.get("firm_id")
     if not firm_id:
+        # Fallback: get user's first firm from FirmUser table
+        from app.services.firm_service import get_user_firms
+        user_id = request.session.get("user_id")
+        if user_id:
+            firms = get_user_firms(db, user_id)
+            if firms:
+                firm_id = firms[0].id
+                request.session["firm_id"] = firm_id
+    if not firm_id:
         return _render(request, db, error="No firm selected")
 
     from app.services.approval_service import upsert_approval_rule
