@@ -1,294 +1,627 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>splanly — Resource Planning for CA Firms</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230e7490'/><text x='50' y='68' font-family='Arial,sans-serif' font-size='48' font-weight='bold' fill='white' text-anchor='middle'>SP</text></svg>">
-    <link rel="preconnect" href="https://rsms.me/">
-    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/franken-ui@2.1.2/dist/css/core.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/franken-ui@2.1.2/dist/css/utilities.min.css">
-    <link rel="stylesheet" href="/static/custom-theme.css">
-    <script>
-        const htmlElement = document.documentElement;
-        const __FRANKEN__ = JSON.parse(localStorage.getItem("__FRANKEN__") || "{}");
-        if (__FRANKEN__.mode === "dark" || (!__FRANKEN__.mode && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
-            htmlElement.classList.add("dark");
-        } else {
-            htmlElement.classList.remove("dark");
-        }
-        htmlElement.classList.add(__FRANKEN__.theme || "uk-theme-zinc");
-        htmlElement.classList.add(__FRANKEN__.radii || "uk-radii-md");
-        htmlElement.classList.add(__FRANKEN__.shadows || "uk-shadows-sm");
-        htmlElement.classList.add(__FRANKEN__.palette || "uk-palette-light-blue");
-    </script>
-    <style>
-        :root {
-            font-family: Inter, sans-serif;
-            font-feature-settings: "liga" 1, "calt" 1;
-        }
-        @supports (font-variation-settings: normal) {
-            :root { font-family: InterVariable, sans-serif; }
-        }
-        .hero-gradient {
-            background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 50%, hsl(var(--primary) / 0.6) 100%);
-        }
-        .feature-card {
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .feature-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px -8px hsl(var(--primary) / 0.15);
-        }
-        .stat-card {
-            background: hsl(var(--card));
-            border: 1px solid hsl(var(--border));
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>splanly — Resource Planning for CA Firms</title>
+<meta name="description" content="splanly gives chartered accountant firms one place to staff engagements, watch team capacity, and catch overlaps before they become client-facing problems.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%2314304d'/><circle cx='38' cy='54' r='22' fill='%234f82b0' fill-opacity='0.85'/><circle cx='62' cy='46' r='22' fill='%23eef5fc'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>
+  /* Set theme before first paint to avoid a flash of the wrong theme. */
+  (function(){
+    try{
+      var saved = localStorage.getItem('splanly-theme');
+      var theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+    }catch(e){ document.documentElement.setAttribute('data-theme','light'); }
+  })();
+</script>
+<style>
+  :root{
+    --navy: #16324f;
+    --navy-2: #1e4468;
+    --heading: #16324f;
+    --steel: #4f82b0;
+    --steel-light: #a9c8e2;
+    --bg: #f6fafe;
+    --card: #ffffff;
+    --nav-bg: rgba(246,250,254,.82);
+    --ink: #10202f;
+    --muted: #5c7086;
+    --border: #dee9f3;
+    --amber: #ee9b4d;
+    --amber-bg: #fff6ea;
+    --amber-border: #f5ddb8;
+    --amber-text: #8a5a1c;
+    --icon-bg: #eef5fc;
+    --board-cell: #eef3f8;
+    --radius-lg: 22px;
+    --radius-md: 14px;
+    --radius-sm: 9px;
+    --shadow: 0 1px 2px rgba(16,32,47,.04), 0 12px 32px -16px rgba(20,48,77,.18);
+    --ease: cubic-bezier(.16,.8,.28,1);
+  }
+
+  html[data-theme="dark"]{
+    --navy: #eaf2fb;
+    --navy-2: #cfe1f4;
+    --heading: #f2f7fc;
+    --steel: #6fa2cf;
+    --steel-light: #2e567c;
+    --bg: #0b1a29;
+    --card: #12283d;
+    --nav-bg: rgba(11,26,41,.82);
+    --ink: #e9f1f9;
+    --muted: #93a9bd;
+    --border: #1f3a52;
+    --amber: #e8a35c;
+    --amber-bg: #2a2013;
+    --amber-border: #4a3620;
+    --amber-text: #f0c493;
+    --icon-bg: #17304a;
+    --board-cell: #17304a;
+    --shadow: 0 1px 2px rgba(0,0,0,.2), 0 16px 36px -16px rgba(0,0,0,.55);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important;}
+  }
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.5;
+    transition:background .25s var(--ease), color .25s var(--ease);
+  }
+  h1,h2,h3,.display{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    color:var(--heading);
+    letter-spacing:-0.02em;
+    margin:0;
+  }
+  a{color:inherit; text-decoration:none;}
+  img,svg{display:block;}
+  .wrap{max-width:1180px; margin:0 auto; padding:0 24px;}
+  ::selection{background:var(--steel-light); color:var(--heading);}
+  :focus-visible{outline:2.5px solid var(--steel); outline-offset:3px; border-radius:6px;}
+
+  /* ---------- Buttons ---------- */
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    padding:13px 26px; border-radius:999px; font-weight:600; font-size:15px;
+    border:1.5px solid transparent; cursor:pointer; transition:transform .18s var(--ease), box-shadow .18s var(--ease), background .18s var(--ease), border-color .18s var(--ease), color .18s var(--ease);
+    white-space:nowrap;
+  }
+  .btn:hover{transform:translateY(-1px);}
+  .btn-primary{background:var(--navy); color: var(--bg);}
+  html[data-theme="light"] .btn-primary, html:not([data-theme="dark"]) .btn-primary{ color:#fff; box-shadow:0 8px 20px -8px rgba(20,48,77,.55); }
+  html[data-theme="dark"] .btn-primary{ color:var(--bg); box-shadow:0 8px 20px -8px rgba(0,0,0,.5); }
+  .btn-primary:hover{background:var(--steel);}
+  .btn-ghost{background:transparent; color:var(--heading); border-color:var(--border);}
+  .btn-ghost:hover{border-color:var(--steel); background:var(--card);}
+  .btn-onvy{background:#fff; color:var(--navy-2);}
+  html[data-theme="dark"] .btn-onvy{ color:#16324f; }
+  .btn-onvy:hover{background:#eef5fc;}
+  .btn-sm{padding:9px 18px; font-size:14px;}
+
+  .theme-toggle{
+    width:38px; height:38px; border-radius:50%; border:1px solid var(--border);
+    background:var(--card); display:flex; align-items:center; justify-content:center;
+    cursor:pointer; color:var(--heading); flex-shrink:0; transition:border-color .18s, transform .18s var(--ease);
+  }
+  .theme-toggle:hover{border-color:var(--steel); transform:translateY(-1px);}
+  .theme-toggle svg{width:18px; height:18px;}
+  .theme-toggle .icon-moon{display:none;}
+  html[data-theme="dark"] .theme-toggle .icon-sun{display:none;}
+  html[data-theme="dark"] .theme-toggle .icon-moon{display:block;}
+
+  /* ---------- Nav ---------- */
+  header{
+    position:sticky; top:0; z-index:100;
+    background:var(--nav-bg); backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+    transition:background .25s var(--ease), border-color .25s var(--ease);
+  }
+  .nav{display:flex; align-items:center; justify-content:space-between; height:72px;}
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand-mark{width:34px; height:34px; border-radius:10px; position:relative; overflow:hidden; background:var(--navy); flex-shrink:0;}
+  html[data-theme="dark"] .brand-mark{background:#0e2032;}
+  .brand-mark span{position:absolute; border-radius:50%;}
+  .brand-mark .b1{width:26px; height:26px; background:var(--steel); opacity:.88; left:2px; top:12px;}
+  .brand-mark .b2{width:22px; height:22px; background:#eef5fc; right:3px; top:4px;}
+  html[data-theme="dark"] .brand-mark .b2{background:#0b1a29;}
+  .brand-word{font-family:'Plus Jakarta Sans'; font-weight:700; font-size:20px; color:var(--heading); letter-spacing:-0.01em;}
+  .nav-links{display:flex; align-items:center; gap:32px;}
+  .nav-links a{font-size:14.5px; font-weight:500; color:var(--muted); transition:color .15s;}
+  .nav-links a:hover{color:var(--heading);}
+  .nav-cta{display:flex; align-items:center; gap:12px;}
+
+  @media (max-width: 860px){
+    .nav-links{display:none;}
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{padding:76px 0 40px; overflow:hidden;}
+  .hero-grid{display:grid; grid-template-columns:1.05fr .95fr; gap:56px; align-items:center;}
+  @media (max-width: 980px){ .hero-grid{grid-template-columns:1fr; gap:48px;} }
+
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:7px 14px 7px 10px; border-radius:999px;
+    background:var(--card); border:1px solid var(--border);
+    font-size:13px; font-weight:600; color:var(--navy-2);
+    margin-bottom:22px;
+  }
+  .eyebrow .dot{width:7px; height:7px; border-radius:50%; background:var(--steel);}
+  @media (prefers-reduced-motion: no-preference){
+    .eyebrow .dot{animation:pulse 2.2s ease-in-out infinite;}
+  }
+  @keyframes pulse{0%,100%{opacity:1; transform:scale(1);} 50%{opacity:.45; transform:scale(1.35);}}
+
+  .hero h1{font-size:clamp(34px,4.6vw,54px); font-weight:800; line-height:1.06;}
+  .hero h1 em{font-style:normal; color:var(--steel);}
+  .hero p.lede{font-size:18px; color:var(--muted); max-width:490px; margin:22px 0 32px;}
+  .hero-actions{display:flex; align-items:center; gap:16px; flex-wrap:wrap;}
+  .hero-note{margin-top:22px; font-size:13.5px; color:var(--muted); display:flex; align-items:center; gap:8px;}
+
+  /* ---------- Signature: capacity board ---------- */
+  .board-frame{
+    background:var(--card); border:1px solid var(--border); border-radius:var(--radius-lg);
+    box-shadow:var(--shadow); padding:20px; position:relative;
+    transition:background .25s var(--ease), border-color .25s var(--ease);
+  }
+  .board-frame::before{
+    content:""; position:absolute; inset:-40px -60px auto auto; top:-60px; right:-60px;
+    width:220px; height:220px; border-radius:50%;
+    background:radial-gradient(circle, var(--steel-light) 0%, transparent 70%);
+    opacity:.6; z-index:-1;
+  }
+  .board-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;}
+  .board-title{font-size:13.5px; font-weight:700; color:var(--heading);}
+  .board-week{font-size:12px; color:var(--muted); font-weight:500;}
+  .board-days{
+    display:grid; grid-template-columns:112px repeat(5,1fr); gap:6px; margin-bottom:8px;
+    padding:0 2px;
+  }
+  .board-days span{font-size:11px; font-weight:600; color:var(--muted); text-align:center;}
+  .board-row{display:grid; grid-template-columns:112px repeat(5,1fr); gap:6px; align-items:center; margin-bottom:7px;}
+  .person{display:flex; align-items:center; gap:8px; font-size:12.5px; font-weight:600; color:var(--heading);}
+  .avatar{width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:#fff; flex-shrink:0;}
+  .cell{height:26px; border-radius:7px; background:var(--board-cell);}
+  .cell.fill-1{background:var(--steel-light);}
+  .cell.fill-2{background:var(--steel);}
+  .cell.fill-3{background:var(--navy-2); opacity:.9;}
+  html[data-theme="dark"] .cell.fill-3{background:#3a5a7c;}
+  .cell.conflict{
+    background:var(--amber); position:relative;
+  }
+  .cell.conflict::after{
+    content:""; position:absolute; inset:0; border-radius:7px; border:2px solid var(--card); box-shadow:0 0 0 2px var(--amber);
+  }
+  .board-legend{display:flex; align-items:center; gap:16px; margin-top:16px; padding-top:14px; border-top:1px dashed var(--border); flex-wrap:wrap;}
+  .legend-item{display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--muted); font-weight:500;}
+  .legend-swatch{width:10px; height:10px; border-radius:3px;}
+  .board-alert{
+    display:flex; align-items:center; gap:10px; margin-top:14px;
+    background:var(--amber-bg); border:1px solid var(--amber-border); border-radius:var(--radius-sm);
+    padding:11px 14px; font-size:12.5px; color:var(--amber-text); font-weight:500;
+  }
+
+  /* ---------- Stat band ---------- */
+  .stats{border-top:1px solid var(--border); border-bottom:1px solid var(--border); background:var(--card); transition:background .25s var(--ease), border-color .25s var(--ease);}
+  .stats-grid{display:grid; grid-template-columns:repeat(4,1fr); padding:34px 0;}
+  .stats-grid > div{text-align:center; position:relative;}
+  .stats-grid > div:not(:last-child)::after{
+    content:""; position:absolute; right:0; top:8px; bottom:8px; width:1px; background:var(--border);
+  }
+  .stat-num{font-family:'Plus Jakarta Sans'; font-weight:800; font-size:28px; color:var(--heading); font-variant-numeric:tabular-nums; letter-spacing:-0.01em;}
+  .stat-label{font-size:13px; color:var(--muted); margin-top:4px; font-weight:500;}
+  @media (max-width: 700px){
+    .stats-grid{grid-template-columns:repeat(2,1fr); gap:26px 0;}
+    .stats-grid > div:nth-child(2n)::after{display:none;}
+  }
+
+  /* ---------- Section shared ---------- */
+  section{padding:96px 0;}
+  .section-head{max-width:620px; margin:0 auto 52px; text-align:center;}
+  .section-eyebrow{font-size:13px; font-weight:700; color:var(--steel); text-transform:uppercase; letter-spacing:.08em; margin-bottom:10px;}
+  .section-head h2{font-size:clamp(28px,3.4vw,38px); font-weight:800;}
+  .section-head p{color:var(--muted); font-size:16.5px; margin-top:14px;}
+
+  .reveal{
+    opacity:0; transform:translateY(28px) scale(.97); filter:blur(2px);
+    transition:opacity .7s var(--ease), transform .7s var(--ease), filter .7s var(--ease);
+    transition-delay:var(--d, 0s);
+    will-change:opacity, transform;
+  }
+  .reveal.in{opacity:1; transform:translateY(0) scale(1); filter:blur(0);}
+  .reveal.up{transform:translateY(-16px) scale(.98); filter:blur(1.5px);}
+
+  /* ---------- Features ---------- */
+  .feature-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:20px;}
+  @media (max-width: 980px){ .feature-grid{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width: 640px){ .feature-grid{grid-template-columns:1fr;} }
+  .feature-card{
+    background:var(--card); border:1px solid var(--border); border-radius:var(--radius-md);
+    padding:26px; transition:transform .22s var(--ease), box-shadow .22s var(--ease), border-color .22s var(--ease), background .25s var(--ease);
+  }
+  .feature-card:hover{transform:translateY(-4px); box-shadow:var(--shadow); border-color:var(--steel-light);}
+  .feature-icon{
+    width:42px; height:42px; border-radius:11px; background:var(--icon-bg);
+    display:flex; align-items:center; justify-content:center; margin-bottom:16px;
+    color:var(--heading);
+  }
+  .feature-card h3{font-size:16.5px; font-weight:700; margin-bottom:8px;}
+  .feature-card p{font-size:14px; color:var(--muted); margin:0;}
+
+  /* ---------- How it works ---------- */
+  .how{background:linear-gradient(180deg, var(--card), var(--bg)); transition:background .25s var(--ease);}
+  .steps{display:grid; grid-template-columns:repeat(3,1fr); gap:0; position:relative; counter-reset:step;}
+  @media (max-width: 860px){ .steps{grid-template-columns:1fr; gap:36px;} }
+  .steps::before{
+    content:""; position:absolute; top:23px; left:calc(100%/6); right:calc(100%/6); height:1px;
+    background:repeating-linear-gradient(90deg, var(--border) 0 8px, transparent 8px 16px);
+  }
+  @media (max-width: 860px){ .steps::before{display:none;} }
+  .step{position:relative; padding:0 20px; text-align:left;}
+  .step-num{
+    width:46px; height:46px; border-radius:50%; background:var(--card); border:1.5px solid var(--navy);
+    color:var(--heading); font-family:'Plus Jakarta Sans'; font-weight:800; font-size:17px;
+    display:flex; align-items:center; justify-content:center; margin-bottom:18px; position:relative; z-index:1;
+  }
+  .step h3{font-size:16.5px; font-weight:700; margin-bottom:8px;}
+  .step p{font-size:14px; color:var(--muted); margin:0;}
+
+  /* ---------- CTA ---------- */
+  .cta-banner{
+    background:linear-gradient(120deg, var(--navy-2) 0%, #1e4468 55%, var(--steel) 130%);
+    border-radius:var(--radius-lg); padding:64px 44px; text-align:center; color:#fff; position:relative; overflow:hidden;
+  }
+  html[data-theme="dark"] .cta-banner{background:linear-gradient(120deg, #0e2032 0%, #1c3a56 55%, var(--steel) 130%);}
+  .cta-banner::before{
+    content:""; position:absolute; width:340px; height:340px; border-radius:50%;
+    background:radial-gradient(circle, rgba(255,255,255,.14), transparent 70%);
+    top:-120px; right:-80px;
+  }
+  .cta-banner h2{color:#fff; font-size:clamp(26px,3.2vw,36px); font-weight:800;}
+  .cta-banner p{color:rgba(255,255,255,.8); max-width:520px; margin:14px auto 30px; font-size:16px;}
+
+  /* ---------- Footer ---------- */
+  footer{background:var(--card); border-top:1px solid var(--border); padding:64px 0 32px; transition:background .25s var(--ease), border-color .25s var(--ease);}
+  .footer-grid{display:grid; grid-template-columns:1.6fr repeat(3,1fr); gap:32px; padding-bottom:44px;}
+  @media (max-width: 760px){ .footer-grid{grid-template-columns:repeat(2,1fr);} }
+  .footer-grid h4{font-size:13.5px; font-weight:700; color:var(--heading); margin-bottom:14px;}
+  .footer-grid ul{list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px;}
+  .footer-grid a{font-size:14px; color:var(--muted); transition:color .15s;}
+  .footer-grid a:hover{color:var(--heading);}
+  .footer-about p{font-size:14px; color:var(--muted); max-width:280px; margin-top:14px;}
+  .footer-bottom{border-top:1px solid var(--border); padding-top:26px; text-align:center; font-size:13px; color:var(--muted);}
+  .footer-bottom a{text-decoration:underline; text-decoration-color:var(--border); text-underline-offset:3px;}
+  .footer-bottom a:hover{color:var(--heading); text-decoration-color:var(--steel);}
+</style>
 </head>
-<body class="bg-background text-foreground min-h-screen flex flex-col">
+<body>
 
-    <!-- Navbar -->
-    <nav class="bg-background/80 backdrop-blur-md border-b border-border sticky top-0" style="z-index: 100;">
-        <div class="uk-container uk-container-xlarge">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">SP</div>
-                    <span class="font-semibold text-lg text-foreground">splanly <span class="text-sm font-normal text-muted-foreground">by SkilledCA</span></span>
-                </div>
-                <div class="flex items-center gap-3">
-                    <a href="/auth/login" class="uk-btn uk-btn-default uk-btn-sm">Sign In</a>
-                    <a href="/auth/register" class="uk-btn uk-btn-primary uk-btn-sm">Get Started</a>
-                </div>
-            </div>
-        </div>
+<header>
+  <div class="wrap nav">
+    <a href="#" class="brand" aria-label="splanly home">
+      <span class="brand-mark"><span class="b2"></span><span class="b1"></span></span>
+      <span class="brand-word">splanly</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#features">Features</a>
+      <a href="#how-it-works">How it works</a>
+      <a href="#" onclick="return false;" aria-disabled="true" style="opacity:.55; cursor:default;">Pricing</a>
     </nav>
+    <div class="nav-cta">
+      <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.9 19.1l1.7-1.7M17.4 6.6l1.7-1.7"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+      </button>
+      <a href="/auth/login" class="btn btn-ghost btn-sm">Sign in</a>
+      <a href="/auth/register" class="btn btn-primary btn-sm">Get started</a>
+    </div>
+  </div>
+</header>
 
-    <!-- Hero Section -->
-    <section class="hero-gradient text-primary-foreground py-20 px-4">
-        <div class="uk-container uk-container-xlarge text-center">
-            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/15 text-sm font-medium mb-6">
-                <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-                Trusted by CA firms across India
-            </div>
-            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
-                Smart Resource Planning<br>
-                <a href="https://skilledca.in" target="_blank" rel="noopener noreferrer" class="text-white/80 hover:text-white transition-colors underline decoration-white/30 hover:decoration-white/60">by SkilledCA Enterprises</a>
-            </h1>
-            <p class="text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-10">
-                Allocate staff, track engagements, prevent over-allocation, and manage leave conflicts — all in one intuitive platform built for chartered accountant firms.
-            </p>
-            <div class="flex items-center justify-center gap-4">
-                <a href="/auth/register" class="uk-btn uk-btn-lg bg-white text-primary font-semibold hover:bg-white/90 border-0 px-8 shadow-lg">
-                    Start Free Trial
-                </a>
-                <a href="#features" class="uk-btn uk-btn-lg border-2 border-white text-white font-semibold hover:bg-white/20 px-8">
-                    Learn More
-                </a>
-            </div>
+<main>
+  <!-- Hero -->
+  <section class="hero" style="padding-top:76px; padding-bottom:0;">
+    <div class="wrap">
+      <div class="hero-grid">
+        <div>
+          <span class="eyebrow"><span class="dot"></span>Built for chartered accountant firms</span>
+          <h1>Know who's free<br><em>before</em> it's a problem.</h1>
+          <p class="lede">splanly gives CA firms one place to staff engagements, watch team capacity, and catch double-bookings before they turn into a client-facing fire drill.</p>
+          <div class="hero-actions">
+            <a href="/auth/register" class="btn btn-primary">Start free trial</a>
+            <a href="#how-it-works" class="btn btn-ghost">See how it works</a>
+          </div>
+          <div class="hero-note">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--steel)" stroke-width="2.4" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg>
+            No credit card needed · Set up your first engagement in minutes
+          </div>
         </div>
-    </section>
 
-    <!-- Stats Bar -->
-    <section class="bg-background border-b border-border py-8 px-4">
-        <div class="uk-container uk-container-xlarge">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-                <div>
-                    <div class="text-3xl font-bold text-primary">500+</div>
-                    <div class="text-sm text-muted-foreground mt-1">Team Members Managed</div>
-                </div>
-                <div>
-                    <div class="text-3xl font-bold text-primary">1,200+</div>
-                    <div class="text-sm text-muted-foreground mt-1">Engagements Tracked</div>
-                </div>
-                <div>
-                    <div class="text-3xl font-bold text-primary">99.9%</div>
-                    <div class="text-sm text-muted-foreground mt-1">Uptime Reliability</div>
-                </div>
-                <div>
-                    <div class="text-3xl font-bold text-primary">50+</div>
-                    <div class="text-sm text-muted-foreground mt-1">Firms Using splanly</div>
-                </div>
-            </div>
+        <div class="board-frame reveal in">
+          <div class="board-head">
+            <span class="board-title">Team capacity — this week</span>
+            <span class="board-week">Mon – Fri</span>
+          </div>
+          <div class="board-days">
+            <span></span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span>
+          </div>
+
+          <div class="board-row">
+            <div class="person"><span class="avatar" style="background:var(--navy);">AR</span>Aisha R.</div>
+            <div class="cell fill-2"></div><div class="cell fill-2"></div><div class="cell fill-2"></div><div class="cell fill-3"></div><div class="cell fill-3"></div>
+          </div>
+          <div class="board-row">
+            <div class="person"><span class="avatar" style="background:var(--steel);">MK</span>Manoj K.</div>
+            <div class="cell fill-1"></div><div class="cell conflict" title="Double-booked"></div><div class="cell fill-1"></div><div class="cell"></div><div class="cell"></div>
+          </div>
+          <div class="board-row">
+            <div class="person"><span class="avatar" style="background:var(--navy-2);">SP</span>Sana P.</div>
+            <div class="cell"></div><div class="cell fill-1"></div><div class="cell fill-1"></div><div class="cell fill-1"></div><div class="cell fill-1"></div>
+          </div>
+          <div class="board-row">
+            <div class="person"><span class="avatar" style="background:#8098ad;">DV</span>Dev V.</div>
+            <div class="cell fill-3"></div><div class="cell fill-3"></div><div class="cell"></div><div class="cell"></div><div class="cell fill-1"></div>
+          </div>
+
+          <div class="board-legend">
+            <span class="legend-item"><span class="legend-swatch" style="background:var(--steel-light);"></span>Light load</span>
+            <span class="legend-item"><span class="legend-swatch" style="background:var(--navy-2);"></span>Full engagement</span>
+            <span class="legend-item"><span class="legend-swatch" style="background:var(--amber);"></span>Conflict</span>
+          </div>
+
+          <div class="board-alert">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amber-text)" stroke-width="2.2"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18.5a1.9 1.9 0 0 0 1.6 2.9h17.2a1.9 1.9 0 0 0 1.6-2.9L13.7 3.9a1.9 1.9 0 0 0-3.4 0Z"/></svg>
+            Manoj is booked on two engagements Tuesday — resolve before the audit kicks off.
+          </div>
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
 
-    <!-- Features Section -->
-    <section id="features" class="py-20 px-4 bg-background">
-        <div class="uk-container uk-container-xlarge">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-4xl font-bold text-foreground mb-4">Everything You Need</h2>
-                <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
-                    Purpose-built for CA firms, splanly handles the complexities of resource management so you can focus on what matters.
-                </p>
-            </div>
+  <!-- Stats -->
+  <section class="stats" style="padding:0; margin-top:64px;">
+    <div class="wrap stats-grid">
+      <div class="reveal" style="--d:0s"><div class="stat-num" data-target="500" data-suffix="+">0+</div><div class="stat-label">Team members managed</div></div>
+      <div class="reveal" style="--d:0.08s"><div class="stat-num" data-target="1200" data-suffix="+">0+</div><div class="stat-label">Engagements tracked</div></div>
+      <div class="reveal" style="--d:0.16s"><div class="stat-num" data-target="99.9" data-suffix="%">0%</div><div class="stat-label">Uptime reliability</div></div>
+      <div class="reveal" style="--d:0.24s"><div class="stat-num" data-target="50" data-suffix="+">0+</div><div class="stat-label">Firms using splanly</div></div>
+    </div>
+  </section>
 
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Feature 1 -->
-                <div class="feature-card uk-card uk-card-body uk-card-default p-6">
-                    <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                        <uk-icon icon="users" width="24" height="24" class="text-primary"></uk-icon>
-                    </div>
-                    <h3 class="text-lg font-semibold text-foreground mb-2">Team Management</h3>
-                    <p class="text-sm text-muted-foreground">
-                        Maintain a complete roster of partners, directors, managers, staff, and articles with roles, seniority, and availability tracking.
-                    </p>
-                </div>
+  <!-- Features -->
+  <section id="features">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div class="section-eyebrow">Everything in one place</div>
+        <h2>Purpose-built for how CA firms actually staff work</h2>
+        <p>No spreadsheets, no guessing who's free. splanly handles the complexity of resourcing so you can focus on the client.</p>
+      </div>
 
-                <!-- Feature 2 -->
-                <div class="feature-card uk-card uk-card-body uk-card-default p-6">
-                    <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                        <uk-icon icon="briefcase" width="24" height="24" class="text-primary"></uk-icon>
-                    </div>
-                    <h3 class="text-lg font-semibold text-foreground mb-2">Engagement Tracking</h3>
-                    <p class="text-sm text-muted-foreground">
-                        Manage audits, tax filings, consulting projects, and special assignments with recurrence patterns and instance-based scheduling.
-                    </p>
-                </div>
-
-                <!-- Feature 3 -->
-                <div class="feature-card uk-card uk-card-body uk-card-default p-6">
-                    <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                        <uk-icon icon="git-branch" width="24" height="24" class="text-primary"></uk-icon>
-                    </div>
-                    <h3 class="text-lg font-semibold text-foreground mb-2">Smart Allocation</h3>
-                    <p class="text-sm text-muted-foreground">
-                        Assign staff to engagements with automatic over-allocation prevention. The system blocks conflicts before they happen.
-                    </p>
-                </div>
-
-                <!-- Feature 4 -->
-                <div class="feature-card uk-card uk-card-body uk-card-default p-6">
-                    <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                        <uk-icon icon="calendar" width="24" height="24" class="text-primary"></uk-icon>
-                    </div>
-                    <h3 class="text-lg font-semibold text-foreground mb-2">Leave Management</h3>
-                    <p class="text-sm text-muted-foreground">
-                        Track vacation, sick leave, and exam leave. Approved leaves automatically block conflicting assignments.
-                    </p>
-                </div>
-
-                <!-- Feature 5 -->
-                <div class="feature-card uk-card uk-card-body uk-card-default p-6">
-                    <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                        <uk-icon icon="layout-dashboard" width="24" height="24" class="text-primary"></uk-icon>
-                    </div>
-                    <h3 class="text-lg font-semibold text-foreground mb-2">Bench Dashboard</h3>
-                    <p class="text-sm text-muted-foreground">
-                        Instantly see who's on the bench now and who's rolling off soon. Configurable windows for proactive planning.
-                    </p>
-                </div>
-
-                <!-- Feature 6 -->
-                <div class="feature-card uk-card uk-card-body uk-card-default p-6">
-                    <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                        <uk-icon icon="shield" width="24" height="24" class="text-primary"></uk-icon>
-                    </div>
-                    <h3 class="text-lg font-semibold text-foreground mb-2">Role-Based Access</h3>
-                    <p class="text-sm text-muted-foreground">
-                        Admin, moderator, and viewer roles with Microsoft 365 SSO and two-factor authentication for enterprise security.
-                    </p>
-                </div>
-            </div>
+      <div class="feature-grid">
+        <div class="feature-card reveal" style="--d:0s">
+          <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <h3>Team management</h3>
+          <p>Maintain a complete roster of partners, directors, managers, staff, and articles — with roles, seniority, and availability tracked in one place.</p>
         </div>
-    </section>
 
-    <!-- How It Works -->
-    <section class="py-20 px-4 bg-muted/30">
-        <div class="uk-container uk-container-xlarge">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-4xl font-bold text-foreground mb-4">How It Works</h2>
-                <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
-                    Get started in minutes with a simple three-step process.
-                </p>
-            </div>
-
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="text-center">
-                    <div class="w-16 h-16 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-2xl font-bold mx-auto mb-6">1</div>
-                    <h3 class="text-lg font-semibold text-foreground mb-2">Add Your Team</h3>
-                    <p class="text-sm text-muted-foreground">
-                        Import your team via CSV or add members individually. Set roles, seniority, and join dates.
-                    </p>
-                </div>
-                <div class="text-center">
-                    <div class="w-16 h-16 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-2xl font-bold mx-auto mb-6">2</div>
-                    <h3 class="text-lg font-semibold text-foreground mb-2">Create Engagements</h3>
-                    <p class="text-sm text-muted-foreground">
-                        Set up client engagements with recurrence patterns. Create instances for each period.
-                    </p>
-                </div>
-                <div class="text-center">
-                    <div class="w-16 h-16 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-2xl font-bold mx-auto mb-6">3</div>
-                    <h3 class="text-lg font-semibold text-foreground mb-2">Assign & Track</h3>
-                    <p class="text-sm text-muted-foreground">
-                        Allocate staff with smart conflict detection. Monitor utilization and bench status in real-time.
-                    </p>
-                </div>
-            </div>
+        <div class="feature-card reveal" style="--d:0.06s">
+          <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          </div>
+          <h3>Engagement tracking</h3>
+          <p>Manage audits, tax filings, consulting projects, and special assignments with recurrence patterns and instance-based scheduling.</p>
         </div>
-    </section>
 
-    <!-- CTA Section -->
-    <section class="py-20 px-4 bg-background">
-        <div class="uk-container uk-container-xlarge">
-            <div class="uk-card uk-card-body p-12 text-center bg-primary text-primary-foreground rounded-2xl">
-                <h2 class="text-3xl md:text-4xl font-bold mb-4">Ready to Transform Your Resource Planning?</h2>
-                <p class="text-lg text-primary-foreground/80 max-w-2xl mx-auto mb-8">
-                    Join CA firms that have already streamlined their staffing operations with splanly.
-                </p>
-                <a href="/auth/register" class="uk-btn uk-btn-lg bg-white text-primary font-semibold hover:bg-white/90 border-0 px-10 shadow-lg">
-                    Get Started Now
-                </a>
-            </div>
+        <div class="feature-card reveal" style="--d:0.12s">
+          <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
+          </div>
+          <h3>Smart allocation</h3>
+          <p>Assign staff to engagements with automatic over-allocation checks. The system flags conflicts before they happen, not after.</p>
         </div>
-    </section>
 
-    <!-- Footer -->
-    <footer class="bg-muted/50 border-t border-border py-12 px-4 mt-auto">
-        <div class="uk-container uk-container-xlarge">
-            <div class="grid md:grid-cols-4 gap-8">
-                <div>
-                    <div class="flex items-center gap-2 mb-4">
-                        <div class="w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold text-xs">SP</div>
-                        <span class="font-semibold text-foreground">splanly <span class="text-xs font-normal text-muted-foreground">by SkilledCA</span></span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">
-                        Smart resource planning for modern CA firms.
-                    </p>
-                </div>
-                <div>
-                    <h4 class="font-semibold text-foreground mb-3">Product</h4>
-                    <ul class="space-y-2 text-sm text-muted-foreground">
-                        <li><a href="#features" class="hover:text-foreground transition-colors">Features</a></li>
-                        <li><a href="#" class="hover:text-foreground transition-colors">Pricing</a></li>
-                        <li><a href="#" class="hover:text-foreground transition-colors">Documentation</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-semibold text-foreground mb-3">Company</h4>
-                    <ul class="space-y-2 text-sm text-muted-foreground">
-                        <li><a href="#" class="hover:text-foreground transition-colors">About Us</a></li>
-                        <li><a href="#" class="hover:text-foreground transition-colors">Contact</a></li>
-                        <li><a href="#" class="hover:text-foreground transition-colors">Support</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-semibold text-foreground mb-3">Legal</h4>
-                    <ul class="space-y-2 text-sm text-muted-foreground">
-                        <li><a href="#" class="hover:text-foreground transition-colors">Privacy Policy</a></li>
-                        <li><a href="#" class="hover:text-foreground transition-colors">Terms of Service</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="border-t border-border mt-8 pt-8 text-center text-sm text-muted-foreground">
-                <p><a href="https://skilledca.in" target="_blank" rel="noopener noreferrer" class="hover:text-foreground transition-colors underline decoration-muted-foreground/30 hover:decoration-foreground/50">splanly by SkilledCA Enterprises</a> &copy; 2026. All rights reserved.</p>
-            </div>
+        <div class="feature-card reveal" style="--d:0s">
+          <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          </div>
+          <h3>Leave management</h3>
+          <p>Track vacation, sick leave, and exam leave. Approved leave automatically blocks any assignment that would conflict with it.</p>
         </div>
-    </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/franken-ui@2.1.2/dist/js/core.iife.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/franken-ui@2.1.2/dist/js/icon.iife.js"></script>
+        <div class="feature-card reveal" style="--d:0.06s">
+          <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+          </div>
+          <h3>Bench dashboard</h3>
+          <p>See instantly who's on the bench right now, and who's rolling off soon — with configurable windows for proactive planning.</p>
+        </div>
+
+        <div class="feature-card reveal" style="--d:0.12s">
+          <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6l-8-4Z"/></svg>
+          </div>
+          <h3>Role-based access</h3>
+          <p>Admin, moderator, and viewer roles with Microsoft 365 SSO and two-factor authentication built in for enterprise security.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section id="how-it-works" class="how">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div class="section-eyebrow">Getting started</div>
+        <h2>Live in three steps</h2>
+        <p>Most firms are staffing their first engagement inside splanly the same day they sign up.</p>
+      </div>
+
+      <div class="steps">
+        <div class="step reveal" style="--d:0s">
+          <div class="step-num">1</div>
+          <h3>Add your team</h3>
+          <p>Import your roster via CSV or add members individually. Set roles, seniority, and join dates in a few clicks.</p>
+        </div>
+        <div class="step reveal" style="--d:0.1s">
+          <div class="step-num">2</div>
+          <h3>Create engagements</h3>
+          <p>Set up client engagements with recurrence patterns, then generate instances for each period automatically.</p>
+        </div>
+        <div class="step reveal" style="--d:0.2s">
+          <div class="step-num">3</div>
+          <h3>Assign & track</h3>
+          <p>Allocate staff with built-in conflict detection, then monitor utilization and bench status in real time.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section>
+    <div class="wrap">
+      <div class="cta-banner reveal">
+        <h2>Ready to stop double-booking your best people?</h2>
+        <p>Join the CA firms that have already traded spreadsheets for a system that catches conflicts on its own.</p>
+        <a href="/auth/register" class="btn btn-onvy">Get started now</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-about">
+        <div class="brand">
+          <span class="brand-mark" style="width:28px; height:28px;"><span class="b2"></span><span class="b1"></span></span>
+          <span class="brand-word" style="font-size:17px;">splanly</span>
+        </div>
+        <p>Smart resource planning for modern CA firms — built by SkilledCA Enterprises.</p>
+        <a href="mailto:samarth@skilledca.in" style="display:inline-flex; align-items:center; gap:7px; margin-top:14px; font-size:14px; font-weight:600; color:var(--heading);">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
+          samarth@skilledca.in
+        </a>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <ul>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#" onclick="return false;">Pricing</a></li>
+          <li><a href="#" onclick="return false;">Documentation</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#" onclick="return false;">About us</a></li>
+          <li><a href="mailto:samarth@skilledca.in">Contact</a></li>
+          <li><a href="#" onclick="return false;">Support</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#" onclick="return false;">Privacy policy</a></li>
+          <li><a href="#" onclick="return false;">Terms of service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <a href="https://skilledca.in" target="_blank" rel="noopener noreferrer">splanly by SkilledCA Enterprises</a> &copy; 2026. All rights reserved.
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Theme toggle
+  (function(){
+    var root = document.documentElement;
+    var btn = document.getElementById('themeToggle');
+    btn.addEventListener('click', function(){
+      var current = root.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+      var next = current === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try{ localStorage.setItem('splanly-theme', next); }catch(e){}
+    });
+  })();
+
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Scroll reveal — plays both ways: fades/slides in on entry, fades back
+  // out on exit, and enters from a slightly different direction depending
+  // on whether the element is coming from above or below the viewport.
+  if (!prefersReducedMotion && 'IntersectionObserver' in window) {
+    let lastY = window.scrollY;
+    window.addEventListener('scroll', () => { lastY = window.scrollY; }, { passive: true });
+
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const el = entry.target;
+        const scrollingUp = window.scrollY < lastY;
+        if (entry.isIntersecting) {
+          el.classList.remove('up');
+          el.classList.add('in');
+        } else {
+          el.classList.remove('in');
+          if (scrollingUp) el.classList.add('up'); else el.classList.remove('up');
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  } else {
+    document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
+  }
+
+  // Animated number count-up for the stats band. Replays each time the
+  // stat scrolls back into view for a bit of life on re-visits.
+  if ('IntersectionObserver' in window) {
+    const formatValue = (value, target) => {
+      const isDecimal = target.toString().includes('.');
+      return isDecimal ? value.toFixed(1) : Math.round(value).toLocaleString('en-IN');
+    };
+
+    const runCount = (el) => {
+      const target = parseFloat(el.dataset.target);
+      const suffix = el.dataset.suffix || '';
+      if (prefersReducedMotion) {
+        el.textContent = formatValue(target, el.dataset.target) + suffix;
+        return;
+      }
+      const duration = 1300;
+      const start = performance.now();
+      cancelAnimationFrame(el._countRaf);
+      const tick = (now) => {
+        const t = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - t, 4); // easeOutQuart
+        el.textContent = formatValue(target * eased, el.dataset.target) + suffix;
+        if (t < 1) { el._countRaf = requestAnimationFrame(tick); }
+      };
+      el._countRaf = requestAnimationFrame(tick);
+    };
+
+    const statIo = new IntersectionObserver((entries) => {
+      entries.forEach(entry => { if (entry.isIntersecting) runCount(entry.target); });
+    }, { threshold: 0.5 });
+
+    document.querySelectorAll('.stat-num[data-target]').forEach(el => statIo.observe(el));
+  }
+</script>
 </body>
 </html>
