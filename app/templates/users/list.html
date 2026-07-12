@@ -10,22 +10,29 @@
     <h2 class="text-xl font-semibold mb-4">Users</h2>
 
     <!-- Tabs -->
-    <div class="flex gap-1 border-b border-border mb-4">
-        <button onclick="showTab('users')" id="tab-users" class="users-tab px-4 py-2 text-sm font-medium rounded-t-md border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors">
-            <uk-icon icon="users" width="14" height="14" class="mr-1"></uk-icon> All Users
-            <span class="ml-1 text-xs bg-muted px-1.5 py-0.5 rounded">{{ total }}</span>
+    <div class="flex gap-1 border-b border-border mb-4 overflow-x-auto">
+        <button onclick="showTab('users')" id="tab-users" class="users-tab flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-t-md border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            All Users
+            <span class="text-xs bg-muted px-1.5 py-0.5 rounded">{{ total }}</span>
         </button>
-        <button onclick="showTab('approvals')" id="tab-approvals" class="users-tab px-4 py-2 text-sm font-medium rounded-t-md border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors">
-            <uk-icon icon="check-circle" width="14" height="14" class="mr-1"></uk-icon> Pending Approvals
+        <button onclick="showTab('approvals')" id="tab-approvals" class="users-tab flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-t-md border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>
+            Pending Approvals
             {% if pending_approvals %}
-            <span class="ml-1 text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded">{{ pending_approvals | length }}</span>
+            <span class="text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded">{{ pending_approvals | length }}</span>
             {% endif %}
         </button>
-        <button onclick="showTab('extensions')" id="tab-extensions" class="users-tab px-4 py-2 text-sm font-medium rounded-t-md border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors">
-            <uk-icon icon="git-branch" width="14" height="14" class="mr-1"></uk-icon> Extension Requests
+        <button onclick="showTab('extensions')" id="tab-extensions" class="users-tab flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-t-md border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
+            Extension Requests
             {% if pending_extensions %}
-            <span class="ml-1 text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded">{{ pending_extensions | length }}</span>
+            <span class="text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded">{{ pending_extensions | length }}</span>
             {% endif %}
+        </button>
+        <button onclick="showTab('logs')" id="tab-logs" class="users-tab flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-t-md border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            Approval Logs
         </button>
     </div>
 
@@ -110,7 +117,6 @@
                     <tr>
                         <th>Type</th>
                         <th>Operation</th>
-                        <th>Requested By</th>
                         <th>Payload</th>
                         <th>Actions</th>
                     </tr>
@@ -120,7 +126,6 @@
                     <tr class="hover:bg-muted/50 transition-colors">
                         <td><span class="uk-badge">{{ r.resource_type.value | replace("_", " ") | title }}</span></td>
                         <td>{{ r.operation.value | title }}</td>
-                        <td>{{ r.requested_by_user_id }}</td>
                         <td class="text-xs text-muted-foreground max-w-xs truncate">{{ r.payload }}</td>
                         <td class="flex gap-1">
                             <form method="POST" action="/api/v1/approval-requests/{{ r.id }}/approve" class="inline">
@@ -176,6 +181,66 @@
         </div>
         {% else %}
         <div class="uk-alert uk-alert-success" uk-alert><p>No pending extension requests.</p></div>
+        {% endif %}
+    </div>
+
+    <!-- Approval Logs Section -->
+    <div id="section-logs" class="users-section hidden">
+        {% if approval_logs %}
+        <div class="overflow-auto">
+            <table class="uk-table uk-table-hover uk-table-divider uk-table-small uk-table-striped">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Operation</th>
+                        <th>Status</th>
+                        <th>Requested By</th>
+                        <th>Reviewed By</th>
+                        <th>Note</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in approval_logs %}
+                    <tr class="hover:bg-muted/50 transition-colors">
+                        <td class="text-sm whitespace-nowrap">{{ r.created_at.strftime('%d %b %Y %H:%M') if r.created_at else "—" }}</td>
+                        <td><span class="uk-badge">{{ r.resource_type.value | replace("_", " ") | title }}</span></td>
+                        <td>{{ r.operation.value | title }}</td>
+                        <td>
+                            {% if r.status.value == 'approved' %}
+                            <span class="uk-badge uk-badge-primary">Approved</span>
+                            {% elif r.status.value == 'rejected' %}
+                            <span class="uk-badge uk-badge-destructive">Rejected</span>
+                            {% else %}
+                            <span class="uk-badge">Pending</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-sm">{{ r.requested_by_user_id }}</td>
+                        <td class="text-sm">{{ r.reviewed_by_user_id or "—" }}</td>
+                        <td class="text-xs text-muted-foreground max-w-xs truncate">{{ r.review_note or "—" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if log_total > log_limit %}
+        <div class="flex items-center justify-between mt-4 pt-4 border-t border-border">
+            <div class="text-sm text-muted-foreground">
+                Showing {{ log_offset + 1 }}–{{ [log_offset + log_limit, log_total]|min }} of {{ log_total }}
+            </div>
+            <div class="flex gap-2">
+                {% if log_offset > 0 %}
+                <a href="/users?log_offset={{ [log_offset - log_limit, 0]|max }}" class="uk-btn uk-btn-default uk-btn-sm">Previous</a>
+                {% endif %}
+                {% if log_offset + log_limit < log_total %}
+                <a href="/users?log_offset={{ log_offset + log_limit }}" class="uk-btn uk-btn-default uk-btn-sm">Next</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="uk-alert uk-alert-success" uk-alert><p>No approval logs yet.</p></div>
         {% endif %}
     </div>
 </div>

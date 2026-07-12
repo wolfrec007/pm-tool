@@ -44,6 +44,21 @@ def list_users(
     from app.services.extension_service import list_extension_requests
     pending_extensions = list_extension_requests(db, firm_id, status="pending") if firm_id else []
 
+    # Get approval logs (last 25, paginated)
+    from app.models.models import ApprovalRequest as ApprovalRequestModel
+    log_offset_val = int(request.query_params.get("log_offset", 0))
+    log_limit = 25
+    if firm_id:
+        log_total = db.query(ApprovalRequestModel).filter(
+            ApprovalRequestModel.firm_id == firm_id
+        ).count()
+        approval_logs = db.query(ApprovalRequestModel).filter(
+            ApprovalRequestModel.firm_id == firm_id
+        ).order_by(ApprovalRequestModel.created_at.desc()).offset(log_offset_val).limit(log_limit).all()
+    else:
+        log_total = 0
+        approval_logs = []
+
     return templates.TemplateResponse(request, "users/list.html", {
         "items": items,
         "total": total,
@@ -54,6 +69,10 @@ def list_users(
         "user": user,
         "pending_approvals": pending_approvals,
         "pending_extensions": pending_extensions,
+        "approval_logs": approval_logs,
+        "log_total": log_total,
+        "log_limit": log_limit,
+        "log_offset": log_offset_val,
     })
 
 
