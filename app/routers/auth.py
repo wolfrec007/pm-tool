@@ -34,17 +34,20 @@ def _set_session(request: Request, user: User, firm_id: int | None = None) -> No
     request.session["user_name"] = user.display_name
     if firm_id:
         request.session["firm_id"] = firm_id
-        # Get role from FirmUser
-        from app.services.firm_service import get_user_role_in_firm
+        # Get role and firm name from FirmUser
+        from app.services.firm_service import get_user_role_in_firm, get_firm
         from app.database import SessionLocal
         db = SessionLocal()
         try:
             role = get_user_role_in_firm(db, user.id, firm_id)
             request.session["user_role"] = role.value if role else "viewer"
+            firm = get_firm(db, firm_id)
+            request.session["firm_name"] = firm.name
         finally:
             db.close()
     else:
         request.session["user_role"] = "viewer"
+        request.session.pop("firm_name", None)
 
 
 @router.get("/login", response_class=HTMLResponse)

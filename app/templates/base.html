@@ -85,6 +85,9 @@
                     <div class="relative" id="user-menu-container">
                         <button id="user-menu-button" class="hidden md:flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-muted transition-colors">
                             <span>{{ request.session.user_name }}</span>
+                            {% if request.session.get("firm_name") %}
+                            <span class="text-xs px-2 py-0.5 rounded bg-primary/10 text-primary font-medium">{{ request.session.firm_name }}</span>
+                            {% endif %}
                             <span class="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">{{ request.session.user_role | title }}</span>
                             <uk-icon icon="chevron-down" width="14" height="14"></uk-icon>
                         </button>
@@ -181,6 +184,9 @@
                 <div class="border-t border-border my-2"></div>
                 <div class="px-3 py-2">
                     <p class="text-sm font-medium text-foreground">{{ request.session.user_name }}</p>
+                    {% if request.session.get("firm_name") %}
+                    <p class="text-xs text-primary font-medium">{{ request.session.firm_name }}</p>
+                    {% endif %}
                     <p class="text-xs text-muted-foreground">{{ request.session.user_role | title }}</p>
                 </div>
                 {% if request.session.get("firm_id") %}
