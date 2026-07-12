@@ -83,6 +83,7 @@ async def create_team_member_form(
 
     errors = []
     data = {}
+    data["firm_id"] = request.session.get("firm_id")
     for key in ["name", "email", "employee_code", "business_role", "seniority_level", "date_of_joining", "date_of_relieving"]:
         val = form_data.get(key, "").strip()
         if val:
