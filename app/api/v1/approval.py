@@ -77,7 +77,9 @@ def _apply_approved_change(db: Session, req) -> None:
     from app.services import team_member_service, client_service, engagement_service, leave_service
     from app.services import allocation_service
 
-    payload = req.payload
+    payload = req.payload.copy()
+    # Inject firm_id into payload for resources that need it
+    payload["firm_id"] = req.firm_id
     rid = req.resource_id
 
     if req.resource_type == ResourceType.team_member:
