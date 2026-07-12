@@ -89,14 +89,33 @@ async def login(request: Request, db: Session = Depends(get_db)):
         request.session["pending_2fa_user_id"] = user.id
         return RedirectResponse(url="/auth/2fa", status_code=303)
 
-    # Get user's firms and set firm_id
-    from app.services.firm_service import get_user_firms
+    # Get user's firms
+    from app.services.firm_service import get_user_firms, get_firm_user
     firms = get_user_firms(db, user.id)
-    firm_id = firms[0].id if firms else None
 
-    _set_session(request, user, firm_id)
-    set_flash(request, f"Welcome back, {user.display_name}!")
-    return RedirectResponse(url="/dashboard", status_code=303)
+    if len(firms) == 0:
+        _set_session(request, user, None)
+        set_flash(request, f"Welcome back, {user.display_name}!")
+        return RedirectResponse(url="/dashboard", status_code=303)
+
+    if len(firms) == 1:
+        firm_id = firms[0].id
+        _set_session(request, user, firm_id)
+        set_flash(request, f"Welcome back, {user.display_name}!")
+        return RedirectResponse(url="/dashboard", status_code=303)
+
+    # Multiple firms — show firm selector
+    request.session["user_id"] = user.id
+    request.session["user_email"] = user.email
+    request.session["user_name"] = user.display_name
+    # Store firm_users data for the selector page
+    firm_users = []
+    for f in firms:
+        fu = get_firm_user(db, user.id, f.id)
+        if fu:
+            firm_users.append({"firm": f, "firm_id": f.id, "role": fu.technical_role.value, "firm_name": f.name})
+    request.session["pending_firm_users"] = firm_users
+    return RedirectResponse(url="/auth/firm-select", status_code=303)
 
 
 # ── 2FA ──
@@ -242,6 +261,48 @@ async def ms365_callback(request: Request, db: Session = Depends(get_db)):
 def logout(request: Request):
     request.session.clear()
     return RedirectResponse(url="/auth/login", status_code=303)
+
+
+# ── Firm Selection ──
+
+@router.get("/firm-select", response_class=HTMLResponse)
+def firm_select_page(request: Request):
+    """Show firm selector if user belongs to multiple firms."""
+    user_id = request.session.get("user_id")
+    if not user_id:
+        return RedirectResponse(url="/auth/login", status_code=303)
+
+    # If user already has a firm selected, go to dashboard
+    if request.session.get("firm_id"):
+        return RedirectResponse(url="/dashboard", status_code=303)
+
+    firm_users = request.session.get("pending_firm_users", [])
+    if not firm_users:
+        # No pending firms, redirect to login
+        return RedirectResponse(url="/auth/login", status_code=303)
+
+    return templates.TemplateResponse(request, "auth/firm_select.html", {
+        "firm_users": firm_users,
+    })
+
+
+@router.get("/firm/switch/{firm_id}")
+def firm_switch(request: Request, firm_id: int, db: Session = Depends(get_db)):
+    """Switch active firm."""
+    user_id = request.session.get("user_id")
+    if not user_id:
+        return RedirectResponse(url="/auth/login", status_code=303)
+
+    from app.services.firm_service import get_firm_user
+    fu = get_firm_user(db, user_id, firm_id)
+    if not fu or not fu.is_active:
+        set_flash(request, "You are not a member of this firm", "danger")
+        return RedirectResponse(url="/auth/firm-select", status_code=303)
+
+    _set_session(request, db.query(User).filter(User.id == user_id).first(), firm_id)
+    request.session.pop("pending_firm_users", None)
+    set_flash(request, f"Switched to firm")
+    return RedirectResponse(url="/dashboard", status_code=303)
 
 
 # ── Password change (logged-in users) ──

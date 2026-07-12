@@ -88,11 +88,20 @@
                             <span class="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">{{ request.session.user_role | title }}</span>
                             <uk-icon icon="chevron-down" width="14" height="14"></uk-icon>
                         </button>
-                        <div id="user-menu-dropdown" class="hidden absolute right-0 mt-1 w-48 bg-background border border-border rounded-md shadow-lg" style="z-index: 9999;">
+                        <div id="user-menu-dropdown" class="hidden absolute right-0 mt-1 w-56 bg-background border border-border rounded-md shadow-lg" style="z-index: 9999;">
                             <ul class="py-1">
-                                <li><a href="/auth/change-password" class="block px-4 py-2 text-sm hover:bg-muted">Change Password</a></li>
-                                <li><a href="/auth/2fa-setup" class="block px-4 py-2 text-sm hover:bg-muted">Setup 2FA</a></li>
-                                <li><a href="/auth/2fa" class="block px-4 py-2 text-sm hover:bg-muted">Verify 2FA</a></li>
+                                <li class="px-4 py-2 border-b border-border">
+                                    <div class="text-sm font-medium text-foreground">{{ request.session.user_name }}</div>
+                                    <div class="text-xs text-muted-foreground">{{ request.session.user_role | title }}</div>
+                                </li>
+                                {% if request.session.get("firm_id") %}
+                                <li><a href="/auth/firm-select" class="flex items-center gap-2 px-4 py-2 text-sm hover:bg-muted">
+                                    <uk-icon icon="building" width="14" height="14"></uk-icon> Switch Firm
+                                </a></li>
+                                {% endif %}
+                                <li><a href="/auth/change-password" class="flex items-center gap-2 px-4 py-2 text-sm hover:bg-muted">
+                                    <uk-icon icon="key-round" width="14" height="14"></uk-icon> Change Password
+                                </a></li>
                                 <li class="border-t border-border my-1"></li>
                                 <li>
                                     <a href="#" id="theme-toggle" class="flex items-center gap-2 px-4 py-2 text-sm hover:bg-muted">
@@ -100,15 +109,22 @@
                                         <span id="theme-label">Dark Mode</span>
                                     </a>
                                 </li>
+                                <li>
+                                    <div class="px-4 py-2">
+                                        <div class="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Theme</div>
+                                        <div class="flex gap-2">
+                                            <button class="palette-option w-7 h-7 rounded-full border-2 border-border hover:border-primary transition-colors" data-palette="uk-palette-light-blue" style="background:hsl(188 42% 44%)" title="Light Blue"></button>
+                                            <button class="palette-option w-7 h-7 rounded-full border-2 border-border hover:border-primary transition-colors" data-palette="uk-palette-frozen-water" style="background:hsl(157 50% 38%)" title="Frozen Water"></button>
+                                            <button class="palette-option w-7 h-7 rounded-full border-2 border-border hover:border-primary transition-colors" data-palette="uk-palette-warm-teal" style="background:hsl(170 50% 34%)" title="Warm Teal"></button>
+                                            <button class="palette-option w-7 h-7 rounded-full border-2 border-border hover:border-primary transition-colors" data-palette="uk-palette-slate-indigo" style="background:hsl(235 58% 48%)" title="Slate Indigo"></button>
+                                            <button class="palette-option w-7 h-7 rounded-full border-2 border-border hover:border-primary transition-colors" data-palette="uk-palette-zinc" style="background:hsl(240 5.9% 10%)" title="Zinc"></button>
+                                        </div>
+                                    </div>
+                                </li>
                                 <li class="border-t border-border my-1"></li>
-                                <li class="px-4 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Theme Color</li>
-                                <li><a href="#" class="palette-option flex items-center gap-2 px-4 py-2 text-sm hover:bg-muted" data-palette="uk-palette-light-blue"><span class="inline-block w-3 h-3 rounded-full" style="background:hsl(188 42% 44%)"></span>Light Blue</a></li>
-                                <li><a href="#" class="palette-option flex items-center gap-2 px-4 py-2 text-sm hover:bg-muted" data-palette="uk-palette-frozen-water"><span class="inline-block w-3 h-3 rounded-full" style="background:hsl(157 50% 38%)"></span>Frozen Water</a></li>
-                                <li><a href="#" class="palette-option flex items-center gap-2 px-4 py-2 text-sm hover:bg-muted" data-palette="uk-palette-warm-teal"><span class="inline-block w-3 h-3 rounded-full" style="background:hsl(170 50% 34%)"></span>Warm Teal</a></li>
-                                <li><a href="#" class="palette-option flex items-center gap-2 px-4 py-2 text-sm hover:bg-muted" data-palette="uk-palette-slate-indigo"><span class="inline-block w-3 h-3 rounded-full" style="background:hsl(235 58% 48%)"></span>Slate Indigo</a></li>
-                                <li><a href="#" class="palette-option flex items-center gap-2 px-4 py-2 text-sm hover:bg-muted" data-palette="uk-palette-zinc"><span class="inline-block w-3 h-3 rounded-full" style="background:hsl(240 5.9% 10%)"></span>Zinc</a></li>
-                                <li class="border-t border-border my-1"></li>
-                                <li><a href="/auth/logout" class="block px-4 py-2 text-sm text-destructive hover:bg-muted">Logout</a></li>
+                                <li><a href="/auth/logout" class="flex items-center gap-2 px-4 py-2 text-sm text-destructive hover:bg-muted">
+                                    <uk-icon icon="log-out" width="14" height="14"></uk-icon> Logout
+                                </a></li>
                             </ul>
                         </div>
                     </div>
@@ -185,28 +201,17 @@
                 </a>
                 {% endif %}
 
-                <div class="border-t border-border my-2"></div>
-                <p class="px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Appearance</p>
-                <a href="#" id="sidebar-theme-toggle" class="flex items-center gap-3 px-3 py-2.5 text-sm rounded-md text-muted-foreground hover:text-foreground hover:bg-muted">
-                    <uk-icon icon="moon" width="16" height="16"></uk-icon>
-                    <span id="sidebar-theme-label">Dark Mode</span>
-                </a>
-                <div class="px-3 py-2">
-                    <div class="flex gap-2">
-                        <button class="palette-option-sidebar w-7 h-7 rounded-full border-2 border-border hover:border-primary transition-colors" data-palette="uk-palette-light-blue" style="background:hsl(188 42% 44%)" title="Light Blue"></button>
-                        <button class="palette-option-sidebar w-7 h-7 rounded-full border-2 border-border hover:border-primary transition-colors" data-palette="uk-palette-frozen-water" style="background:hsl(157 50% 38%)" title="Frozen Water"></button>
-                        <button class="palette-option-sidebar w-7 h-7 rounded-full border-2 border-border hover:border-primary transition-colors" data-palette="uk-palette-warm-teal" style="background:hsl(170 50% 34%)" title="Warm Teal"></button>
-                        <button class="palette-option-sidebar w-7 h-7 rounded-full border-2 border-border hover:border-primary transition-colors" data-palette="uk-palette-slate-indigo" style="background:hsl(235 58% 48%)" title="Slate Indigo"></button>
-                        <button class="palette-option-sidebar w-7 h-7 rounded-full border-2 border-border hover:border-primary transition-colors" data-palette="uk-palette-zinc" style="background:hsl(240 5.9% 10%)" title="Zinc"></button>
-                    </div>
-                </div>
-
                 {% if request.session.get("user_name") %}
                 <div class="border-t border-border my-2"></div>
                 <div class="px-3 py-2">
                     <p class="text-sm font-medium text-foreground">{{ request.session.user_name }}</p>
                     <p class="text-xs text-muted-foreground">{{ request.session.user_role | title }}</p>
                 </div>
+                {% if request.session.get("firm_id") %}
+                <a href="/auth/firm-select" class="flex items-center gap-3 px-3 py-2.5 text-sm rounded-md text-muted-foreground hover:text-foreground hover:bg-muted">
+                    <uk-icon icon="building" width="16" height="16"></uk-icon> Switch Firm
+                </a>
+                {% endif %}
                 <a href="/auth/change-password" class="flex items-center gap-3 px-3 py-2.5 text-sm rounded-md text-muted-foreground hover:text-foreground hover:bg-muted">
                     <uk-icon icon="key-round" width="16" height="16"></uk-icon> Change Password
                 </a>
@@ -281,7 +286,7 @@
                 __FRANKEN__.mode = 'dark';
             }
             localStorage.setItem('__FRANKEN__', JSON.stringify(__FRANKEN__));
-            document.querySelectorAll('#theme-label, #sidebar-theme-label').forEach(function(el) {
+            document.querySelectorAll('#theme-label').forEach(function(el) {
                 el.textContent = __FRANKEN__.mode === 'dark' ? 'Light Mode' : 'Dark Mode';
             });
             updateNavThemeIcon();
@@ -294,25 +299,7 @@
             icon.setAttribute('icon', isDark ? 'sun' : 'moon');
         }
 
-        // Sidebar palette switcher
-        document.querySelectorAll('.palette-option-sidebar').forEach(function(el) {
-            el.addEventListener('click', function(e) {
-                e.preventDefault();
-                var palette = this.dataset.palette;
-                var html = document.documentElement;
-                html.classList.remove(
-                    'uk-palette-light-blue',
-                    'uk-palette-frozen-water',
-                    'uk-palette-warm-teal',
-                    'uk-palette-slate-indigo',
-                    'uk-palette-zinc'
-                );
-                html.classList.add(palette);
-                var __FRANKEN__ = JSON.parse(localStorage.getItem('__FRANKEN__') || '{}');
-                __FRANKEN__.palette = palette;
-                localStorage.setItem('__FRANKEN__', JSON.stringify(__FRANKEN__));
-            });
-        });
+
 
         // Sidebar drawer toggle
         function openSidebar() {
@@ -336,7 +323,7 @@
         (function() {
             var isDark = document.documentElement.classList.contains('dark');
             var label = isDark ? 'Light Mode' : 'Dark Mode';
-            document.querySelectorAll('#theme-label, #sidebar-theme-label').forEach(function(el) {
+            document.querySelectorAll('#theme-label').forEach(function(el) {
                 if (el) el.textContent = label;
             });
             updateNavThemeIcon();
