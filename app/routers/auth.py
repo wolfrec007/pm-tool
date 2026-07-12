@@ -266,20 +266,27 @@ def logout(request: Request):
 # ── Firm Selection ──
 
 @router.get("/firm-select", response_class=HTMLResponse)
-def firm_select_page(request: Request):
+def firm_select_page(request: Request, db: Session = Depends(get_db)):
     """Show firm selector if user belongs to multiple firms."""
     user_id = request.session.get("user_id")
     if not user_id:
         return RedirectResponse(url="/auth/login", status_code=303)
 
-    # If user already has a firm selected, go to dashboard
-    if request.session.get("firm_id"):
-        return RedirectResponse(url="/dashboard", status_code=303)
-
+    # If user already has a firm selected and no pending data, fetch fresh from DB
     firm_users = request.session.get("pending_firm_users", [])
     if not firm_users:
-        # No pending firms, redirect to login
-        return RedirectResponse(url="/auth/login", status_code=303)
+        from app.services.firm_service import get_user_firms, get_firm_user
+        firms = get_user_firms(db, user_id)
+        for f in firms:
+            fu = get_firm_user(db, user_id, f.id)
+            if fu:
+                firm_users.append({"firm_id": f.id, "role": fu.technical_role.value, "firm_name": f.name})
+
+    if len(firm_users) <= 1:
+        # Single firm, go to dashboard
+        if firm_users:
+            request.session["firm_id"] = firm_users[0]["firm_id"]
+        return RedirectResponse(url="/dashboard", status_code=303)
 
     return templates.TemplateResponse(request, "auth/firm_select.html", {
         "firm_users": firm_users,
