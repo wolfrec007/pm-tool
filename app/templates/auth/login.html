@@ -4,92 +4,77 @@
 {% block title %}Login — splanly{% endblock %}
 
 {% block content %}
-<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 px-4 py-12">
-    <div class="w-full max-w-md">
-        <!-- Logo & Header -->
-        <div class="text-center mb-8">
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary text-white text-2xl font-bold mb-4">
-                SP
+<body class="bg-background text-foreground antialiased">
+  <div class="flex min-h-svh items-center justify-center p-4 md:p-10">
+    <div class="w-full max-w-sm">
+      <div class="mb-6 flex justify-center">
+        <a href="/">
+          <div class="w-12 h-12 rounded-xl bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg">SP</div>
+        </a>
+      </div>
+      <div class="space-y-1.5 text-center">
+        <h1 class="uk-h4">Welcome back.</h1>
+        <p>Don't have an account? <a class="uk-link text-primary" href="/auth/register">Register</a></p>
+      </div>
+      <form class="mt-6 space-y-6" action="/auth/login" method="POST">
+        {{ csrf_field(csrf_token) }}
+
+        {% if error %}
+        <div class="uk-alert uk-alert-destructive">
+            <div class="flex items-center gap-2">
+                <uk-icon icon="alert-circle" width="16" height="16"></uk-icon>
+                <span>{{ error }}</span>
             </div>
-            <h1 class="text-2xl font-semibold text-foreground">Welcome back</h1>
-            <p class="text-muted-foreground mt-1">Sign in to your splanly by SkilledCA account</p>
+        </div>
+        {% endif %}
+
+        <div class="grid gap-y-1">
+          <label class="uk-form-label" for="email">Email</label>
+          <input
+            class="uk-input"
+            id="email"
+            name="email"
+            type="email"
+            placeholder="you@company.com"
+            required
+            autofocus
+          />
         </div>
 
-        <!-- Login Card -->
-        <div class="uk-card uk-card-body">
-            {% if error %}
-            <div class="uk-alert uk-alert-destructive mb-6" uk-alert>
-                <div class="flex items-center gap-2">
-                    <uk-icon icon="alert-circle" width="16" height="16"></uk-icon>
-                    <span>{{ error }}</span>
-                </div>
-            </div>
-            {% endif %}
-
-            <form method="POST" action="/auth/login" class="space-y-5">
-                {{ csrf_field(csrf_token) }}
-
-                <div class="space-y-2">
-                    <label for="email" class="uk-form-label">Email</label>
-                    <input 
-                        type="email" 
-                        name="email" 
-                        id="email" 
-                        class="uk-input w-full"
-                        placeholder="you@company.com" 
-                        required 
-                        autofocus
-                    >
-                </div>
-
-                <div class="space-y-2">
-                    <label for="password" class="uk-form-label">Password</label>
-                    <input 
-                        type="password" 
-                        name="password" 
-                        id="password" 
-                        class="uk-input w-full"
-                        placeholder="Enter your password" 
-                        required
-                    >
-                </div>
-
-                <button type="submit" class="uk-btn uk-btn-primary w-full">
-                    Sign In
-                </button>
-            </form>
-
-            {% if ms365_enabled %}
-            <div class="mt-6">
-                <div class="relative">
-                    <div class="absolute inset-0 flex items-center">
-                        <div class="w-full border-t border-border"></div>
-                    </div>
-                    <div class="relative flex justify-center text-sm">
-                        <span class="px-4 bg-background text-muted-foreground">or continue with</span>
-                    </div>
-                </div>
-
-                <a href="/auth/ms365" class="uk-btn uk-btn-default w-full mt-4 flex items-center justify-center gap-2">
-                    <svg class="w-5 h-5" viewBox="0 0 24 24">
-                        <path fill="#F25022" d="M1 1h10v10H1z"/>
-                        <path fill="#00A4EF" d="M1 13h10v10H1z"/>
-                        <path fill="#7FBA00" d="M13 1h10v10H13z"/>
-                        <path fill="#FFB900" d="M13 13h10v10H13z"/>
-                    </svg>
-                    Sign in with Microsoft 365
-                </a>
-            </div>
-            {% endif %}
+        <div class="grid gap-y-1">
+          <label class="uk-form-label" for="password">Password</label>
+          <input
+            class="uk-input"
+            id="password"
+            name="password"
+            type="password"
+            placeholder="Enter your password"
+            required
+          />
         </div>
 
-        <!-- Footer -->
-        <p class="text-center text-sm text-muted-foreground mt-6">
-            Don't have an account? <a href="/auth/register" class="text-primary hover:underline font-medium">Register</a>
-        </p>
-        <p class="text-center text-xs text-muted-foreground mt-2">
-            splanly by SkilledCA &copy; 2026
-        </p>
+        <button class="uk-btn uk-btn-primary block w-full">Sign in</button>
+
+        {% if ms365_enabled %}
+        <div class="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
+          <span class="text-muted-foreground relative z-10 bg-background px-2">Or</span>
+        </div>
+        <a href="/auth/ms365" class="uk-btn uk-btn-default w-full flex items-center justify-center gap-2">
+          <svg class="w-5 h-5" viewBox="0 0 24 24">
+            <path fill="#F25022" d="M1 1h10v10H1z"/>
+            <path fill="#00A4EF" d="M1 13h10v10H1z"/>
+            <path fill="#7FBA00" d="M13 1h10v10H13z"/>
+            <path fill="#FFB900" d="M13 13h10v10H13z"/>
+          </svg>
+          <span>Sign in with Microsoft 365</span>
+        </a>
+        {% endif %}
+
+        <div class="text-muted-foreground text-sm text-center">
+          splanly by SkilledCA &copy; 2026
+        </div>
+      </form>
     </div>
-</div>
+  </div>
+</body>
 {% endblock %}
