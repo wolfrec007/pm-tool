@@ -1,80 +1,115 @@
 {% extends "base.html" %}
 {% from "macros/_csrf.html" import csrf_field %}
 
-{% block title %}Login — splanly{% endblock %}
+{% block title %}Sign in — splanly{% endblock %}
 
 {% block content %}
-<body class="bg-background text-foreground antialiased">
-  <div class="flex min-h-svh items-center justify-center p-4 md:p-10">
-    <div class="w-full max-w-sm">
-      <div class="mb-6 flex justify-center">
-        <a href="/">
-          <div class="w-12 h-12 rounded-xl bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg">SP</div>
-        </a>
-      </div>
-      <div class="space-y-1.5 text-center">
-        <h1 class="uk-h4">Welcome back.</h1>
-        <p>Don't have an account? <a class="uk-link text-primary" href="/auth/register">Register</a></p>
-      </div>
-      <form class="mt-6 space-y-6" action="/auth/login" method="POST">
-        {{ csrf_field(csrf_token) }}
+<div class="grid min-h-[calc(100vh-3.5rem)] grid-cols-1 lg:grid-cols-2">
+  <!-- Left panel: brand + testimonial -->
+  <div class="hidden lg:flex flex-col justify-between p-12" style="background:var(--navy);">
+    <div>
+      <a href="/" class="flex items-center gap-3 text-white text-lg font-bold" style="font-family:'Plus Jakarta Sans',sans-serif;">
+        <svg width="32" height="32" viewBox="0 0 1024 768" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g transform="translate(200,160) scale(0.6)">
+            <path d="M82.4 110.5h6.4c1.1 0 1.9-.7 2.2-1.7l6.4-24c1.7-6.1 6.7-9.9 12.9-9.9h7.1c3.3 0 5.9 2.6 6 5.9-.1 3.3-2.7 5.9-6 5.9h-6.4c-1.1 0-1.9.6-2.2 1.5l-6.4 24c-1.7 6.1-6.7 9.9-12.9 9.9h-7.1c-3.3 0-5.9-2.6-6-5.9.1-3.3 2.7-5.9 6-5.9z" fill="#1c375c"/>
+            <path d="M100.5 122.8c-4.5 0-8.7-1.3-12.4-3.4v9.9c0 3.6-3.1 6.4-6.6 5.9-3-.4-5.2-3.1-5.2-6.1v-30.1c0-.1 0-.2 0-.3 0-13.5 11-24.3 24.2-24.3 13.3 0 24.1 10.8 24.1 24.3s-10.8 24.1-24.1 24.1zm0-36.4c-1.2 0-2.3.2-3.4.5-.2.1-.5.2-.7.3-4.5 1.6-7.8 5.6-8.2 10.6 0 .2 0 .3 0 .5.1 6.8 5.7 12.3 12.4 12.3s12.2-5.5 12.2-12.3c0-6.9-5.5-12.4-12.2-12.4z" fill="#5488b7"/>
+            <path d="M92.9 75.8c3.7-1.2 7.5 1.5 7.5 5.4v.5c0 2.2-1.3 4.2-3.3 5.1-4.8 1.4-8.5 5.7-8.9 11 0 .2 0 .3 0 .5-.1 10.7-7.1 19.8-16.7 19.8-9.5 0-17.2-7.8-17.2-17.4 0-10.8 5.5-16.2 12.3-16.2.6 0 1.1 0 1.6.1" fill="#385e88"/>
+            <path d="M128.6 114l-11.7-25.6c-.1-.1-.1-.1-.1-.2-.1-.2-.2-.4-.2-.6 0-4.3-3.6-7.8-7.8-7.8s-7.8 3.5-7.8 7.8c0 .2 0 .3 0 .5-2.3 39.8 8.5 69.4 24.2 69.4 8.2 0 15.5-5.8 20-14.1l3-6.6c.9 2.1 3 3.4 5.3 3.4 4.3 0 7.2-4.5 5.4-8.4l-12.3-40.9zm-33.6 24.2c-6.7 0-12.2-5.5-12.2-12.3 0-6.7 5.5-12.2 12.2-12.2 1.6 0 3.1.3 4.5.9.1 0 .2 0 .3 0 3.8 2.1 6.4 6.1 6.4 10.7 0 6.9-5.5 12.4-12.2 12.4z" fill="#1c375c"/>
+            <path d="M95 56.1c3.2 0 5.9 2.7 5.9 5.9v54.3c.1 3.3-2.6 6-5.9 6-3.2 0-5.9-2.7-5.9-5.9V62c0-3.3 2.7-5.9 5.9-5.9z" fill="#1c375c"/>
+            <path d="M100 74.9c-3.2 0-5.9-2.7-5.9-5.9V56.1c0-3.3 2.7-5.9 5.9-5.9s5.9 2.6 5.9 5.9v12.9c0 3.3-2.7 6-5.9 6z" fill="#385e88"/>
+            <path d="M75.9 116.3V98.6c0-13.2 10.8-24 24-24s24 10.8 24 24v17.8c.1 3.3-2.7 6-5.9 6-3.3 0-5.9-2.7-5.9-6V98.6c0-6.8-5.5-12.3-12.2-12.3s-12.2 5.5-12.2 12.3v17.7c0 3.3-2.7 6-5.9 6s-5.9-2.7-5.9-5.9z" fill="#1c375c"/>
+            <path d="M117.6 74.9c-3.2 0-5.9 2.7-5.9 5.9v17.8c-6.8-4.3-12.3-10.8-15.5-18.4l-2.1 4.5c-.9 2.1-3 3.4-5.3 3.4-4.3 0-7.2-4.5-5.4-8.4l11.8-25.6c.1-.1.1-.1.1-.2.1-.2.2-.4.2-.6 0-4.3-3.6-7.8-7.8-7.8s-7.8 3.5-7.8 7.8c0 .2 0 .3 0 .5 0 13.5 10.8 24.3 24.1 24.3 5 0 9.6-1.5 13.4-4l3 6.6c1.8 3.9 7.2 8.4 11.5 8.4 4.3 0 7.2-4.5 5.4-8.4L117.6 74.9z" fill="#1c375c"/>
+            <path d="M111.8 135.2c0 7.2-3.3 13.7-8.4 18.1-4.3 3.7-9.8 6-15.8 6-6.8 0-12.3-5.7-12.3-12.4 0-6.8 5.5-12.3 12.3-12.3 4.5 0 8.6 1.2 12.2 3.3 3.7 4.4 7 10.9 7 18.4 0 7.1-3.3 13.7-8.4 18.1L115.2 117c-4.3-3.7-9.8-6-15.8-6-6.8 0-12.3 5.7-12.3 12.4 0 6.8 5.5 12.3 12.3 12.3 5 0 9.6-1.5 13.4-4l-3-6.6" fill="#5488b7"/>
+          </g>
+        </svg>
+        splanly
+      </a>
+    </div>
+    <blockquote class="space-y-4">
+      <p class="text-lg text-white/90 leading-relaxed">
+        "splanly has completely transformed how we manage our audit teams. We caught three double-bookings in the first week alone."
+      </p>
+      <footer class="text-sm text-white/60">— Rajesh Kumar, Partner at PKF</footer>
+    </blockquote>
+  </div>
 
-        {% if error %}
-        <div class="uk-alert uk-alert-destructive">
-            <div class="flex items-center gap-2">
-                <uk-icon icon="alert-circle" width="16" height="16"></uk-icon>
-                <span>{{ error }}</span>
-            </div>
-        </div>
-        {% endif %}
+  <!-- Right panel: form -->
+  <div class="flex flex-col p-8 lg:p-12">
+    <div class="flex flex-none justify-end">
+      <a href="/auth/register" style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:600; color:var(--heading); padding:9px 18px; border-radius:999px; font-size:14px; border:1.5px solid var(--border); transition:all .18s;" onmouseover="this.style.borderColor='var(--steel)'; this.style.background='var(--card)'" onmouseout="this.style.borderColor=''; this.style.background=''">Sign Up</a>
+    </div>
 
-        <div class="grid gap-y-1">
-          <label class="uk-form-label" for="email">Email</label>
-          <input
-            class="uk-input"
-            id="email"
-            name="email"
-            type="email"
-            placeholder="you@company.com"
-            required
-            autofocus
-          />
-        </div>
-
-        <div class="grid gap-y-1">
-          <label class="uk-form-label" for="password">Password</label>
-          <input
-            class="uk-input"
-            id="password"
-            name="password"
-            type="password"
-            placeholder="Enter your password"
-            required
-          />
+    <div class="flex flex-1 items-center justify-center">
+      <div class="w-full max-w-sm space-y-6">
+        <div class="flex flex-col space-y-2 text-center">
+          <h1 class="text-2xl font-semibold tracking-tight" style="font-family:'Plus Jakarta Sans',sans-serif; color:var(--heading);">Welcome back</h1>
+          <p style="color:var(--muted); font-size:14px;">Sign in to your splanly account</p>
         </div>
 
-        <button class="uk-btn uk-btn-primary block w-full">Sign in</button>
+        <form method="POST" action="/auth/login" class="space-y-4">
+          {{ csrf_field(csrf_token) }}
+
+          {% if error %}
+          <div style="background:var(--amber-bg); border:1px solid var(--amber-border); border-radius:var(--radius-sm); padding:11px 14px; font-size:13px; color:var(--amber-text); font-weight:500;">
+            {{ error }}
+          </div>
+          {% endif %}
+
+          <div class="space-y-2">
+            <label style="font-size:13px; font-weight:600; color:var(--heading); display:block; margin-bottom:6px;">Email</label>
+            <input
+              class="uk-input"
+              name="email"
+              type="email"
+              placeholder="you@company.com"
+              required
+              autofocus
+              style="border-radius:var(--radius-sm);"
+            />
+          </div>
+
+          <div class="space-y-2">
+            <label style="font-size:13px; font-weight:600; color:var(--heading); display:block; margin-bottom:6px;">Password</label>
+            <input
+              class="uk-input"
+              name="password"
+              type="password"
+              placeholder="Enter your password"
+              required
+              style="border-radius:var(--radius-sm);"
+            />
+          </div>
+
+          <button type="submit" style="display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:13px 26px; border-radius:999px; font-weight:600; font-size:15px; border:1.5px solid transparent; cursor:pointer; width:100%; background:var(--navy); color:#fff; box-shadow:0 8px 20px -8px rgba(20,48,77,.55); transition:all .18s var(--ease);">
+            Sign in
+          </button>
+        </form>
 
         {% if ms365_enabled %}
-        <div class="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
-          <span class="text-muted-foreground relative z-10 bg-background px-2">Or</span>
+        <div class="relative">
+          <div class="absolute inset-0 flex items-center">
+            <span class="w-full" style="border-top:1px solid var(--border);"></span>
+          </div>
+          <div class="relative flex justify-center text-xs uppercase" style="padding:0 12px;">
+            <span style="background:var(--bg); padding:0 12px; color:var(--muted); font-size:12px; font-weight:500;">or continue with</span>
+          </div>
         </div>
-        <a href="/auth/ms365" class="uk-btn uk-btn-default w-full flex items-center justify-center gap-2">
+        <a href="/auth/ms365" style="display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:13px 26px; border-radius:999px; font-weight:600; font-size:15px; border:1.5px solid var(--border); cursor:pointer; width:100%; background:var(--card); color:var(--heading); transition:all .18s;">
           <svg class="w-5 h-5" viewBox="0 0 24 24">
             <path fill="#F25022" d="M1 1h10v10H1z"/>
             <path fill="#00A4EF" d="M1 13h10v10H1z"/>
             <path fill="#7FBA00" d="M13 1h10v10H13z"/>
             <path fill="#FFB900" d="M13 13h10v10H13z"/>
           </svg>
-          <span>Sign in with Microsoft 365</span>
+          Sign in with Microsoft 365
         </a>
         {% endif %}
 
-        <div class="text-muted-foreground text-sm text-center">
-          splanly by SkilledCA &copy; 2026
-        </div>
-      </form>
+        <p style="color:var(--muted); font-size:13px; text-align:center; margin-top:24px;">
+          Don't have an account? <a href="/auth/register" style="color:var(--steel); font-weight:600; text-decoration:none;">Register</a>
+        </p>
+      </div>
     </div>
   </div>
-</body>
+</div>
 {% endblock %}
