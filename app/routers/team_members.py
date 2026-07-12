@@ -38,8 +38,9 @@ def list_team_members(
     db: Session = Depends(get_db),
     user=Depends(get_current_user),
 ):
+    firm_id = request.session.get("firm_id")
     items, total = service.list_team_members(
-        db, limit=limit, offset=offset, q=q, is_active=is_active, business_role=business_role
+        db, firm_id=firm_id, limit=limit, offset=offset, q=q, is_active=is_active, business_role=business_role
     )
     return templates.TemplateResponse(request, "team_members/list.html", {
         "items": items, "total": total, "limit": limit, "offset": offset, "q": q or "", "is_active": is_active,

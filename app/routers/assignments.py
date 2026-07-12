@@ -36,8 +36,9 @@ def list_assignments(
     db: Session = Depends(get_db),
     user=Depends(require_role(TechnicalRole.admin, TechnicalRole.moderator, TechnicalRole.viewer)),
 ):
+    firm_id = request.session.get("firm_id")
     items, total = service.list_assignments(
-        db, limit=limit, offset=offset, team_member_id=team_member_id, engagement_instance_id=engagement_instance_id
+        db, firm_id=firm_id, limit=limit, offset=offset, team_member_id=team_member_id, engagement_instance_id=engagement_instance_id
     )
     return templates.TemplateResponse(request, "assignments/list.html", {
         "items": items, "total": total, "limit": limit, "offset": offset,
@@ -52,8 +53,9 @@ def assign_staff_page(
     db: Session = Depends(get_db),
     user=Depends(require_role(TechnicalRole.admin, TechnicalRole.moderator)),
 ):
-    members, _ = team_member_service.list_team_members(db, limit=200, is_active=True, q=q)
-    allocations = service.get_member_allocations(db)
+    firm_id = request.session.get("firm_id")
+    members, _ = team_member_service.list_team_members(db, firm_id=firm_id, limit=200, is_active=True, q=q)
+    allocations = service.get_member_allocations(db, firm_id=firm_id)
     return templates.TemplateResponse(request, "assignments/assign_staff.html", {
         "members": members,
         "allocations": allocations,

@@ -25,7 +25,8 @@ def list_leaves(
     team_member_id: Optional[int] = None, status: Optional[str] = None,
     db: Session = Depends(get_db), user=Depends(get_current_user),
 ):
-    items, total = service.list_leaves(db, limit=limit, offset=offset, team_member_id=team_member_id, status=status)
+    firm_id = request.session.get("firm_id")
+    items, total = service.list_leaves(db, firm_id=firm_id, limit=limit, offset=offset, team_member_id=team_member_id, status=status)
     return templates.TemplateResponse(request, "leaves/list.html", {
         "items": items, "total": total, "limit": limit, "offset": offset,
         "user": user,
@@ -34,11 +35,13 @@ def list_leaves(
 
 @router.get("/json", response_model=dict)
 def list_leaves_json(
+    request: Request,
     limit: int = Query(50, ge=1, le=200), offset: int = Query(0, ge=0),
     team_member_id: Optional[int] = None, status: Optional[str] = None,
     db: Session = Depends(get_db), _=Depends(get_current_user),
 ):
-    items, total = service.list_leaves(db, limit=limit, offset=offset, team_member_id=team_member_id, status=status)
+    firm_id = request.session.get("firm_id")
+    items, total = service.list_leaves(db, firm_id=firm_id, limit=limit, offset=offset, team_member_id=team_member_id, status=status)
     return {"items": [LeaveRead.model_validate(l) for l in items], "total": total, "limit": limit, "offset": offset}
 
 

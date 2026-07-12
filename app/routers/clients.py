@@ -27,7 +27,8 @@ def list_clients(
     db: Session = Depends(get_db),
     user=Depends(get_current_user),
 ):
-    items, total = service.list_clients(db, limit=limit, offset=offset, q=q, is_active=is_active)
+    firm_id = request.session.get("firm_id")
+    items, total = service.list_clients(db, firm_id=firm_id, limit=limit, offset=offset, q=q, is_active=is_active)
     return templates.TemplateResponse(request, "clients/list.html", {
         "items": items, "total": total, "limit": limit, "offset": offset, "q": q or "", "is_active": is_active,
         "user": user,
@@ -36,11 +37,13 @@ def list_clients(
 
 @router.get("/json", response_model=dict)
 def list_clients_json(
+    request: Request,
     limit: int = Query(50, ge=1, le=200), offset: int = Query(0, ge=0),
     q: Optional[str] = None, is_active: Optional[bool] = None,
     db: Session = Depends(get_db), _=Depends(get_current_user),
 ):
-    items, total = service.list_clients(db, limit=limit, offset=offset, q=q, is_active=is_active)
+    firm_id = request.session.get("firm_id")
+    items, total = service.list_clients(db, firm_id=firm_id, limit=limit, offset=offset, q=q, is_active=is_active)
     return {"items": [ClientRead.model_validate(c) for c in items], "total": total, "limit": limit, "offset": offset}
 
 
