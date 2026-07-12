@@ -109,11 +109,12 @@ def team_member_detail(
     request: Request, member_id: int,
     db: Session = Depends(get_db), _=Depends(get_current_user),
 ):
+    firm_id = request.session.get("firm_id")
     member = service.get_team_member(db, member_id)
     from app.services import allocation_service
-    assignments, _ = allocation_service.list_assignments(db, limit=200, team_member_id=member_id)
+    assignments, _ = allocation_service.list_assignments(db, firm_id=firm_id, limit=200, team_member_id=member_id)
     from app.services import leave_service
-    leaves_list, _ = leave_service.list_leaves(db, limit=200, team_member_id=member_id)
+    leaves_list, _ = leave_service.list_leaves(db, firm_id=firm_id, limit=200, team_member_id=member_id)
 
     return templates.TemplateResponse(request, "team_members/detail.html", {
         "member": member, "assignments": assignments, "leaves_list": leaves_list,
