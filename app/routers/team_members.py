@@ -273,3 +273,37 @@ def bulk_deactivate(
 ):
     count = service.bulk_deactivate(db, member_ids)
     return {"deactivated": count}
+
+
+@router.post("/{member_id}/extend")
+async def create_extension_form(
+    request: Request, member_id: int,
+    db: Session = Depends(get_db),
+    user=Depends(require_role(TechnicalRole.admin, TechnicalRole.moderator)),
+):
+    form_data = await request.form()
+    if not validate_csrf(request, form_data.get("csrf_token")):
+        raise HTTPException(status_code=403, detail="Invalid CSRF token")
+
+    firm_id = request.session.get("firm_id")
+    from app.services.extension_service import create_extension_request
+    from datetime import date as _date
+
+    try:
+        ext = create_extension_request(
+            db=db,
+            firm_id=firm_id,
+            user_id=user.id,
+            team_member_id=member_id,
+            engagement_instance_id=int(form_data["engagement_instance_id"]),
+            allocation_percent=int(form_data["allocation_percent"]),
+            start_date=_date.today(),
+            end_date=_date.fromisoformat(form_data["end_date"]),
+            role_on_engagement=form_data.get("role_on_engagement", "").strip() or None,
+            reason=form_data.get("reason", "").strip() or None,
+        )
+        set_flash(request, "Extension request submitted for approval")
+    except Exception as e:
+        set_flash(request, f"Error: {e}", "danger")
+
+    return RedirectResponse(url=f"/team-members/{member_id}", status_code=303)

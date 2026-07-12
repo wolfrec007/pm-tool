@@ -68,6 +68,11 @@
                     <td><span class="uk-badge">{{ a.allocation_percent }}%</span></td>
                     <td>{{ a.start_date }}</td>
                     <td>{{ a.end_date }}</td>
+                    <td>
+                        <button onclick="openExtendModal({{ a.engagement_instance_id }}, '{{ a.role_on_engagement or '' }}', '{{ a.end_date }}')" class="uk-btn uk-btn-default uk-btn-xs">
+                            <uk-icon icon="plus-circle" width="12" height="12" class="mr-1"></uk-icon>Extend
+                        </button>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -107,4 +112,59 @@
     </div>
 </div>
 {% endif %}
+
+<!-- Extension Request Modal -->
+<div id="extend-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center" style="background: rgba(0,0,0,0.5);">
+    <div class="uk-card uk-card-body w-full max-w-md mx-4" style="background: hsl(var(--background)); border: 1px solid hsl(var(--border));">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold">Request Extension</h3>
+            <button onclick="closeExtendModal()" class="flex items-center justify-center w-8 h-8 rounded-md hover:bg-muted">
+                <uk-icon icon="x" width="18" height="18"></uk-icon>
+            </button>
+        </div>
+        <form id="extend-form" method="POST" action="/extensions/new" class="space-y-4">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <input type="hidden" name="team_member_id" value="{{ member.id }}">
+            <input type="hidden" name="engagement_instance_id" id="ext-instance-id">
+
+            <div class="space-y-2">
+                <label class="uk-form-label">Role on Engagement</label>
+                <input type="text" name="role_on_engagement" id="ext-role" class="uk-input w-full" placeholder="e.g., Senior Auditor">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-2">
+                    <label class="uk-form-label">Allocation %</label>
+                    <input type="number" name="allocation_percent" class="uk-input w-full" min="1" max="100" required placeholder="25">
+                </div>
+                <div class="space-y-2">
+                    <label class="uk-form-label">End Date</label>
+                    <input type="date" name="end_date" id="ext-end-date" class="uk-input w-full" required>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="uk-form-label">Justification <span class="text-destructive">*</span></label>
+                <textarea name="reason" class="uk-textarea w-full" rows="3" required placeholder="Explain why this extension is needed..."></textarea>
+            </div>
+
+            <div class="flex gap-2 pt-2">
+                <button type="submit" class="uk-btn uk-btn-primary flex-1">Submit Request</button>
+                <button type="button" onclick="closeExtendModal()" class="uk-btn uk-btn-default">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openExtendModal(instanceId, role, endDate) {
+    document.getElementById('ext-instance-id').value = instanceId;
+    document.getElementById('ext-role').value = role;
+    document.getElementById('ext-end-date').value = endDate;
+    document.getElementById('extend-modal').classList.remove('hidden');
+}
+function closeExtendModal() {
+    document.getElementById('extend-modal').classList.add('hidden');
+}
+</script>
 {% endblock %}
