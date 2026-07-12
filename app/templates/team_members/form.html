@@ -24,7 +24,6 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {{ select_field("technical_role", "Technical Role", ["admin","moderator","viewer"], value=member.technical_role.value if member and member.technical_role else "viewer") }}
             <div class="space-y-2">
                 <label class="uk-form-label">Oversight Only</label>
                 <label class="flex items-center gap-2 cursor-pointer mt-2">

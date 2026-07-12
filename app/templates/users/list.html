@@ -43,9 +43,9 @@
                     <td class="font-medium">{{ u.display_name }}</td>
                     <td class="text-muted-foreground">{{ u.email }}</td>
                     <td>
-                        {% if u.technical_role.value == 'admin' %}
+                        {% if u.firm_role == 'admin' %}
                         <span class="uk-badge uk-badge-primary">Admin</span>
-                        {% elif u.technical_role.value == 'moderator' %}
+                        {% elif u.firm_role == 'moderator' %}
                         <span class="uk-badge uk-badge-secondary">Moderator</span>
                         {% else %}
                         <span class="uk-badge">Viewer</span>

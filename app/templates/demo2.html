@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StaffPlan — Design System</title>
+    <link rel="preconnect" href="https://rsms.me/">
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/franken-ui@2.1.2/dist/css/core.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/franken-ui@2.1.2/dist/css/utilities.min.css">
+    <link rel="stylesheet" href="/static/custom-theme.css">
+    <script>
+        const h = document.documentElement;
+        const f = JSON.parse(localStorage.getItem("__FRANKEN__") || "{}");
+        if (f.mode === "dark" || (!f.mode && window.matchMedia("(prefers-color-scheme: dark)").matches)) h.classList.add("dark");
+        h.classList.add(f.theme || "uk-theme-zinc");
+        h.classList.add(f.radii || "uk-radii-md");
+        h.classList.add(f.shadows || "uk-shadows-sm");
+        h.classList.add(f.palette || "uk-palette-slate-indigo");
+    </script>
+    <style>
+        :root { font-family: Inter, sans-serif; font-feature-settings: "liga" 1, "calt" 1; }
+        @supports (font-variation-settings: normal) { :root { font-family: InterVariable, sans-serif; } }
+        .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace; }
+        .badge { display: inline-flex; align-items: center; padding: 0.125rem 0.5rem; font-size: 0.7rem; font-weight: 600; border-radius: 9999px; line-height: 1.25rem; }
+        .initials { display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 600; flex-shrink: 0; }
+        .metric-icon { display: inline-flex; align-items: center; justify-content: center; width: 2.25rem; height: 2.25rem; border-radius: 0.5rem; flex-shrink: 0; }
+        .severity-card { background: hsl(var(--card)); border: 1px solid hsl(var(--border)); border-radius: var(--uk-global-radius); padding: 0.75rem 0.875rem; display: flex; align-items: center; gap: 0.625rem; }
+        .severity-card.bench-now { border-left: 3px solid #EF4444; }
+        .severity-card.ending-soon { border-left: 3px solid #F59E0B; }
+        .progress-bg { height: 0.375rem; border-radius: 9999px; overflow: hidden; background: hsl(var(--muted)); }
+        .progress-fill { height: 100%; border-radius: 9999px; transition: width 0.3s ease; }
+        .chip { display: inline-flex; align-items: center; padding: 0.25rem 0.625rem; font-size: 0.75rem; font-weight: 500; border-radius: 9999px; border: 1px solid hsl(var(--border)); background: hsl(var(--background)); color: hsl(var(--muted-foreground)); cursor: pointer; transition: all 0.15s ease; }
+        .chip:hover { background: hsl(var(--accent)); color: hsl(var(--accent-foreground)); }
+        .chip[aria-pressed="true"] { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); border-color: hsl(var(--primary)); }
+    </style>
+</head>
+<body class="bg-background text-foreground min-h-screen">
+
+    <!-- Top Bar -->
+    <div class="uk-background-muted uk-border-bottom">
+        <div class="uk-container uk-container-lg flex items-center justify-between" style="height:2.25rem">
+            <div class="flex items-center gap-2">
+                <span class="uk-text-small font-semibold text-primary tracking-wide">STAFFPLAN</span>
+                <span class="text-muted-foreground uk-text-small">|</span>
+                <span class="uk-text-small text-muted-foreground">Thu, 3 Jul 2026</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="setPalette('uk-palette-light-blue')" class="chip uk-text-xs" data-p="uk-palette-light-blue"><span class="inline-block rounded-full uk-margin-small-right" style="width:0.375rem;height:0.375rem;background:hsl(188 42% 44%)"></span>Light Blue</button>
+                <button onclick="setPalette('uk-palette-frozen-water')" class="chip uk-text-xs" data-p="uk-palette-frozen-water"><span class="inline-block rounded-full uk-margin-small-right" style="width:0.375rem;height:0.375rem;background:hsl(157 50% 38%)"></span>Frozen Water</button>
+                <button onclick="setPalette('uk-palette-warm-teal')" class="chip uk-text-xs" data-p="uk-palette-warm-teal"><span class="inline-block rounded-full uk-margin-small-right" style="width:0.375rem;height:0.375rem;background:hsl(170 50% 34%)"></span>Warm Teal</button>
+                <button onclick="setPalette('uk-palette-slate-indigo')" class="chip uk-text-xs" data-p="uk-palette-slate-indigo"><span class="inline-block rounded-full uk-margin-small-right" style="width:0.375rem;height:0.375rem;background:hsl(235 58% 48%)"></span>Slate Indigo</button>
+                <span class="text-muted-foreground uk-text-small">|</span>
+                <button onclick="toggleDark()" class="chip uk-text-xs"><span id="mode-lbl">Dark</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nav -->
+    <nav class="uk-background-default uk-border-bottom uk-sticky" style="z-index:100" uk-sticky>
+        <div class="uk-container uk-container-lg flex items-center" style="height:2.75rem;gap:0.125rem">
+            <a href="#" class="uk-btn uk-btn-primary uk-btn-xs">Dashboard</a>
+            <a href="#" class="uk-btn uk-btn-ghost uk-btn-xs text-muted-foreground">Team</a>
+            <a href="#" class="uk-btn uk-btn-ghost uk-btn-xs text-muted-foreground">Clients</a>
+            <a href="#" class="uk-btn uk-btn-ghost uk-btn-xs text-muted-foreground">Projects</a>
+            <a href="#" class="uk-btn uk-btn-ghost uk-btn-xs text-muted-foreground">Assignments</a>
+            <a href="#" class="uk-btn uk-btn-ghost uk-btn-xs text-muted-foreground">Leaves</a>
+            <a href="#" class="uk-btn uk-btn-ghost uk-btn-xs text-muted-foreground">Bench</a>
+            <div class="flex items-center gap-2 uk-margin-auto-left">
+                <span class="uk-text-small text-muted-foreground">Arjun Mehta</span>
+                <div class="initials text-primary-foreground" style="background:hsl(var(--primary));font-size:0.6rem">AM</div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="uk-container uk-container-lg uk-padding-small">
+
+        <!-- Greeting Banner -->
+        <div class="uk-card uk-card-primary uk-card-body uk-margin-small-bottom" style="border:none">
+            <div class="flex items-center justify-between flex-wrap gap-3">
+                <div>
+                    <p class="uk-text-small" style="opacity:0.75">Good morning</p>
+                    <h1 class="uk-h3 uk-margin-remove-top uk-margin-small-top">Arjun Mehta</h1>
+                    <p class="uk-text-small uk-margin-small-top" style="opacity:0.75">4 active assignments &middot; 87% utilization this week</p>
+                </div>
+                <div class="flex gap-3">
+                    <div class="uk-background-white uk-border-rounded uk-padding-small uk-text-center" style="background:hsla(0,0%,100%,0.12)">
+                        <div class="uk-h4 uk-margin-remove uk-text-bold" style="font-variant-numeric:tabular-nums">12</div>
+                        <div class="uk-text-xs" style="opacity:0.75">Active Projects</div>
+                    </div>
+                    <div class="uk-background-white uk-border-rounded uk-padding-small uk-text-center" style="background:hsla(0,0%,100%,0.12)">
+                        <div class="uk-h4 uk-margin-remove uk-text-bold" style="font-variant-numeric:tabular-nums">3</div>
+                        <div class="uk-text-xs" style="opacity:0.75">On Bench</div>
+                    </div>
+                    <div class="uk-background-white uk-border-rounded uk-padding-small uk-text-center" style="background:hsla(0,0%,100%,0.12)">
+                        <div class="uk-h4 uk-margin-remove uk-text-bold" style="font-variant-numeric:tabular-nums">87%</div>
+                        <div class="uk-text-xs" style="opacity:0.75">Utilization</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metric Cards -->
+        <div class="uk-grid-small uk-child-width-1-2@s uk-child-width-1-4@l uk-grid-match uk-margin-small-bottom" uk-grid>
+            <div>
+                <div class="uk-card uk-card-default uk-card-body uk-card-small">
+                    <div class="flex items-start gap-3">
+                        <div class="metric-icon" style="background:hsl(var(--primary) / 0.1);color:hsl(var(--primary))"><uk-icon icon="users" width="16" height="16"></uk-icon></div>
+                        <div>
+                            <div class="uk-text-xl uk-text-bold" style="font-variant-numeric:tabular-nums">47</div>
+                            <div class="uk-text-small text-muted-foreground">Team Members</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="uk-card uk-card-default uk-card-body uk-card-small">
+                    <div class="flex items-start gap-3">
+                        <div class="metric-icon" style="background:hsl(40 90% 90%);color:hsl(40 70% 35%)"><uk-icon icon="alert-triangle" width="16" height="16"></uk-icon></div>
+                        <div>
+                            <div class="uk-text-xl uk-text-bold" style="font-variant-numeric:tabular-nums">3</div>
+                            <div class="uk-text-small text-muted-foreground">On Bench Now</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="uk-card uk-card-default uk-card-body uk-card-small">
+                    <div class="flex items-start gap-3">
+                        <div class="metric-icon" style="background:hsl(var(--primary) / 0.1);color:hsl(var(--primary))"><uk-icon icon="briefcase" width="16" height="16"></uk-icon></div>
+                        <div>
+                            <div class="uk-text-xl uk-text-bold" style="font-variant-numeric:tabular-nums">12</div>
+                            <div class="uk-text-small text-muted-foreground">Active Engagements</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="uk-card uk-card-default uk-card-body uk-card-small">
+                    <div class="flex items-start gap-3">
+                        <div class="metric-icon" style="background:hsl(150 40% 88%);color:hsl(150 40% 30%)"><uk-icon icon="trending-up" width="16" height="16"></uk-icon></div>
+                        <div>
+                            <div class="uk-text-xl uk-text-bold" style="font-variant-numeric:tabular-nums">78%</div>
+                            <div class="uk-text-small text-muted-foreground">Firm Utilization</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Three-panel row -->
+        <div class="uk-grid-small uk-child-width-1-1 uk-child-width-1-3@l uk-grid-match uk-margin-small-bottom" uk-grid>
+            <!-- On Bench Now -->
+            <div>
+                <div class="uk-card uk-card-default uk-card-body uk-card-small">
+                    <div class="flex items-center gap-2 uk-margin-small-bottom">
+                        <span class="inline-block rounded-full" style="width:0.5rem;height:0.5rem;background:#EF4444"></span>
+                        <span class="uk-text-small uk-text-bold">On bench right now</span>
+                        <span class="uk-text-xs text-muted-foreground">(2)</span>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <div class="severity-card bench-now">
+                            <div class="initials" style="background:#FAEEDA;color:#633806;font-size:0.6rem">RS</div>
+                            <div class="flex-1 min-w-0">
+                                <div class="uk-text-small uk-text-bold">Rahul Sharma</div>
+                                <div class="uk-text-xs text-muted-foreground">No active assignment</div>
+                            </div>
+                            <span class="badge" style="background:#FAEEDA;color:#633806">Article</span>
+                        </div>
+                        <div class="severity-card bench-now">
+                            <div class="initials" style="background:#FBEAF0;color:#72243E;font-size:0.6rem">PM</div>
+                            <div class="flex-1 min-w-0">
+                                <div class="uk-text-small uk-text-bold">Pooja Mehta</div>
+                                <div class="uk-text-xs text-muted-foreground">No active assignment</div>
+                            </div>
+                            <span class="badge" style="background:#FBEAF0;color:#72243E">Staff</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Ending Soon -->
+            <div>
+                <div class="uk-card uk-card-default uk-card-body uk-card-small">
+                    <div class="flex items-center gap-2 uk-margin-small-bottom">
+                        <span class="inline-block rounded-full" style="width:0.5rem;height:0.5rem;background:#F59E0B"></span>
+                        <span class="uk-text-small uk-text-bold">Ending soon</span>
+                        <span class="uk-text-xs text-muted-foreground">(2)</span>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <div class="severity-card ending-soon">
+                            <div class="initials" style="background:#E6F1FB;color:#0C447C;font-size:0.6rem">AK</div>
+                            <div class="flex-1 min-w-0">
+                                <div class="uk-text-small uk-text-bold">Amit Kumar</div>
+                                <div class="uk-text-xs text-muted-foreground">HDFC Audit &middot; ends 10 Jul</div>
+                            </div>
+                            <span class="badge" style="background:#FEF3C7;color:#92400E">7d left</span>
+                        </div>
+                        <div class="severity-card ending-soon">
+                            <div class="initials" style="background:#E6F1FB;color:#185FA5;font-size:0.6rem">NS</div>
+                            <div class="flex-1 min-w-0">
+                                <div class="uk-text-small uk-text-bold">Neha Singh</div>
+                                <div class="uk-text-xs text-muted-foreground">TCS Assignment &middot; ends 15 Jul</div>
+                            </div>
+                            <span class="badge" style="background:#FEF3C7;color:#92400E">12d left</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Bench by Grade -->
+            <div>
+                <div class="uk-card uk-card-default uk-card-body uk-card-small">
+                    <div class="uk-text-small uk-text-bold uk-margin-small-bottom">Bench by Grade</div>
+                    <div class="flex flex-col gap-3">
+                        <div>
+                            <div class="flex items-center justify-between uk-text-xs uk-margin-small-bottom"><span>Article</span><span class="text-muted-foreground">2/8</span></div>
+                            <div class="progress-bg"><div class="progress-fill" style="width:25%;background:hsl(160 45% 50%)"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex items-center justify-between uk-text-xs uk-margin-small-bottom"><span>Staff</span><span class="text-muted-foreground">1/12</span></div>
+                            <div class="progress-bg"><div class="progress-fill" style="width:8%;background:hsl(160 45% 50%)"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex items-center justify-between uk-text-xs uk-margin-small-bottom"><span>CA Manager</span><span class="text-muted-foreground">3/6</span></div>
+                            <div class="progress-bg"><div class="progress-fill" style="width:50%;background:hsl(160 45% 50%)"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex items-center justify-between uk-text-xs uk-margin-small-bottom"><span>Partner</span><span class="text-muted-foreground">4/5</span></div>
+                            <div class="progress-bg"><div class="progress-fill" style="width:80%;background:hsl(40 90% 55%)"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex items-center justify-between uk-text-xs uk-margin-small-bottom"><span>Director</span><span class="text-muted-foreground">2/3</span></div>
+                            <div class="progress-bg"><div class="progress-fill" style="width:67%;background:hsl(40 90% 55%)"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Clients Section -->
+        <div class="flex items-center justify-between uk-margin-small-bottom">
+            <h2 class="uk-text-large uk-text-bold uk-margin-remove">Clients</h2>
+            <div class="flex items-center gap-2">
+                <input type="text" class="uk-input uk-form-small" style="width:12rem" placeholder="Search...">
+                <select class="uk-select uk-form-small" style="width:auto"><option>All Industries</option><option>Banking</option><option>IT Services</option><option>NBFC</option></select>
+                <button class="uk-btn uk-btn-primary uk-btn-xs"><uk-icon icon="plus" width="12" height="12" class="uk-margin-small-right"></uk-icon>Add Client</button>
+            </div>
+        </div>
+        <div class="flex gap-2 uk-margin-small-bottom flex-wrap">
+            <button class="chip" aria-pressed="true">All</button>
+            <button class="chip" aria-pressed="false">Statutory Audit</button>
+            <button class="chip" aria-pressed="false">Special Assignment</button>
+            <button class="chip" aria-pressed="false">Consulting</button>
+            <button class="chip" aria-pressed="false">Tax</button>
+        </div>
+        <div class="uk-grid-small uk-child-width-1-1 uk-child-width-1-2@s uk-child-width-1-3@m uk-child-width-1-4@l uk-grid-match uk-margin-small-bottom" uk-grid>
+            <div>
+                <div class="uk-card uk-card-default uk-card-body uk-card-small">
+                    <div class="flex items-start gap-2">
+                        <div class="initials text-primary-foreground" style="background:hsl(var(--primary));font-size:0.6rem">HB</div>
+                        <div class="flex-1 min-w-0">
+                            <div class="mono uk-text-xs text-muted-foreground">0142</div>
+                            <div class="uk-text-small uk-text-bold uk-text-truncate">HDFC Bank</div>
+                        </div>
+                    </div>
+                    <div class="uk-margin-small-top flex gap-1 flex-wrap">
+                        <span class="badge" style="background:#E6F1FB;color:#0C447C">Statutory Audit</span>
+                        <span class="badge" style="background:#EAF3DE;color:#3B6D11">Active</span>
+                    </div>
+                    <div class="uk-text-xs text-muted-foreground uk-margin-small-top">Banking &middot; Priya Sharma</div>
+                </div>
+            </div>
+            <div>
+                <div class="uk-card uk-card-default uk-card-body uk-card-small">
+                    <div class="flex items-start gap-2">
+                        <div class="initials text-primary-foreground" style="background:hsl(var(--primary));font-size:0.6rem">TC</div>
+                        <div class="flex-1 min-w-0">
+                            <div class="mono uk-text-xs text-muted-foreground">0298</div>
+                            <div class="uk-text-small uk-text-bold uk-text-truncate">Tata Consultancy</div>
+                        </div>
+                    </div>
+                    <div class="uk-margin-small-top flex gap-1 flex-wrap">
+                        <span class="badge" style="background:#FAEEDA;color:#633806">Special Assignment</span>
+                        <span class="badge" style="background:#EAF3DE;color:#3B6D11">Active</span>
+                    </div>
+                    <div class="uk-text-xs text-muted-foreground uk-margin-small-top">IT Services &middot; Arun Nair</div>
+                </div>
+            </div>
+            <div>
+                <div class="uk-card uk-card-default uk-card-body uk-card-small">
+                    <div class="flex items-start gap-2">
+                        <div class="initials text-primary-foreground" style="background:hsl(var(--primary));font-size:0.6rem">RI</div>
+                        <div class="flex-1 min-w-0">
+                            <div class="mono uk-text-xs text-muted-foreground">0071</div>
+                            <div class="uk-text-small uk-text-bold uk-text-truncate">Reliance Industries</div>
+                        </div>
+                    </div>
+                    <div class="uk-margin-small-top flex gap-1 flex-wrap">
+                        <span class="badge" style="background:#E6F1FB;color:#0C447C">Statutory Audit</span>
+                        <span class="badge" style="background:#EAF3DE;color:#3B6D11">Active</span>
+                    </div>
+                    <div class="uk-text-xs text-muted-foreground uk-margin-small-top">Conglomerate &middot; Rajan Mehta</div>
+                </div>
+            </div>
+            <div>
+                <div class="uk-card uk-card-default uk-card-body uk-card-small">
+                    <div class="flex items-start gap-2">
+                        <div class="initials text-primary-foreground" style="background:hsl(var(--primary));font-size:0.6rem">IL</div>
+                        <div class="flex-1 min-w-0">
+                            <div class="mono uk-text-xs text-muted-foreground">0183</div>
+                            <div class="uk-text-small uk-text-bold uk-text-truncate">Infosys Ltd</div>
+                        </div>
+                    </div>
+                    <div class="uk-margin-small-top flex gap-1 flex-wrap">
+                        <span class="badge" style="background:#EEEDFE;color:#3C3489">Consulting</span>
+                        <span class="badge" style="background:#EAF3DE;color:#3B6D11">Active</span>
+                    </div>
+                    <div class="uk-text-xs text-muted-foreground uk-margin-small-top">IT Services &middot; Kavya Rao</div>
+                </div>
+            </div>
+            <div>
+                <div class="uk-card uk-card-default uk-card-body uk-card-small">
+                    <div class="flex items-start gap-2">
+                        <div class="initials text-primary-foreground" style="background:hsl(var(--primary));font-size:0.6rem">BF</div>
+                        <div class="flex-1 min-w-0">
+                            <div class="mono uk-text-xs text-muted-foreground">0056</div>
+                            <div class="uk-text-small uk-text-bold uk-text-truncate">Bajaj Finance</div>
+                        </div>
+                    </div>
+                    <div class="uk-margin-small-top flex gap-1 flex-wrap">
+                        <span class="badge" style="background:#FBEAF0;color:#72243E">Tax</span>
+                        <span class="badge" style="background:#EAF3DE;color:#3B6D11">Active</span>
+                    </div>
+                    <div class="uk-text-xs text-muted-foreground uk-margin-small-top">NBFC &middot; Sameer Joshi</div>
+                </div>
+            </div>
+            <div>
+                <div class="uk-card uk-card-default uk-card-body uk-card-small" style="opacity:0.5">
+                    <div class="flex items-start gap-2">
+                        <div class="initials" style="background:hsl(var(--muted-foreground));font-size:0.6rem">WL</div>
+                        <div class="flex-1 min-w-0">
+                            <div class="mono uk-text-xs text-muted-foreground">0219</div>
+                            <div class="uk-text-small uk-text-bold uk-text-truncate">Wipro Ltd</div>
+                        </div>
+                    </div>
+                    <div class="uk-margin-small-top flex gap-1 flex-wrap">
+                        <span class="badge" style="background:#FAEEDA;color:#633806">Special Assignment</span>
+                        <span class="badge" style="background:#F1EFE8;color:#5F5E5A">Inactive</span>
+                    </div>
+                    <div class="uk-text-xs text-muted-foreground uk-margin-small-top">IT Services &middot; Neha Kulkarni</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Projects Table -->
+        <h2 class="uk-text-large uk-text-bold uk-margin-small-bottom">Active Projects</h2>
+        <div class="uk-card uk-card-default uk-card-body uk-card-small uk-margin-small-bottom uk-overflow-auto">
+            <table class="uk-table uk-table-small uk-table-hover uk-table-divider uk-table-middle">
+                <thead>
+                    <tr>
+                        <th class="uk-text-xs text-muted-foreground font-normal">Project</th>
+                        <th class="uk-text-xs text-muted-foreground font-normal">Client</th>
+                        <th class="uk-text-xs text-muted-foreground font-normal">Type</th>
+                        <th class="uk-text-xs text-muted-foreground font-normal">Timeline</th>
+                        <th class="uk-text-xs text-muted-foreground font-normal">Status</th>
+                        <th class="uk-text-xs text-muted-foreground font-normal uk-text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><div class="uk-text-small uk-text-bold">Annual Audit FY25</div><div class="uk-text-xs text-muted-foreground">Monthly</div></td>
+                        <td class="uk-text-small">HDFC Bank</td>
+                        <td><span class="badge" style="background:#E6F1FB;color:#0C447C">Statutory Audit</span></td>
+                        <td class="uk-text-xs text-muted-foreground">Apr 25 – Mar 26</td>
+                        <td><span class="badge" style="background:#EAF3DE;color:#3B6D11">Active</span></td>
+                        <td class="uk-text-right"><div class="flex gap-1 justify-end"><button class="uk-btn uk-btn-ghost uk-btn-icon uk-btn-xs" title="View"><uk-icon icon="eye" width="14" height="14"></uk-icon></button><button class="uk-btn uk-btn-ghost uk-btn-icon uk-btn-xs" title="Edit"><uk-icon icon="pencil" width="14" height="14"></uk-icon></button></div></td>
+                    </tr>
+                    <tr>
+                        <td><div class="uk-text-small uk-text-bold">ERP Implementation</div><div class="uk-text-xs text-muted-foreground">Monthly</div></td>
+                        <td class="uk-text-small">Reliance Industries</td>
+                        <td><span class="badge" style="background:#EEEDFE;color:#3C3489">Consulting</span></td>
+                        <td class="uk-text-xs text-muted-foreground">Jan 25 – Dec 25</td>
+                        <td><span class="badge" style="background:#EAF3DE;color:#3B6D11">Active</span></td>
+                        <td class="uk-text-right"><div class="flex gap-1 justify-end"><button class="uk-btn uk-btn-ghost uk-btn-icon uk-btn-xs" title="View"><uk-icon icon="eye" width="14" height="14"></uk-icon></button><button class="uk-btn uk-btn-ghost uk-btn-icon uk-btn-xs" title="Edit"><uk-icon icon="pencil" width="14" height="14"></uk-icon></button></div></td>
+                    </tr>
+                    <tr>
+                        <td><div class="uk-text-small uk-text-bold">Tax Advisory Q3</div><div class="uk-text-xs text-muted-foreground">Quarterly</div></td>
+                        <td class="uk-text-small">Bajaj Finance</td>
+                        <td><span class="badge" style="background:#FBEAF0;color:#72243E">Tax</span></td>
+                        <td class="uk-text-xs text-muted-foreground">Jul 25 – Sep 25</td>
+                        <td><span class="badge" style="background:#FEF3C7;color:#92400E">Planning</span></td>
+                        <td class="uk-text-right"><div class="flex gap-1 justify-end"><button class="uk-btn uk-btn-ghost uk-btn-icon uk-btn-xs" title="View"><uk-icon icon="eye" width="14" height="14"></uk-icon></button><button class="uk-btn uk-btn-ghost uk-btn-icon uk-btn-xs" title="Edit"><uk-icon icon="pencil" width="14" height="14"></uk-icon></button></div></td>
+                    </tr>
+                    <tr>
+                        <td><div class="uk-text-small uk-text-bold">Digital Transformation</div><div class="uk-text-xs text-muted-foreground">Weekly</div></td>
+                        <td class="uk-text-small">Tata Consultancy</td>
+                        <td><span class="badge" style="background:#FAEEDA;color:#633806">Special Assignment</span></td>
+                        <td class="uk-text-xs text-muted-foreground">Mar 25 – Aug 25</td>
+                        <td><span class="badge" style="background:#EAF3DE;color:#3B6D11">Active</span></td>
+                        <td class="uk-text-right"><div class="flex gap-1 justify-end"><button class="uk-btn uk-btn-ghost uk-btn-icon uk-btn-xs" title="View"><uk-icon icon="eye" width="14" height="14"></uk-icon></button><button class="uk-btn uk-btn-ghost uk-btn-icon uk-btn-xs" title="Edit"><uk-icon icon="pencil" width="14" height="14"></uk-icon></button></div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Form Modal Preview -->
+        <h2 class="uk-text-large uk-text-bold uk-margin-small-bottom">Add Member (Modal Preview)</h2>
+        <div class="uk-card uk-card-default uk-card-body uk-card-small uk-margin-bottom" style="max-width:32rem">
+            <div class="uk-form-stacked flex flex-col gap-3">
+                <div class="uk-grid-small" uk-grid>
+                    <div class="uk-width-1-2@s"><label class="uk-form-label">Full Name</label><input class="uk-input uk-form-small" placeholder="Enter name"></div>
+                    <div class="uk-width-1-2@s"><label class="uk-form-label">Email</label><input class="uk-input uk-form-small" placeholder="user@example.com"></div>
+                </div>
+                <div class="uk-grid-small" uk-grid>
+                    <div class="uk-width-1-2@s"><label class="uk-form-label">Grade</label><select class="uk-select uk-form-small"><option>Article</option><option>Staff</option><option>CA Manager</option><option>Partner</option><option>Director</option></select></div>
+                    <div class="uk-width-1-2@s"><label class="uk-form-label">Status</label><select class="uk-select uk-form-small"><option>Active</option><option>Inactive</option></select></div>
+                </div>
+                <div><label class="uk-form-label">Joining Date</label><input type="date" class="uk-input uk-form-small"></div>
+                <div class="flex gap-2 uk-margin-small-top">
+                    <button class="uk-btn uk-btn-primary uk-btn-sm">Save Member</button>
+                    <button class="uk-btn uk-btn-ghost uk-btn-sm">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="uk-section-xsmall uk-text-center uk-text-muted uk-background-muted uk-margin-top">
+        <div class="uk-container uk-container-lg"><p class="uk-text-small">StaffPlan &copy; 2026</p></div>
+    </footer>
+
+    <script>
+        function setPalette(p) {
+            var h = document.documentElement;
+            h.classList.remove('uk-palette-light-blue','uk-palette-frozen-water','uk-palette-warm-teal','uk-palette-slate-indigo');
+            h.classList.add(p);
+            var f = JSON.parse(localStorage.getItem('__FRANKEN__') || '{}');
+            f.palette = p; localStorage.setItem('__FRANKEN__', JSON.stringify(f));
+        }
+        function toggleDark() {
+            var h = document.documentElement, d = h.classList.contains('dark');
+            var f = JSON.parse(localStorage.getItem('__FRANKEN__') || '{}');
+            h.classList.toggle('dark'); f.mode = d ? 'light' : 'dark';
+            document.getElementById('mode-lbl').textContent = d ? 'Dark' : 'Light';
+            localStorage.setItem('__FRANKEN__', JSON.stringify(f));
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/franken-ui@2.1.2/dist/js/core.iife.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/franken-ui@2.1.2/dist/js/icon.iife.js"></script>
+</body>
+</html>

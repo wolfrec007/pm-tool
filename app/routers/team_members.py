@@ -82,7 +82,7 @@ async def create_team_member_form(
 
     errors = []
     data = {}
-    for key in ["name", "email", "employee_code", "business_role", "technical_role", "seniority_level", "date_of_joining", "date_of_relieving"]:
+    for key in ["name", "email", "employee_code", "business_role", "seniority_level", "date_of_joining", "date_of_relieving"]:
         val = form_data.get(key, "").strip()
         if val:
             data[key] = val
@@ -141,7 +141,7 @@ async def update_team_member_form(
 
     errors = []
     data = {}
-    for key in ["name", "email", "employee_code", "business_role", "technical_role", "seniority_level", "date_of_joining", "date_of_relieving"]:
+    for key in ["name", "email", "employee_code", "business_role", "seniority_level", "date_of_joining", "date_of_relieving"]:
         val = form_data.get(key, "").strip()
         if val:
             data[key] = val

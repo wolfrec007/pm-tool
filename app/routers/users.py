@@ -24,13 +24,17 @@ def list_users(
     offset: int = Query(0, ge=0),
     q: Optional[str] = None,
     is_active: Optional[bool] = None,
-    technical_role: Optional[str] = None,
     db: Session = Depends(get_db),
     user=Depends(require_role(TechnicalRole.admin)),
 ):
+    firm_id = request.session.get("firm_id")
     items, total = service.list_users(
-        db, limit=limit, offset=offset, q=q, is_active=is_active, technical_role=technical_role
+        db, limit=limit, offset=offset, q=q, is_active=is_active
     )
+    # Attach firm_role to each user for template display
+    from app.services.firm_service import get_user_role_in_firm
+    for u in items:
+        u.firm_role = get_user_role_in_firm(db, u.id, firm_id).value if firm_id and get_user_role_in_firm(db, u.id, firm_id) else "viewer"
     return templates.TemplateResponse(request, "users/list.html", {
         "items": items,
         "total": total,
@@ -38,7 +42,6 @@ def list_users(
         "offset": offset,
         "q": q or "",
         "is_active": is_active,
-        "technical_role": technical_role,
         "user": user,
     })
 
@@ -49,12 +52,11 @@ def list_users_json(
     offset: int = Query(0, ge=0),
     q: Optional[str] = None,
     is_active: Optional[bool] = None,
-    technical_role: Optional[str] = None,
     db: Session = Depends(get_db),
     _=Depends(require_role(TechnicalRole.admin)),
 ):
     items, total = service.list_users(
-        db, limit=limit, offset=offset, q=q, is_active=is_active, technical_role=technical_role
+        db, limit=limit, offset=offset, q=q, is_active=is_active
     )
     return {
         "items": [UserRead.model_validate(u) for u in items],
@@ -92,7 +94,7 @@ async def create_user_form(
     data = {}
     data["email"] = form_data.get("email", "").strip()
     data["display_name"] = form_data.get("display_name", "").strip()
-    data["technical_role"] = form_data.get("technical_role", "viewer")
+    firm_role = form_data.get("technical_role", "viewer")
     password = form_data.get("password", "").strip()
 
     if not data["email"]:
@@ -104,7 +106,13 @@ async def create_user_form(
 
     if not errors:
         try:
-            service.create_user(db, data, password=password or None)
+            new_user = service.create_user(db, data, password=password or None)
+            # Add user to firm with role
+            firm_id = request.session.get("firm_id")
+            if firm_id:
+                from app.services.firm_service import add_user_to_firm
+                from app.models.models import TechnicalRole
+                add_user_to_firm(db, new_user.id, firm_id, TechnicalRole(firm_role))
             set_flash(request, f"User '{data['display_name']}' created.")
             return RedirectResponse(url="/users", status_code=303)
         except ValidationError as e:
@@ -151,7 +159,7 @@ async def update_user_form(
     data = {}
     data["email"] = form_data.get("email", "").strip()
     data["display_name"] = form_data.get("display_name", "").strip()
-    data["technical_role"] = form_data.get("technical_role")
+    firm_role = form_data.get("technical_role")
     password = form_data.get("password", "").strip()
 
     if not data["email"]:
@@ -169,6 +177,16 @@ async def update_user_form(
 
                 user_obj = service.get_user(db, user_id)
                 set_user_password(db, user_obj, password)
+            # Update firm role if provided
+            if firm_role:
+                firm_id = request.session.get("firm_id")
+                if firm_id:
+                    from app.services.firm_service import update_firm_user_role
+                    from app.models.models import TechnicalRole
+                    try:
+                        update_firm_user_role(db, user_id, firm_id, TechnicalRole(firm_role))
+                    except Exception:
+                        pass  # User might not be in this firm yet
             set_flash(request, f"User '{data['display_name']}' updated.")
             return RedirectResponse(url="/users", status_code=303)
         except ValidationError as e:

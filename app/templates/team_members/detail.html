@@ -27,7 +27,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
         <div><span class="text-muted-foreground">Employee Code:</span> {{ member.employee_code or "—" }}</div>
-        <div><span class="text-muted-foreground">Technical Role:</span> {{ member.technical_role.value }}</div>
+        <div><span class="text-muted-foreground">Business Role:</span> {{ member.business_role.value | replace("_", " ") | title }}</div>
         <div><span class="text-muted-foreground">Seniority:</span> {{ member.seniority_level or "—" }}</div>
         <div><span class="text-muted-foreground">Joined:</span> {{ member.date_of_joining or "—" }}</div>
         <div><span class="text-muted-foreground">Relieved:</span> {{ member.date_of_relieving or "—" }}</div>

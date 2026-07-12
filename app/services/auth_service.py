@@ -139,12 +139,21 @@ def find_or_create_oauth_user(db: Session, claims: dict) -> Optional[User]:
             email=email,
             display_name=display_name,
             azure_oid=oid,
-            technical_role="viewer",
         )
         db.add(user)
         db.commit()
         db.refresh(user)
-        logger.info(f"Created new user from OAuth: {user.email} (ID: {user.id}, role: {user.technical_role})")
+        # Add to default firm as viewer
+        from app.services.firm_service import add_user_to_firm, get_user_firms
+        from app.models.models import TechnicalRole
+        firms = get_user_firms(db, user.id)
+        if not firms:
+            # Add to first active firm
+            from app.models.models import Firm
+            default_firm = db.query(Firm).filter(Firm.is_active == True).first()
+            if default_firm:
+                add_user_to_firm(db, user.id, default_firm.id, TechnicalRole.viewer)
+        logger.info(f"Created new user from OAuth: {user.email} (ID: {user.id})")
         return user
 
     logger.warning(f"Could not find or create user from claims: {claims}")

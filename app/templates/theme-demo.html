@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StaffPlan Theme Demo</title>
+    <link rel="preconnect" href="https://rsms.me/">
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/franken-ui@2.1.2/dist/css/core.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/franken-ui@2.1.2/dist/css/utilities.min.css">
+    <link rel="stylesheet" href="/static/custom-theme.css">
+    <script>
+        const htmlElement = document.documentElement;
+        const __FRANKEN__ = JSON.parse(localStorage.getItem("__FRANKEN__") || "{}");
+        if (__FRANKEN__.mode === "dark" || (!__FRANKEN__.mode && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+            htmlElement.classList.add("dark");
+        }
+        htmlElement.classList.add(__FRANKEN__.theme || "uk-theme-zinc");
+        htmlElement.classList.add(__FRANKEN__.radii || "uk-radii-md");
+        htmlElement.classList.add(__FRANKEN__.shadows || "uk-shadows-sm");
+        htmlElement.classList.add(__FRANKEN__.font || "uk-font-sm");
+        htmlElement.classList.add(__FRANKEN__.palette || "uk-palette-light-blue");
+    </script>
+    <style>
+        :root { font-family: Inter, sans-serif; font-feature-settings: "liga" 1, "calt" 1; }
+        @supports (font-variation-settings: normal) { :root { font-family: InterVariable, sans-serif; } }
+        .color-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(6rem, 1fr)); gap: 0.5rem; }
+        .color-chip { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; padding: 0.375rem; border-radius: 0.375rem; border: 1px solid hsl(var(--border)); background: hsl(var(--card)); }
+        .color-chip .swatch { width: 2rem; height: 2rem; border-radius: 0.25rem; }
+        .color-chip .label { font-size: 0.6rem; color: hsl(var(--muted-foreground)); text-align: center; line-height: 1.2; }
+        .initials { display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; border-radius: 9999px; font-size: 0.65rem; font-weight: 600; flex-shrink: 0; }
+        .metric-icon { display: inline-flex; align-items: center; justify-content: center; width: 2.25rem; height: 2.25rem; border-radius: 0.5rem; flex-shrink: 0; }
+        .badge-soft { display: inline-flex; align-items: center; padding: 0.125rem 0.5rem; font-size: 0.7rem; font-weight: 600; border-radius: 9999px; line-height: 1.25rem; }
+        .palette-btn[aria-pressed="true"] { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); border-color: hsl(var(--primary)); }
+        .severity-bar { border-left: 3px solid; }
+    </style>
+</head>
+<body class="bg-background text-foreground min-h-screen">
+
+    <!-- Palette Switcher Bar -->
+    <div class="bg-muted border-b border-border py-3">
+        <div class="uk-container">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+                <span class="text-sm font-semibold text-foreground">StaffPlan Theme Demo</span>
+                <div class="flex items-center gap-1 flex-wrap">
+                    <span class="text-xs text-muted-foreground mr-1">Palette:</span>
+                    <button onclick="setPalette('uk-palette-light-blue')" class="palette-btn uk-btn uk-btn-xs uk-btn-default" data-palette="uk-palette-light-blue">
+                        <span class="inline-block w-2 h-2 rounded-full mr-1" style="background:hsl(188 42% 44%)"></span>Light Blue
+                    </button>
+                    <button onclick="setPalette('uk-palette-frozen-water')" class="palette-btn uk-btn uk-btn-xs uk-btn-default" data-palette="uk-palette-frozen-water">
+                        <span class="inline-block w-2 h-2 rounded-full mr-1" style="background:hsl(157 50% 38%)"></span>Frozen Water
+                    </button>
+                    <button onclick="setPalette('uk-palette-zinc')" class="palette-btn uk-btn uk-btn-xs uk-btn-default" data-palette="uk-palette-zinc">
+                        <span class="inline-block w-2 h-2 rounded-full mr-1" style="background:hsl(240 5.9% 10%)"></span>Zinc
+                    </button>
+                    <button onclick="setPalette('uk-palette-regular')" class="palette-btn uk-btn uk-btn-xs uk-btn-default" data-palette="uk-palette-regular">
+                        <span class="inline-block w-2 h-2 rounded-full mr-1" style="background:hsl(0 0% 10%)"></span>Regular
+                    </button>
+                    <button onclick="setPalette('uk-palette-mono-accent')" class="palette-btn uk-btn uk-btn-xs uk-btn-default" data-palette="uk-palette-mono-accent">
+                        <span class="inline-block w-2 h-2 rounded-full mr-1" style="background:hsl(0 0% 40%)"></span>Mono Accent
+                    </button>
+                    <button onclick="setPalette('uk-palette-pure-black')" class="palette-btn uk-btn uk-btn-xs uk-btn-default" data-palette="uk-palette-pure-black">
+                        <span class="inline-block w-2 h-2 rounded-full mr-1" style="background:hsl(0 0% 0%)"></span>Pure Black
+                    </button>
+                    <span class="mx-1 text-border">|</span>
+                    <button onclick="toggleDark()" class="uk-btn uk-btn-xs uk-btn-default">
+                        <span id="mode-label">Dark Mode</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="uk-container uk-container-lg uk-padding-small">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+
+            <!-- Buttons Card -->
+            <div class="uk-card uk-card-body">
+                <h3 class="uk-card-title mb-4">Buttons</h3>
+                <div class="flex flex-wrap gap-2">
+                    <button class="uk-btn uk-btn-primary">Primary</button>
+                    <button class="uk-btn uk-btn-secondary">Secondary</button>
+                    <button class="uk-btn uk-btn-default">Default</button>
+                    <button class="uk-btn uk-btn-destructive">Destructive</button>
+                    <button class="uk-btn uk-btn-ghost">Ghost</button>
+                </div>
+                <div class="flex flex-wrap gap-2 mt-3">
+                    <button class="uk-btn uk-btn-primary uk-btn-sm">Small Primary</button>
+                    <button class="uk-btn uk-btn-primary uk-btn-xs">Extra Small</button>
+                    <button class="uk-btn uk-btn-secondary uk-btn-sm">Small Secondary</button>
+                </div>
+            </div>
+
+            <!-- Palette Colors Card -->
+            <div class="uk-card uk-card-body">
+                <h3 class="uk-card-title mb-4">Palette Colors</h3>
+                <div class="color-grid">
+                    <div class="color-chip">
+                        <div class="swatch" style="background:hsl(var(--primary))"></div>
+                        <span class="label">primary</span>
+                    </div>
+                    <div class="color-chip">
+                        <div class="swatch" style="background:hsl(var(--primary) / 0.15)"></div>
+                        <span class="label">primary 15%</span>
+                    </div>
+                    <div class="color-chip">
+                        <div class="swatch" style="background:hsl(var(--secondary))"></div>
+                        <span class="label">secondary</span>
+                    </div>
+                    <div class="color-chip">
+                        <div class="swatch" style="background:hsl(var(--accent))"></div>
+                        <span class="label">accent</span>
+                    </div>
+                    <div class="color-chip">
+                        <div class="swatch" style="background:hsl(var(--muted))"></div>
+                        <span class="label">muted</span>
+                    </div>
+                    <div class="color-chip">
+                        <div class="swatch" style="background:hsl(var(--destructive))"></div>
+                        <span class="label">destructive</span>
+                    </div>
+                    <div class="color-chip">
+                        <div class="swatch" style="background:hsl(var(--success))"></div>
+                        <span class="label">success</span>
+                    </div>
+                    <div class="color-chip">
+                        <div class="swatch" style="background:hsl(var(--warning))"></div>
+                        <span class="label">warning</span>
+                    </div>
+                    <div class="color-chip">
+                        <div class="swatch" style="background:hsl(var(--info))"></div>
+                        <span class="label">info</span>
+                    </div>
+                    <div class="color-chip">
+                        <div class="swatch" style="background:hsl(var(--border))"></div>
+                        <span class="label">border</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Badges Card -->
+            <div class="uk-card uk-card-body">
+                <h3 class="uk-card-title mb-4">Status Badges</h3>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="uk-badge uk-badge-primary">Primary</span>
+                    <span class="uk-badge uk-badge-secondary">Secondary</span>
+                    <span class="uk-badge uk-badge-destructive">Destructive</span>
+                </div>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="badge-soft" style="background:hsl(var(--primary) / 0.12); color:hsl(var(--primary))">Assigned</span>
+                    <span class="badge-soft" style="background:hsl(var(--success-muted)); color:hsl(var(--success))">Active</span>
+                    <span class="badge-soft" style="background:hsl(var(--warning-muted)); color:hsl(var(--warning-foreground))">Bench</span>
+                    <span class="badge-soft" style="background:hsl(var(--error-muted)); color:hsl(var(--destructive))">Urgent</span>
+                    <span class="badge-soft" style="background:hsl(var(--info-muted)); color:hsl(var(--info))">Info</span>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <span class="uk-label uk-label-primary">Primary Label</span>
+                    <span class="uk-label uk-label-secondary">Secondary Label</span>
+                    <span class="uk-label uk-label-destructive">Destructive Label</span>
+                </div>
+            </div>
+
+            <!-- Alerts Card -->
+            <div class="uk-card uk-card-body">
+                <h3 class="uk-card-title mb-4">Alerts</h3>
+                <div class="uk-alert uk-alert-primary mb-2" uk-alert>
+                    <p>This is a <strong>primary</strong> alert.</p>
+                </div>
+                <div class="uk-alert uk-alert-warning mb-2" uk-alert>
+                    <p>This is a <strong>warning</strong> alert.</p>
+                </div>
+                <div class="uk-alert uk-alert-destructive" uk-alert>
+                    <p>This is a <strong>destructive</strong> alert.</p>
+                </div>
+            </div>
+
+            <!-- Metric Cards Preview -->
+            <div class="uk-card uk-card-body">
+                <h3 class="uk-card-title mb-4">Metric Cards</h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="rounded-lg border border-border p-3 flex items-start gap-2">
+                        <div class="metric-icon" style="background:hsl(var(--primary) / 0.1);color:hsl(var(--primary))">
+                            <uk-icon icon="users" width="16" height="16"></uk-icon>
+                        </div>
+                        <div>
+                            <div class="text-lg font-bold" style="font-variant-numeric:tabular-nums">47</div>
+                            <div class="text-xs text-muted-foreground">Members</div>
+                        </div>
+                    </div>
+                    <div class="rounded-lg border border-border p-3 flex items-start gap-2">
+                        <div class="metric-icon" style="background:hsl(var(--warning-muted));color:hsl(var(--warning-foreground))">
+                            <uk-icon icon="alert-triangle" width="16" height="16"></uk-icon>
+                        </div>
+                        <div>
+                            <div class="text-lg font-bold" style="font-variant-numeric:tabular-nums">3</div>
+                            <div class="text-xs text-muted-foreground">On Bench</div>
+                        </div>
+                    </div>
+                    <div class="rounded-lg border border-border p-3 flex items-start gap-2">
+                        <div class="metric-icon" style="background:hsl(var(--primary) / 0.1);color:hsl(var(--primary))">
+                            <uk-icon icon="briefcase" width="16" height="16"></uk-icon>
+                        </div>
+                        <div>
+                            <div class="text-lg font-bold" style="font-variant-numeric:tabular-nums">12</div>
+                            <div class="text-xs text-muted-foreground">Engagements</div>
+                        </div>
+                    </div>
+                    <div class="rounded-lg border border-border p-3 flex items-start gap-2">
+                        <div class="metric-icon" style="background:hsl(var(--success-muted));color:hsl(var(--success-foreground))">
+                            <uk-icon icon="trending-up" width="16" height="16"></uk-icon>
+                        </div>
+                        <div>
+                            <div class="text-lg font-bold" style="font-variant-numeric:tabular-nums">78%</div>
+                            <div class="text-xs text-muted-foreground">Utilization</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Role Badges Card -->
+            <div class="uk-card uk-card-body">
+                <h3 class="uk-card-title mb-4">Role Badges</h3>
+                <div class="flex flex-wrap gap-3 items-center mb-4">
+                    <div class="initials text-primary-foreground" style="background:hsl(var(--primary));font-size:0.6rem">AM</div>
+                    <div class="initials" style="background:hsl(var(--primary) / 0.12);color:hsl(var(--primary));font-size:0.6rem">RS</div>
+                    <div class="initials" style="background:hsl(var(--role-manager-muted));color:hsl(var(--role-manager));font-size:0.6rem">PM</div>
+                    <div class="initials" style="background:hsl(var(--role-staff-muted));color:hsl(var(--role-staff));font-size:0.6rem">AK</div>
+                    <div class="initials" style="background:hsl(var(--role-director-muted));color:hsl(var(--role-director));font-size:0.6rem">NS</div>
+                    <div class="initials" style="background:hsl(var(--role-article-muted));color:hsl(var(--role-article));font-size:0.6rem">KR</div>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <span class="badge-soft" style="background:hsl(var(--role-partner-muted));color:hsl(var(--role-partner))">Partner</span>
+                    <span class="badge-soft" style="background:hsl(var(--role-director-muted));color:hsl(var(--role-director))">Director</span>
+                    <span class="badge-soft" style="background:hsl(var(--role-manager-muted));color:hsl(var(--role-manager))">CA Manager</span>
+                    <span class="badge-soft" style="background:hsl(var(--role-staff-muted));color:hsl(var(--role-staff))">Staff</span>
+                    <span class="badge-soft" style="background:hsl(var(--role-article-muted));color:hsl(var(--role-article))">Article</span>
+                </div>
+            </div>
+
+            <!-- Form Inputs Card -->
+            <div class="uk-card uk-card-body">
+                <h3 class="uk-card-title mb-4">Form Inputs</h3>
+                <div class="space-y-3">
+                    <div>
+                        <label class="uk-form-label">Email</label>
+                        <input type="email" class="uk-input" placeholder="user@example.com">
+                    </div>
+                    <div>
+                        <label class="uk-form-label">Role</label>
+                        <select class="uk-select">
+                            <option>Admin</option>
+                            <option>Manager</option>
+                            <option>Staff</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="uk-form-label">Notes</label>
+                        <textarea class="uk-textarea" rows="2" placeholder="Some notes..."></textarea>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" class="uk-checkbox" checked>
+                        <label class="text-sm">Active member</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table Card -->
+            <div class="uk-card uk-card-body">
+                <h3 class="uk-card-title mb-4">Table</h3>
+                <table class="uk-table uk-table-hover uk-table-divider uk-table-small">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="flex items-center gap-2">
+                                <div class="initials text-primary-foreground" style="background:hsl(var(--primary));font-size:0.55rem;width:1.5rem;height:1.5rem">AJ</div>
+                                Alice Johnson
+                            </td>
+                            <td>Manager</td>
+                            <td><span class="badge-soft" style="background:hsl(var(--success-muted)); color:hsl(var(--success))">Active</span></td>
+                        </tr>
+                        <tr>
+                            <td class="flex items-center gap-2">
+                                <div class="initials" style="background:hsl(var(--primary) / 0.12);color:hsl(var(--primary));font-size:0.55rem;width:1.5rem;height:1.5rem">BS</div>
+                                Bob Smith
+                            </td>
+                            <td>Staff</td>
+                            <td><span class="badge-soft" style="background:hsl(var(--warning-muted)); color:hsl(var(--warning-foreground))">Bench</span></td>
+                        </tr>
+                        <tr>
+                            <td class="flex items-center gap-2">
+                                <div class="initials text-primary-foreground" style="background:hsl(var(--primary));font-size:0.55rem;width:1.5rem;height:1.5rem">CL</div>
+                                Carol Lee
+                            </td>
+                            <td>Admin</td>
+                            <td><span class="badge-soft" style="background:hsl(var(--success-muted)); color:hsl(var(--success))">Active</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Navigation Card -->
+            <div class="uk-card uk-card-body">
+                <h3 class="uk-card-title mb-4">Navigation</h3>
+                <ul class="uk-nav uk-nav-primary">
+                    <li class="uk-active"><a href="#">Dashboard</a></li>
+                    <li><a href="#">Team Members</a></li>
+                    <li><a href="#">Clients</a></li>
+                    <li><a href="#">Engagements</a></li>
+                    <li class="uk-nav-divider"></li>
+                    <li><a href="#">Settings</a></li>
+                </ul>
+            </div>
+
+            <!-- Progress & Toggle Card -->
+            <div class="uk-card uk-card-body">
+                <h3 class="uk-card-title mb-4">Progress & Toggle</h3>
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span>Utilization</span>
+                            <span class="text-muted-foreground">78%</span>
+                        </div>
+                        <progress class="uk-progress" value="78" max="100"></progress>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span>Capacity</span>
+                            <span class="text-muted-foreground">45%</span>
+                        </div>
+                        <progress class="uk-progress" value="45" max="100"></progress>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" class="uk-toggle-switch uk-toggle-switch-primary" checked>
+                        <span class="text-sm">Notifications</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs Card -->
+            <div class="uk-card uk-card-body">
+                <h3 class="uk-card-title mb-4">Tabs</h3>
+                <ul class="uk-tab" uk-tab>
+                    <li class="uk-active"><a href="#">Overview</a></li>
+                    <li><a href="#">Assignments</a></li>
+                    <li><a href="#">Leaves</a></li>
+                </ul>
+                <p class="mt-3 text-sm text-muted-foreground">Tab content goes here. The active tab underline uses the primary color.</p>
+            </div>
+
+            <!-- Tags Card -->
+            <div class="uk-card uk-card-body">
+                <h3 class="uk-card-title mb-4">Tags</h3>
+                <div class="flex flex-wrap gap-2">
+                    <span class="uk-tag uk-tag-primary">Audit</span>
+                    <span class="uk-tag uk-tag-primary">Tax</span>
+                    <span class="uk-tag uk-tag-secondary">Advisory</span>
+                    <span class="uk-tag uk-tag-secondary">Compliance</span>
+                    <span class="uk-tag uk-tag-destructive">Urgent</span>
+                    <span class="uk-tag">Default</span>
+                </div>
+                <div class="flex flex-wrap gap-2 mt-3">
+                    <span class="badge-soft" style="background:hsl(var(--primary) / 0.12); color:hsl(var(--primary))">Statutory Audit</span>
+                    <span class="badge-soft" style="background:hsl(var(--role-article-muted));color:hsl(var(--role-article))">Consulting</span>
+                    <span class="badge-soft" style="background:hsl(var(--role-staff-muted));color:hsl(var(--role-staff))">Tax</span>
+                    <span class="badge-soft" style="background:hsl(var(--role-manager-muted));color:hsl(var(--role-manager))">Special</span>
+                </div>
+            </div>
+
+            <!-- Severity Cards Preview -->
+            <div class="uk-card uk-card-body lg:col-span-2">
+                <h3 class="uk-card-title mb-4">Severity / Status Cards</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="severity-bar rounded-lg border border-border p-3 flex items-center gap-3" style="border-color:hsl(var(--destructive))">
+                        <div class="initials" style="background:hsl(var(--role-article-muted));color:hsl(var(--role-article));font-size:0.6rem">RS</div>
+                        <div class="flex-1 min-w-0">
+                            <div class="text-sm font-semibold">Rahul Sharma</div>
+                            <div class="text-xs text-muted-foreground">No active assignment</div>
+                        </div>
+                        <span class="badge-soft" style="background:hsl(var(--role-article-muted));color:hsl(var(--role-article))">Article</span>
+                    </div>
+                    <div class="severity-bar rounded-lg border border-border p-3 flex items-center gap-3" style="border-color:hsl(var(--warning))">
+                        <div class="initials" style="background:hsl(var(--role-director-muted));color:hsl(var(--role-director));font-size:0.6rem">AK</div>
+                        <div class="flex-1 min-w-0">
+                            <div class="text-sm font-semibold">Amit Kumar</div>
+                            <div class="text-xs text-muted-foreground">HDFC Audit &middot; ends 10 Jul</div>
+                        </div>
+                        <span class="badge-soft" style="background:hsl(var(--warning-muted));color:hsl(var(--warning-foreground))">7d left</span>
+                    </div>
+                    <div class="severity-bar rounded-lg border border-border p-3 flex items-center gap-3" style="border-color:hsl(var(--primary))">
+                        <div class="initials text-primary-foreground" style="background:hsl(var(--primary));font-size:0.6rem">PM</div>
+                        <div class="flex-1 min-w-0">
+                            <div class="text-sm font-semibold">Priya Mehta</div>
+                            <div class="text-xs text-muted-foreground">HDFC Audit &middot; 80% allocated</div>
+                        </div>
+                        <span class="badge-soft" style="background:hsl(var(--primary) / 0.12);color:hsl(var(--primary))">Active</span>
+                    </div>
+                    <div class="severity-bar rounded-lg border border-border p-3 flex items-center gap-3" style="border-color:hsl(var(--success))">
+                        <div class="initials" style="background:hsl(var(--role-manager-muted));color:hsl(var(--role-manager));font-size:0.6rem">KR</div>
+                        <div class="flex-1 min-w-0">
+                            <div class="text-sm font-semibold">Kavya Rao</div>
+                            <div class="text-xs text-muted-foreground">Infosys &middot; 60% allocated</div>
+                        </div>
+                        <span class="badge-soft" style="background:hsl(var(--success-muted));color:hsl(var(--success))">Active</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="py-4 text-center text-xs text-muted-foreground bg-muted mt-8 border-t border-border">
+        <div class="uk-container">StaffPlan &copy; 2026 &middot; Theme Demo</div>
+    </footer>
+
+    <script>
+        const allPalettes = [
+            'uk-palette-light-blue',
+            'uk-palette-frozen-water',
+            'uk-palette-zinc',
+            'uk-palette-regular',
+            'uk-palette-mono-accent',
+            'uk-palette-pure-black'
+        ];
+        
+        function setPalette(palette) {
+            var html = document.documentElement;
+            allPalettes.forEach(function(p) { html.classList.remove(p); });
+            html.classList.add(palette);
+            var __FRANKEN__ = JSON.parse(localStorage.getItem('__FRANKEN__') || '{}');
+            __FRANKEN__.palette = palette;
+            localStorage.setItem('__FRANKEN__', JSON.stringify(__FRANKEN__));
+            document.querySelectorAll('.palette-btn').forEach(function(btn) {
+                btn.setAttribute('aria-pressed', btn.dataset.palette === palette ? 'true' : 'false');
+            });
+        }
+        
+        function toggleDark() {
+            var html = document.documentElement;
+            var isDark = html.classList.contains('dark');
+            var __FRANKEN__ = JSON.parse(localStorage.getItem('__FRANKEN__') || '{}');
+            if (isDark) {
+                html.classList.remove('dark');
+                __FRANKEN__.mode = 'light';
+                document.getElementById('mode-label').textContent = 'Dark Mode';
+            } else {
+                html.classList.add('dark');
+                __FRANKEN__.mode = 'dark';
+                document.getElementById('mode-label').textContent = 'Light Mode';
+            }
+            localStorage.setItem('__FRANKEN__', JSON.stringify(__FRANKEN__));
+        }
+        
+        // Initialize
+        (function() {
+            var current = (__FRANKEN__ && __FRANKEN__.palette) || 'uk-palette-light-blue';
+            document.querySelectorAll('.palette-btn').forEach(function(btn) {
+                btn.setAttribute('aria-pressed', btn.dataset.palette === current ? 'true' : 'false');
+            });
+        })();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/franken-ui@2.1.2/dist/js/core.iife.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/franken-ui@2.1.2/dist/js/icon.iife.js"></script>
+</body>
+</html>

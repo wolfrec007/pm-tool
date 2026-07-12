@@ -16,7 +16,7 @@
         {{ form_field("display_name", "Display Name", value=user_obj.display_name if user_obj else "", required=true, placeholder="Full name") }}
         {{ form_field("email", "Email", value=user_obj.email if user_obj else "", type="email", required=true, placeholder="user@example.com") }}
 
-        {{ select_field("technical_role", "Role", roles, value=user_obj.technical_role.value if user_obj else "viewer", required=true) }}
+        {{ select_field("technical_role", "Firm Role", roles, value=user_obj.firm_role if user_obj else "viewer", required=true) }}
 
         {{ form_field("password", "Password" ~ (" (leave blank to keep current)" if user_obj else ""), type="password", required=not user_obj, placeholder="At least 8 characters") }}
 

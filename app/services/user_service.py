@@ -14,7 +14,6 @@ def list_users(
     offset: int = 0,
     q: Optional[str] = None,
     is_active: Optional[bool] = None,
-    technical_role: Optional[str] = None,
 ):
     query = db.query(User)
     if q:
@@ -26,8 +25,6 @@ def list_users(
         )
     if is_active is not None:
         query = query.filter(User.is_active == is_active)
-    if technical_role:
-        query = query.filter(User.technical_role == technical_role)
     total = query.count()
     items = query.order_by(User.display_name).limit(limit).offset(offset).all()
     return items, total

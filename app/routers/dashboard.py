@@ -12,6 +12,7 @@ from app.models.models import (
     Client,
     Engagement,
     EngagementInstance,
+    FirmUser,
     Leave,
     TeamMember,
     User,
@@ -34,7 +35,11 @@ def home_dashboard(
 
     # Team metrics
     total_members = db.query(func.count(TeamMember.id)).filter(TeamMember.is_active == True).scalar() or 0
-    total_admins = db.query(func.count(User.id)).filter(User.is_active == True, User.technical_role == "admin").scalar() or 0
+    total_admins = db.query(func.count(FirmUser.id)).filter(
+        FirmUser.firm_id == request.session.get("firm_id"),
+        FirmUser.technical_role == "admin",
+        FirmUser.is_active == True,
+    ).scalar() or 0
 
     # Engagement metrics
     active_engagements = db.query(func.count(Engagement.id)).filter(Engagement.status == "active").scalar() or 0
