@@ -71,6 +71,15 @@ async def create_client_form(
             data[key] = val
 
     try:
+        # Check if approval is required
+        from app.approval_check import check_approval
+        from app.models.models import ResourceType, OperationType
+        firm_id = request.session.get("firm_id")
+        result = check_approval(db, firm_id, _.id, ResourceType.client, OperationType.create, data)
+        if result:
+            set_flash(request, "Client creation pending approval")
+            return RedirectResponse(url="/users", status_code=303)
+
         service.create_client(db, data)
         return RedirectResponse(url="/clients", status_code=303)
     except ValidationError as e:

@@ -80,6 +80,16 @@ async def create_engagement_form(
     try:
         if "client_id" in data:
             data["client_id"] = int(data["client_id"])
+
+        # Check if approval is required
+        from app.approval_check import check_approval
+        from app.models.models import ResourceType, OperationType
+        firm_id = request.session.get("firm_id")
+        result = check_approval(db, firm_id, _.id, ResourceType.engagement, OperationType.create, data)
+        if result:
+            set_flash(request, "Engagement creation pending approval")
+            return RedirectResponse(url="/users", status_code=303)
+
         service.create_engagement(db, data)
         return RedirectResponse(url="/engagements", status_code=303)
     except (ValidationError, Exception) as e:

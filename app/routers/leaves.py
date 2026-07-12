@@ -75,6 +75,16 @@ async def create_leave_form(
 
     try:
         data["team_member_id"] = int(data["team_member_id"])
+
+        # Check if approval is required
+        from app.approval_check import check_approval
+        from app.models.models import ResourceType, OperationType
+        firm_id = request.session.get("firm_id")
+        result = check_approval(db, firm_id, _.id, ResourceType.leave, OperationType.create, data)
+        if result:
+            set_flash(request, "Leave request pending approval")
+            return RedirectResponse(url="/users", status_code=303)
+
         service.create_leave(db, data)
         return RedirectResponse(url="/leaves", status_code=303)
     except (ValidationError, Exception) as e:

@@ -106,14 +106,31 @@ async def create_assignment_form(
 
     errors = []
     try:
+        # Check if approval is required
+        from app.approval_check import check_approval
+        from app.models.models import ResourceType, OperationType
+        firm_id = request.session.get("firm_id")
+        payload = {
+            "team_member_id": int(form_data["team_member_id"]),
+            "engagement_instance_id": int(form_data["engagement_instance_id"]),
+            "allocation_percent": int(form_data["allocation_percent"]),
+            "start_date": form_data["start_date"],
+            "end_date": form_data["end_date"],
+            "role_on_engagement": form_data.get("role_on_engagement", "").strip() or None,
+        }
+        result = check_approval(db, firm_id, user.id, ResourceType.assignment, OperationType.create, payload)
+        if result:
+            set_flash(request, "Assignment pending approval")
+            return RedirectResponse(url="/users", status_code=303)
+
         result = service.create_assignment(
             db,
-            team_member_id=int(form_data["team_member_id"]),
-            engagement_instance_id=int(form_data["engagement_instance_id"]),
-            allocation_percent=int(form_data["allocation_percent"]),
-            start_date=form_data["start_date"],
-            end_date=form_data["end_date"],
-            role_on_engagement=form_data.get("role_on_engagement", "").strip() or None,
+            team_member_id=payload["team_member_id"],
+            engagement_instance_id=payload["engagement_instance_id"],
+            allocation_percent=payload["allocation_percent"],
+            start_date=payload["start_date"],
+            end_date=payload["end_date"],
+            role_on_engagement=payload["role_on_engagement"],
             created_by_user_id=user.id,
         )
         set_flash(request, f"Assignment created ({result.allocation_percent}% allocation).")
