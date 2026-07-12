@@ -51,6 +51,13 @@ def create_client(
     firm_user: FirmUser = Depends(require_api_role(TechnicalRole.admin, TechnicalRole.moderator)),
     db: Session = Depends(get_db),
 ):
+    from app.approval_check import check_approval
+    from app.models.models import ResourceType, OperationType
+    result = check_approval(db, firm_user.firm_id, firm_user.user_id,
+                            ResourceType.client, OperationType.create, body)
+    if result:
+        return result
+
     data = body.copy()
     data["firm_id"] = firm_user.firm_id
     c = client_service.create_client(db, data)
@@ -64,6 +71,13 @@ def update_client(
     firm_user: FirmUser = Depends(require_api_role(TechnicalRole.admin, TechnicalRole.moderator)),
     db: Session = Depends(get_db),
 ):
+    from app.approval_check import check_approval
+    from app.models.models import ResourceType, OperationType
+    result = check_approval(db, firm_user.firm_id, firm_user.user_id,
+                            ResourceType.client, OperationType.update, body, resource_id=client_id)
+    if result:
+        return result
+
     c = client_service.update_client(db, client_id, body)
     return {"id": c.id, "name": c.name, "code": c.code}
 
@@ -74,5 +88,12 @@ def delete_client(
     firm_user: FirmUser = Depends(require_api_role(TechnicalRole.admin)),
     db: Session = Depends(get_db),
 ):
+    from app.approval_check import check_approval
+    from app.models.models import ResourceType, OperationType
+    result = check_approval(db, firm_user.firm_id, firm_user.user_id,
+                            ResourceType.client, OperationType.delete, {}, resource_id=client_id)
+    if result:
+        return result
+
     client_service.soft_delete_client(db, client_id)
     return {"detail": "Client deactivated"}

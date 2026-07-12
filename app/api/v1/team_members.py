@@ -67,6 +67,13 @@ def create_team_member(
     firm_user: FirmUser = Depends(require_api_role(TechnicalRole.admin, TechnicalRole.moderator)),
     db: Session = Depends(get_db),
 ):
+    from app.approval_check import check_approval
+    from app.models.models import ResourceType, OperationType
+    result = check_approval(db, firm_user.firm_id, firm_user.user_id,
+                            ResourceType.team_member, OperationType.create, body)
+    if result:
+        return result
+
     data = body.copy()
     data["firm_id"] = firm_user.firm_id
     m = team_member_service.create_team_member(db, data)
@@ -80,6 +87,13 @@ def update_team_member(
     firm_user: FirmUser = Depends(require_api_role(TechnicalRole.admin, TechnicalRole.moderator)),
     db: Session = Depends(get_db),
 ):
+    from app.approval_check import check_approval
+    from app.models.models import ResourceType, OperationType
+    result = check_approval(db, firm_user.firm_id, firm_user.user_id,
+                            ResourceType.team_member, OperationType.update, body, resource_id=member_id)
+    if result:
+        return result
+
     m = team_member_service.update_team_member(db, member_id, body)
     return {"id": m.id, "name": m.name, "email": m.email}
 
@@ -90,5 +104,12 @@ def delete_team_member(
     firm_user: FirmUser = Depends(require_api_role(TechnicalRole.admin)),
     db: Session = Depends(get_db),
 ):
+    from app.approval_check import check_approval
+    from app.models.models import ResourceType, OperationType
+    result = check_approval(db, firm_user.firm_id, firm_user.user_id,
+                            ResourceType.team_member, OperationType.delete, {}, resource_id=member_id)
+    if result:
+        return result
+
     team_member_service.soft_delete_team_member(db, member_id)
     return {"detail": "Team member deactivated"}

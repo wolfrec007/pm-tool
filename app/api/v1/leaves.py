@@ -47,6 +47,13 @@ def create_leave(
     firm_user: FirmUser = Depends(require_api_role(TechnicalRole.admin, TechnicalRole.moderator)),
     db: Session = Depends(get_db),
 ):
+    from app.approval_check import check_approval
+    from app.models.models import ResourceType, OperationType
+    result = check_approval(db, firm_user.firm_id, firm_user.user_id,
+                            ResourceType.leave, OperationType.create, body)
+    if result:
+        return result
+
     l = leave_service.create_leave(db, body)
     return {"id": l.id, "team_member_id": l.team_member_id}
 
@@ -58,5 +65,12 @@ def update_leave(
     firm_user: FirmUser = Depends(require_api_role(TechnicalRole.admin, TechnicalRole.moderator)),
     db: Session = Depends(get_db),
 ):
+    from app.approval_check import check_approval
+    from app.models.models import ResourceType, OperationType
+    result = check_approval(db, firm_user.firm_id, firm_user.user_id,
+                            ResourceType.leave, OperationType.update, body, resource_id=leave_id)
+    if result:
+        return result
+
     l = leave_service.update_leave(db, leave_id, body)
     return {"id": l.id, "status": l.status.value}

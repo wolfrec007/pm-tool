@@ -48,6 +48,13 @@ def create_assignment(
     firm_user: FirmUser = Depends(require_api_role(TechnicalRole.admin, TechnicalRole.moderator)),
     db: Session = Depends(get_db),
 ):
+    from app.approval_check import check_approval
+    from app.models.models import ResourceType, OperationType
+    result = check_approval(db, firm_user.firm_id, firm_user.user_id,
+                            ResourceType.assignment, OperationType.create, body)
+    if result:
+        return result
+
     from datetime import date
     a = allocation_service.create_assignment(
         db,
@@ -69,6 +76,13 @@ def update_assignment(
     firm_user: FirmUser = Depends(require_api_role(TechnicalRole.admin, TechnicalRole.moderator)),
     db: Session = Depends(get_db),
 ):
+    from app.approval_check import check_approval
+    from app.models.models import ResourceType, OperationType
+    result = check_approval(db, firm_user.firm_id, firm_user.user_id,
+                            ResourceType.assignment, OperationType.update, body, resource_id=assignment_id)
+    if result:
+        return result
+
     from datetime import date
     a = allocation_service.update_assignment(
         db, assignment_id,

@@ -67,6 +67,13 @@ def create_engagement(
     firm_user: FirmUser = Depends(require_api_role(TechnicalRole.admin, TechnicalRole.moderator)),
     db: Session = Depends(get_db),
 ):
+    from app.approval_check import check_approval
+    from app.models.models import ResourceType, OperationType
+    result = check_approval(db, firm_user.firm_id, firm_user.user_id,
+                            ResourceType.engagement, OperationType.create, body)
+    if result:
+        return result
+
     e = engagement_service.create_engagement(db, body)
     return {"id": e.id, "name": e.name}
 
@@ -78,6 +85,13 @@ def update_engagement(
     firm_user: FirmUser = Depends(require_api_role(TechnicalRole.admin, TechnicalRole.moderator)),
     db: Session = Depends(get_db),
 ):
+    from app.approval_check import check_approval
+    from app.models.models import ResourceType, OperationType
+    result = check_approval(db, firm_user.firm_id, firm_user.user_id,
+                            ResourceType.engagement, OperationType.update, body, resource_id=engagement_id)
+    if result:
+        return result
+
     e = engagement_service.update_engagement(db, engagement_id, body)
     return {"id": e.id, "name": e.name}
 
@@ -88,5 +102,12 @@ def delete_engagement(
     firm_user: FirmUser = Depends(require_api_role(TechnicalRole.admin)),
     db: Session = Depends(get_db),
 ):
+    from app.approval_check import check_approval
+    from app.models.models import ResourceType, OperationType
+    result = check_approval(db, firm_user.firm_id, firm_user.user_id,
+                            ResourceType.engagement, OperationType.delete, {}, resource_id=engagement_id)
+    if result:
+        return result
+
     engagement_service.soft_delete_engagement(db, engagement_id)
     return {"detail": "Engagement deactivated"}
