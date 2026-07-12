@@ -216,17 +216,17 @@
                             {% endif %}
                         </td>
                         <td class="text-sm">
-                            {% if log.requested_by_id %}
-                            <a href="/users/{{ log.requested_by_id }}/edit" class="text-primary hover:underline">{{ log.requested_by_name }}</a>
+                            {% if r.requested_by_id %}
+                            <a href="/users/{{ r.requested_by_id }}/edit" class="text-primary hover:underline">{{ r.requested_by_name }}</a>
                             {% else %}
-                            {{ log.requested_by_name }}
+                            {{ r.requested_by_name }}
                             {% endif %}
                         </td>
                         <td class="text-sm">
-                            {% if log.reviewed_by_id %}
-                            <a href="/users/{{ log.reviewed_by_id }}/edit" class="text-primary hover:underline">{{ log.reviewed_by_name }}</a>
+                            {% if r.reviewed_by_id %}
+                            <a href="/users/{{ r.reviewed_by_id }}/edit" class="text-primary hover:underline">{{ r.reviewed_by_name }}</a>
                             {% else %}
-                            {{ log.reviewed_by_name }}
+                            {{ r.reviewed_by_name }}
                             {% endif %}
                         </td>
                         <td class="text-xs text-muted-foreground max-w-xs truncate">{{ r.review_note or "—" }}</td>
