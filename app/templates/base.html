@@ -37,13 +37,15 @@
         }
         .scrollbar-none::-webkit-scrollbar { display: none; }
         .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+        #flash-message .uk-alert p { font-size: 0.85rem; line-height: 1.4; }
+        #flash-message .uk-alert { padding: 0.6rem 1rem; }
     </style>
     {% block extra_head %}{% endblock %}
 </head>
 <body class="bg-background text-foreground min-h-screen">
     <!-- Flash Messages (Top right, below navbar) -->
     {% if request.state.flash %}
-    <div id="flash-message" class="fixed top-16 right-4 z-50" style="max-width: 350px;">
+    <div id="flash-message" class="fixed top-16 right-4 z-50" style="max-width: 420px;">
         <div class="{% if request.state.flash.level == 'danger' %}uk-alert-destructive{% endif %} uk-alert" uk-alert>
             <a class="uk-alert-close" uk-close></a>
             <p>{{ request.state.flash.message }}</p>

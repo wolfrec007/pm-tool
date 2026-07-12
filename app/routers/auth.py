@@ -10,7 +10,7 @@ from app.config import settings
 from app.csrf_utils import get_csrf_token, validate_csrf
 from app.database import get_db
 from app.flash import set_flash
-from app.models.models import User
+from app.models.models import User, Firm
 from app.services.auth_service import (
     authenticate_user,
     disable_totp,
@@ -311,7 +311,8 @@ def firm_switch(request: Request, firm_id: int, db: Session = Depends(get_db)):
 
     _set_session(request, db.query(User).filter(User.id == user_id).first(), firm_id)
     request.session.pop("pending_firm_users", None)
-    set_flash(request, f"Switched to firm")
+    firm = db.query(Firm).filter(Firm.id == firm_id).first()
+    set_flash(request, f"Switched to {firm.name}" if firm else "Firm switched")
     return RedirectResponse(url="/dashboard", status_code=303)
 
 
