@@ -17,9 +17,19 @@ from app.templates_setup import templates
 router = APIRouter(prefix="/admin/settings", tags=["settings"])
 
 
-def _render(request, db, saved=False, error=""):
+def _render(request, db, saved=False, error="", approval_saved=False):
     """Render the settings page with common context."""
+    firm_id = request.session.get("firm_id")
     all_settings = service.list_all_settings(db)
+    
+    # Get approval rules
+    from app.services.approval_service import list_approval_rules
+    rules = list_approval_rules(db, firm_id) if firm_id else []
+    approval_rules = {}
+    for rule in rules:
+        key = f"{rule.resource_type.value}_{rule.operation.value}"
+        approval_rules[key] = rule.is_enabled
+    
     csrf_token = get_csrf_token(request)
     return templates.TemplateResponse(
         request,
@@ -28,6 +38,8 @@ def _render(request, db, saved=False, error=""):
             "settings": all_settings,
             "saved": saved,
             "error": error,
+            "approval_rules": approval_rules,
+            "approval_saved": approval_saved,
             "csrf_token": csrf_token,
         },
     )
@@ -91,3 +103,37 @@ def update_setting_api(
 ):
     result = service.update_setting(db, key, data.value, updated_by_user_id=user.id)
     return SystemSettingRead.model_validate(result)
+
+
+@router.post("/approval", response_class=HTMLResponse)
+async def update_approval_rules(
+    request: Request,
+    db: Session = Depends(get_db),
+    user=Depends(require_role(TechnicalRole.admin)),
+):
+    form_data = await request.form()
+    if not validate_csrf(request, form_data.get("csrf_token")):
+        raise HTTPException(status_code=403, detail="Invalid CSRF token")
+
+    firm_id = request.session.get("firm_id")
+    if not firm_id:
+        return _render(request, db, error="No firm selected")
+
+    from app.services.approval_service import upsert_approval_rule
+    from app.models.models import ResourceType, OperationType
+
+    resources = ["assignment", "engagement", "client", "team_member", "leave"]
+    operations = ["create", "update", "delete"]
+
+    for resource in resources:
+        for operation in operations:
+            key = f"rule_{resource}_{operation}"
+            is_enabled = form_data.get(key) == "on"
+            upsert_approval_rule(
+                db, firm_id=firm_id,
+                resource_type=ResourceType(resource),
+                operation=OperationType(operation),
+                is_enabled=is_enabled,
+            )
+
+    return _render(request, db, approval_saved=True)

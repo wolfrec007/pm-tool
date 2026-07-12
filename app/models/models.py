@@ -203,6 +203,41 @@ class ApprovalRequest(Base):
     reviewed_by = relationship("User", foreign_keys=[reviewed_by_user_id])
 
 
+class ExtensionStatus(str, enum.Enum):
+    pending = "pending"
+    approved = "approved"
+    rejected = "rejected"
+
+
+class ExtensionRequest(Base):
+    """Request to extend allocation beyond original plan."""
+    __tablename__ = "extension_requests"
+
+    id = Column(Integer, primary_key=True, index=True)
+    firm_id = Column(Integer, ForeignKey("firms.id", ondelete="RESTRICT"), nullable=False)
+    team_member_id = Column(Integer, ForeignKey("team_members.id", ondelete="RESTRICT"), nullable=False)
+    engagement_instance_id = Column(Integer, ForeignKey("engagement_instances.id", ondelete="RESTRICT"), nullable=False)
+    allocation_percent = Column(Integer, nullable=False)
+    start_date = Column(Date, nullable=False)
+    end_date = Column(Date, nullable=False)
+    role_on_engagement = Column(String(255), nullable=True)
+    reason = Column(Text, nullable=True)
+    status = Column(Enum(ExtensionStatus), nullable=False, default=ExtensionStatus.pending)
+    requested_by_user_id = Column(Integer, ForeignKey("users.id", ondelete="RESTRICT"), nullable=False)
+    reviewed_by_user_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    review_note = Column(Text, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at = Column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )
+
+    firm = relationship("Firm")
+    team_member = relationship("TeamMember")
+    engagement_instance = relationship("EngagementInstance")
+    requested_by = relationship("User", foreign_keys=[requested_by_user_id])
+    reviewed_by = relationship("User", foreign_keys=[reviewed_by_user_id])
+
+
 class User(Base):
     __tablename__ = "users"
 

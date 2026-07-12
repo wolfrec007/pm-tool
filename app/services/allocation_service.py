@@ -48,6 +48,7 @@ def create_assignment(
 
     - Locks the TeamMember row (FOR UPDATE)
     - Verifies member exists and is active
+    - Validates assignment dates fall within engagement instance dates
     - Sums overlapping assignment allocations in the date window
     - Rejects if total would exceed 100%
     - Rejects if overlapping approved leave exists
@@ -69,6 +70,23 @@ def create_assignment(
         raise NotFoundError(f"TeamMember {team_member_id} not found")
     if not member.is_active:
         raise ValidationError(f"TeamMember {team_member_id} is not active")
+
+    # Validate assignment dates fall within engagement instance dates
+    instance = (
+        db.query(EngagementInstance)
+        .filter(EngagementInstance.id == engagement_instance_id)
+        .first()
+    )
+    if not instance:
+        raise NotFoundError(f"EngagementInstance {engagement_instance_id} not found")
+    if start_date < instance.start_date:
+        raise ValidationError(
+            f"Assignment start_date ({start_date}) cannot be before engagement instance start ({instance.start_date})"
+        )
+    if end_date > instance.end_date:
+        raise ValidationError(
+            f"Assignment end_date ({end_date}) cannot be after engagement instance end ({instance.end_date})"
+        )
 
     # Sum overlapping existing allocations
     overlap_sum = (
@@ -166,6 +184,22 @@ def update_assignment(
         raise ValidationError("allocation_percent must be between 1 and 100")
     if new_end < new_start:
         raise ValidationError("end_date must be on or after start_date")
+
+    # Validate assignment dates fall within engagement instance dates
+    instance = (
+        db.query(EngagementInstance)
+        .filter(EngagementInstance.id == assignment.engagement_instance_id)
+        .first()
+    )
+    if instance:
+        if new_start < instance.start_date:
+            raise ValidationError(
+                f"Assignment start_date ({new_start}) cannot be before engagement instance start ({instance.start_date})"
+            )
+        if new_end > instance.end_date:
+            raise ValidationError(
+                f"Assignment end_date ({new_end}) cannot be after engagement instance end ({instance.end_date})"
+            )
 
     # Lock the team member row
     member = (
