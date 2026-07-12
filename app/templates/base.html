@@ -37,18 +37,18 @@
         }
         .scrollbar-none::-webkit-scrollbar { display: none; }
         .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
-        #flash-message .uk-alert p { font-size: 0.85rem; line-height: 1.4; }
-        #flash-message .uk-alert { padding: 0.6rem 1rem; }
+        #flash-message .uk-alert p { font-size: 0.85rem; line-height: 1.4; margin: 0; }
+        #flash-message .uk-alert { padding: 0.75rem 2.5rem 0.75rem 1rem; min-height: 2.5rem; }
     </style>
     {% block extra_head %}{% endblock %}
 </head>
 <body class="bg-background text-foreground min-h-screen">
     <!-- Flash Messages (Top right, below navbar) -->
     {% if request.state.flash %}
-    <div id="flash-message" class="fixed top-16 right-4 z-50" style="max-width: 420px;">
-        <div class="{% if request.state.flash.level == 'danger' %}uk-alert-destructive{% endif %} uk-alert" uk-alert>
-            <a class="uk-alert-close" uk-close></a>
-            <p>{{ request.state.flash.message }}</p>
+    <div id="flash-message" class="fixed top-16 right-4 z-50" style="max-width: min(420px, calc(100vw - 2rem));">
+        <div class="{% if request.state.flash.level == 'danger' %}uk-alert-destructive{% endif %} uk-alert" uk-alert style="display: flex; align-items: flex-start; gap: 0.5rem; padding-right: 2rem; position: relative;">
+            <p style="flex: 1; margin: 0; word-break: break-word;">{{ request.state.flash.message }}</p>
+            <a class="uk-alert-close" uk-close style="position: absolute; top: 0.5rem; right: 0.5rem;"></a>
         </div>
     </div>
     <script>
