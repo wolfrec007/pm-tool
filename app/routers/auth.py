@@ -50,6 +50,168 @@ def _set_session(request: Request, user: User, firm_id: int | None = None) -> No
         request.session.pop("firm_name", None)
 
 
+# ── Registration ──
+
+@router.get("/register", response_class=HTMLResponse)
+def register_page(request: Request, error: str = "", step: str = "1"):
+    if request.session.get("user_id"):
+        return RedirectResponse(url="/dashboard", status_code=303)
+    return templates.TemplateResponse(request, "auth/register.html", {
+        "csrf_token": get_csrf_token(request),
+        "error": error,
+        "step": step,
+    })
+
+
+@router.post("/register/check-domain")
+async def register_check_domain(request: Request, db: Session = Depends(get_db)):
+    form_data = await request.form()
+    if not validate_csrf(request, form_data.get("csrf_token")):
+        raise HTTPException(status_code=403, detail="Invalid CSRF token")
+
+    email = form_data.get("email", "").strip().lower()
+    if not email or "@" not in email:
+        return templates.TemplateResponse(request, "auth/register.html", {
+            "csrf_token": get_csrf_token(request),
+            "error": "Please enter a valid email address",
+            "step": "1",
+        })
+
+    # Check if user already exists
+    existing = db.query(User).filter(User.email == email).first()
+    if existing:
+        return templates.TemplateResponse(request, "auth/register.html", {
+            "csrf_token": get_csrf_token(request),
+            "error": "An account with this email already exists",
+            "step": "1",
+        })
+
+    # Find firm by domain
+    from app.services.otp_service import get_firm_for_email
+    firm, reason = get_firm_for_email(db, email)
+
+    if not firm:
+        return templates.TemplateResponse(request, "auth/register.html", {
+            "csrf_token": get_csrf_token(request),
+            "error": f"No firm matches your email domain. {reason}",
+            "step": "1",
+        })
+
+    # Generate and send OTP
+    from app.services.otp_service import generate_otp
+    otp = generate_otp(email)
+
+    # TODO: Send OTP via email (for now, log it)
+    logger.info(f"OTP for {email}: {otp}")
+
+    request.session["pending_registration"] = {
+        "email": email,
+        "firm_id": firm.id,
+        "firm_name": firm.name,
+    }
+
+    return templates.TemplateResponse(request, "auth/register.html", {
+        "csrf_token": get_csrf_token(request),
+        "error": "",
+        "step": "2",
+        "email": email,
+        "firm_name": firm.name,
+        "otp_sent": True,
+    })
+
+
+@router.post("/register/verify-otp")
+async def register_verify_otp(request: Request, db: Session = Depends(get_db)):
+    form_data = await request.form()
+    if not validate_csrf(request, form_data.get("csrf_token")):
+        raise HTTPException(status_code=403, detail="Invalid CSRF token")
+
+    otp = form_data.get("otp", "").strip()
+    pending = request.session.get("pending_registration")
+
+    if not pending:
+        return RedirectResponse(url="/auth/register", status_code=303)
+
+    from app.services.otp_service import verify_otp
+    if not verify_otp(pending["email"], otp):
+        return templates.TemplateResponse(request, "auth/register.html", {
+            "csrf_token": get_csrf_token(request),
+            "error": "Invalid or expired OTP. Please try again.",
+            "step": "2",
+            "email": pending["email"],
+            "firm_name": pending.get("firm_name", ""),
+            "otp_sent": True,
+        })
+
+    # OTP verified — show password form
+    request.session["otp_verified"] = True
+    return templates.TemplateResponse(request, "auth/register.html", {
+        "csrf_token": get_csrf_token(request),
+        "error": "",
+        "step": "3",
+        "email": pending["email"],
+        "firm_name": pending.get("firm_name", ""),
+    })
+
+
+@router.post("/register/complete")
+async def register_complete(request: Request, db: Session = Depends(get_db)):
+    form_data = await request.form()
+    if not validate_csrf(request, form_data.get("csrf_token")):
+        raise HTTPException(status_code=403, detail="Invalid CSRF token")
+
+    pending = request.session.get("pending_registration")
+    if not pending or not request.session.get("otp_verified"):
+        return RedirectResponse(url="/auth/register", status_code=303)
+
+    display_name = form_data.get("display_name", "").strip()
+    password = form_data.get("password", "")
+    confirm = form_data.get("confirm_password", "")
+
+    errors = []
+    if not display_name:
+        errors.append("Name is required")
+    if len(password) < 8:
+        errors.append("Password must be at least 8 characters")
+    if password != confirm:
+        errors.append("Passwords do not match")
+
+    if errors:
+        return templates.TemplateResponse(request, "auth/register.html", {
+            "csrf_token": get_csrf_token(request),
+            "error": " / ".join(errors),
+            "step": "3",
+            "email": pending["email"],
+            "firm_name": pending.get("firm_name", ""),
+        })
+
+    # Create user
+    from app.services.auth_service import hash_password
+    from app.services.firm_service import add_user_to_firm
+    from app.models.models import TechnicalRole
+
+    user = User(
+        email=pending["email"],
+        display_name=display_name,
+        password_hash=hash_password(password),
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+
+    # Add to firm as viewer
+    add_user_to_firm(db, user.id, pending["firm_id"], TechnicalRole.viewer)
+
+    # Clean up session
+    request.session.pop("pending_registration", None)
+    request.session.pop("otp_verified", None)
+
+    # Auto-login
+    _set_session(request, user, pending["firm_id"])
+    set_flash(request, f"Welcome to {pending['firm_name']}, {display_name}!")
+    return RedirectResponse(url="/dashboard", status_code=303)
+
+
 @router.get("/login", response_class=HTMLResponse)
 def login_page(request: Request, error: str = ""):
     # Redirect to home if already logged in

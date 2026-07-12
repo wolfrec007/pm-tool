@@ -17,7 +17,7 @@ from app.templates_setup import templates
 router = APIRouter(prefix="/admin/settings", tags=["settings"])
 
 
-def _render(request, db, saved=False, error="", approval_saved=False):
+def _render(request, db, saved=False, error="", approval_saved=False, domains_saved=False):
     """Render the settings page with common context."""
     firm_id = request.session.get("firm_id")
     all_settings = service.list_all_settings(db)
@@ -29,6 +29,13 @@ def _render(request, db, saved=False, error="", approval_saved=False):
     for rule in rules:
         key = f"{rule.resource_type.value}_{rule.operation.value}"
         approval_rules[key] = rule.is_enabled
+
+    # Get firm domains
+    firm_domains = ""
+    if firm_id:
+        from app.services.firm_service import get_firm
+        firm = get_firm(db, firm_id)
+        firm_domains = firm.allowed_domains or ""
     
     csrf_token = get_csrf_token(request)
     return templates.TemplateResponse(
@@ -40,6 +47,8 @@ def _render(request, db, saved=False, error="", approval_saved=False):
             "error": error,
             "approval_rules": approval_rules,
             "approval_saved": approval_saved,
+            "firm_domains": firm_domains,
+            "domains_saved": domains_saved,
             "csrf_token": csrf_token,
         },
     )
@@ -146,3 +155,34 @@ async def update_approval_rules(
             )
 
     return _render(request, db, approval_saved=True)
+
+
+@router.post("/domains", response_class=HTMLResponse)
+async def update_domains(
+    request: Request,
+    db: Session = Depends(get_db),
+    user=Depends(require_role(TechnicalRole.admin)),
+):
+    form_data = await request.form()
+    if not validate_csrf(request, form_data.get("csrf_token")):
+        raise HTTPException(status_code=403, detail="Invalid CSRF token")
+
+    firm_id = request.session.get("firm_id")
+    if not firm_id:
+        from app.services.firm_service import get_user_firms
+        user_id = request.session.get("user_id")
+        if user_id:
+            firms = get_user_firms(db, user_id)
+            if firms:
+                firm_id = firms[0].id
+                request.session["firm_id"] = firm_id
+
+    if not firm_id:
+        return _render(request, db, error="No firm selected")
+
+    from app.services.firm_service import get_firm
+    firm = get_firm(db, firm_id)
+    firm.allowed_domains = form_data.get("allowed_domains", "").strip()
+    db.commit()
+
+    return _render(request, db, domains_saved=True)

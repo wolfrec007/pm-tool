@@ -112,6 +112,7 @@ class Firm(Base):
     name = Column(String(255), nullable=False)
     code = Column(String(50), unique=True, nullable=False)
     logo_url = Column(String(500), nullable=True)
+    allowed_domains = Column(Text, nullable=True)  # Comma-separated: "pkfindia.com,pkf.in"
     is_active = Column(Boolean, default=True, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(
