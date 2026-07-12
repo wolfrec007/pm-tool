@@ -132,13 +132,13 @@
   }
   .nav{display:flex; align-items:center; justify-content:space-between; height:72px;}
   .brand{display:flex; align-items:center; gap:10px;}
-  .brand-mark{width:34px; height:34px; border-radius:10px; position:relative; overflow:hidden; background:var(--navy); flex-shrink:0;}
-  html[data-theme="dark"] .brand-mark{background:#0e2032;}
-  .brand-mark span{position:absolute; border-radius:50%;}
-  .brand-mark .b1{width:26px; height:26px; background:var(--steel); opacity:.88; left:2px; top:12px;}
-  .brand-mark .b2{width:22px; height:22px; background:#eef5fc; right:3px; top:4px;}
-  html[data-theme="dark"] .brand-mark .b2{background:#0b1a29;}
-  .brand-word{font-family:'Plus Jakarta Sans'; font-weight:700; font-size:20px; color:var(--heading); letter-spacing:-0.01em;}
+  .brand-logo{height:26px; width:auto; display:block;}
+  .brand-logo.footer-logo{height:22px;}
+  /* Recolor the embedded logo's exact fills for dark backgrounds (inline
+     styles need !important to override) */
+  html[data-theme="dark"] .brand-logo path[style*="fill: rgb(28,55,92)"]{fill:#eaf2fb !important;}
+  html[data-theme="dark"] .brand-logo path[style*="fill: rgb(84,136,183)"]{fill:#7fb0da !important;}
+  html[data-theme="dark"] .brand-logo path[style*="fill: rgb(56,94,136)"]{fill:#5f8fbe !important;}
   .nav-links{display:flex; align-items:center; gap:32px;}
   .nav-links a{font-size:14.5px; font-weight:500; color:var(--muted); transition:color .15s;}
   .nav-links a:hover{color:var(--heading);}
@@ -342,12 +342,15 @@
           <h1>Know who's free<br><em>before</em> it's a problem.</h1>
           <p class="lede">splanly gives CA firms one place to staff engagements, watch team capacity, and catch double-bookings before they turn into a client-facing fire drill.</p>
           <div class="hero-actions">
-            <a href="/auth/register" class="btn btn-primary">Start free trial</a>
+            <a href="tel:+919845145102" class="btn btn-primary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>
+              Contact us
+            </a>
             <a href="#how-it-works" class="btn btn-ghost">See how it works</a>
           </div>
           <div class="hero-note">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--steel)" stroke-width="2.4" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg>
-            No credit card needed · Set up your first engagement in minutes
+            +91 98451 45102 · splanly.skilledca.in
           </div>
         </div>
 
@@ -513,10 +516,20 @@
           <span class="brand-word" style="font-size:17px;">splanly</span>
         </div>
         <p>Smart resource planning for modern CA firms — built by SkilledCA Enterprises.</p>
-        <a href="mailto:samarth@skilledca.in" style="display:inline-flex; align-items:center; gap:7px; margin-top:14px; font-size:14px; font-weight:600; color:var(--heading);">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
-          samarth@skilledca.in
-        </a>
+        <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+          <a href="mailto:samarth@skilledca.in" style="display:inline-flex; align-items:center; gap:7px; font-size:14px; font-weight:600; color:var(--heading);">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
+            samarth@skilledca.in
+          </a>
+          <a href="tel:+919845145102" style="display:inline-flex; align-items:center; gap:7px; font-size:14px; font-weight:600; color:var(--heading);">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>
+            +91 98451 45102
+          </a>
+          <a href="https://splanly.skilledca.in" target="_blank" rel="noopener noreferrer" style="display:inline-flex; align-items:center; gap:7px; font-size:14px; font-weight:600; color:var(--heading);">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10Z"/></svg>
+            splanly.skilledca.in
+          </a>
+        </div>
       </div>
       <div>
         <h4>Product</h4>
