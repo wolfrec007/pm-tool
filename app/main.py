@@ -2,6 +2,7 @@ import secrets
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -29,6 +30,7 @@ from app.routers import (
     team_members,
     users,
 )
+from app.api.v1 import router as api_v1_router
 
 
 @asynccontextmanager
@@ -56,6 +58,20 @@ app.add_middleware(
     max_age=settings.SESSION_MAX_AGE_SECONDS,
     same_site="lax",
     https_only=False,  # Allow HTTP in development
+)
+
+# CORS middleware for cross-origin frontend (Next.js on Vercel)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "https://*.vercel.app",
+    ],
+    allow_origin_regex=r"https://.*\.vercel\.app$",
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Templates
@@ -90,6 +106,7 @@ app.include_router(admin_settings.router)
 app.include_router(dashboard.router)
 app.include_router(users.router)
 app.include_router(outbox.router)
+app.include_router(api_v1_router)
 
 
 @app.get("/test")

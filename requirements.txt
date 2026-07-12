@@ -17,3 +17,4 @@ qrcode>=7.4
 Pillow>=9.1.0
 pytest>=8.0.0
 pytest-asyncio>=0.24.0
+PyJWT>=2.8.0

@@ -13,6 +13,7 @@ from sqlalchemy import (
     String,
     Text,
     JSON,
+    UniqueConstraint,
     func,
 )
 from sqlalchemy.orm import relationship
@@ -81,6 +82,127 @@ class LeaveStatus(str, enum.Enum):
     rejected = "rejected"
 
 
+class ResourceType(str, enum.Enum):
+    assignment = "assignment"
+    engagement = "engagement"
+    client = "client"
+    team_member = "team_member"
+    leave = "leave"
+
+
+class OperationType(str, enum.Enum):
+    create = "create"
+    update = "update"
+    delete = "delete"
+
+
+class ApprovalStatus(str, enum.Enum):
+    pending = "pending"
+    approved = "approved"
+    rejected = "rejected"
+
+
+# ── Multi-Tenancy Models ──
+
+
+class Firm(Base):
+    __tablename__ = "firms"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(255), nullable=False)
+    code = Column(String(50), unique=True, nullable=False)
+    logo_url = Column(String(500), nullable=True)
+    is_active = Column(Boolean, default=True, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at = Column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )
+
+    branches = relationship("Branch", back_populates="firm")
+    firm_users = relationship("FirmUser", back_populates="firm")
+    approval_rules = relationship("ApprovalRule", back_populates="firm")
+
+
+class Branch(Base):
+    __tablename__ = "branches"
+
+    id = Column(Integer, primary_key=True, index=True)
+    firm_id = Column(Integer, ForeignKey("firms.id", ondelete="RESTRICT"), nullable=False)
+    name = Column(String(255), nullable=False)
+    code = Column(String(50), nullable=True)
+    city = Column(String(255), nullable=True)
+    address = Column(Text, nullable=True)
+    is_active = Column(Boolean, default=True, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at = Column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )
+
+    firm = relationship("Firm", back_populates="branches")
+    team_members = relationship("TeamMember", back_populates="branch")
+
+
+class FirmUser(Base):
+    __tablename__ = "firm_users"
+    __table_args__ = (UniqueConstraint("user_id", "firm_id", name="uq_firm_user"),)
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="RESTRICT"), nullable=False)
+    firm_id = Column(Integer, ForeignKey("firms.id", ondelete="RESTRICT"), nullable=False)
+    technical_role = Column(Enum(TechnicalRole), nullable=False, default=TechnicalRole.viewer)
+    is_active = Column(Boolean, default=True, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at = Column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )
+
+    user = relationship("User", back_populates="firm_users")
+    firm = relationship("Firm", back_populates="firm_users")
+
+
+class ApprovalRule(Base):
+    __tablename__ = "approval_rules"
+    __table_args__ = (
+        UniqueConstraint("firm_id", "resource_type", "operation", name="uq_approval_rule"),
+    )
+
+    id = Column(Integer, primary_key=True, index=True)
+    firm_id = Column(Integer, ForeignKey("firms.id", ondelete="RESTRICT"), nullable=False)
+    resource_type = Column(Enum(ResourceType), nullable=False)
+    operation = Column(Enum(OperationType), nullable=False)
+    is_enabled = Column(Boolean, default=False, nullable=False)
+    approver_role = Column(Enum(TechnicalRole), nullable=False, default=TechnicalRole.admin)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at = Column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )
+
+    firm = relationship("Firm", back_populates="approval_rules")
+
+
+class ApprovalRequest(Base):
+    __tablename__ = "approval_requests"
+
+    id = Column(Integer, primary_key=True, index=True)
+    firm_id = Column(Integer, ForeignKey("firms.id", ondelete="RESTRICT"), nullable=False)
+    resource_type = Column(Enum(ResourceType), nullable=False)
+    resource_id = Column(Integer, nullable=True)
+    operation = Column(Enum(OperationType), nullable=False)
+    requested_by_user_id = Column(Integer, ForeignKey("users.id", ondelete="RESTRICT"), nullable=False)
+    payload = Column(JSON, nullable=False)
+    status = Column(Enum(ApprovalStatus), nullable=False, default=ApprovalStatus.pending)
+    reviewed_by_user_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    review_note = Column(Text, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at = Column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )
+
+    firm = relationship("Firm")
+    requested_by = relationship("User", foreign_keys=[requested_by_user_id])
+    reviewed_by = relationship("User", foreign_keys=[reviewed_by_user_id])
+
+
 class User(Base):
     __tablename__ = "users"
 
@@ -90,7 +212,6 @@ class User(Base):
     password_hash = Column(String(255), nullable=True)
     totp_secret = Column(String(64), nullable=True)
     totp_enabled = Column(Boolean, default=False, nullable=False)
-    technical_role = Column(Enum(TechnicalRole), nullable=False, default=TechnicalRole.viewer)
     is_active = Column(Boolean, default=True, nullable=False)
     azure_oid = Column(String(255), unique=True, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
@@ -98,15 +219,18 @@ class User(Base):
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
     )
 
+    firm_users = relationship("FirmUser", back_populates="user")
+
 
 class TeamMember(Base):
     __tablename__ = "team_members"
 
     id = Column(Integer, primary_key=True, index=True)
+    firm_id = Column(Integer, ForeignKey("firms.id", ondelete="RESTRICT"), nullable=False)
+    branch_id = Column(Integer, ForeignKey("branches.id", ondelete="SET NULL"), nullable=True)
     employee_code = Column(String(50), unique=True, nullable=True)
     name = Column(String(255), nullable=False)
     email = Column(String(255), unique=True, nullable=False)
-    technical_role = Column(Enum(TechnicalRole), nullable=False, default=TechnicalRole.viewer)
     business_role = Column(Enum(BusinessRole), nullable=False)
     is_oversight_only = Column(Boolean, default=False, nullable=False)
     seniority_level = Column(String(100), nullable=True)
@@ -118,6 +242,8 @@ class TeamMember(Base):
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
     )
 
+    firm = relationship("Firm")
+    branch = relationship("Branch", back_populates="team_members")
     assignments = relationship("Assignment", back_populates="team_member")
     leaves = relationship("Leave", back_populates="team_member")
 
@@ -126,6 +252,7 @@ class Client(Base):
     __tablename__ = "clients"
 
     id = Column(Integer, primary_key=True, index=True)
+    firm_id = Column(Integer, ForeignKey("firms.id", ondelete="RESTRICT"), nullable=False)
     name = Column(String(255), nullable=False)
     code = Column(String(50), unique=True, nullable=True)
     industry = Column(String(255), nullable=True)
@@ -135,6 +262,7 @@ class Client(Base):
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
     )
 
+    firm = relationship("Firm")
     engagements = relationship("Engagement", back_populates="client")
 
 
@@ -238,6 +366,7 @@ class SystemSetting(Base):
     __tablename__ = "system_settings"
 
     id = Column(Integer, primary_key=True, index=True)
+    firm_id = Column(Integer, ForeignKey("firms.id", ondelete="SET NULL"), nullable=True)
     key = Column(String(255), unique=True, nullable=False)
     value = Column(Text, nullable=False)
     description = Column(Text, nullable=True)
@@ -246,6 +375,8 @@ class SystemSetting(Base):
     updated_at = Column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
     )
+
+    firm = relationship("Firm")
 
 
 class EmailOutbox(Base):

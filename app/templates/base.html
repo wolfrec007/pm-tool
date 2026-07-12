@@ -35,6 +35,8 @@
         @supports (font-variation-settings: normal) {
             :root { font-family: InterVariable, sans-serif; }
         }
+        .scrollbar-none::-webkit-scrollbar { display: none; }
+        .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
     {% block extra_head %}{% endblock %}
 </head>
@@ -61,32 +63,27 @@
 
     <!-- Navbar -->
     <nav class="bg-background border-b border-border sticky top-0" style="z-index: 100;">
-        <div class="uk-container uk-container-xlarge">
-            <div class="flex items-center justify-between h-14">
-                <!-- Logo -->
-                <a href="/" class="font-semibold text-lg text-foreground">StaffPlan</a>
-                
-                <!-- Navigation Links -->
-                <div class="hidden md:flex items-center gap-1">
-                    <a href="/dashboard" class="px-3 py-2 text-sm rounded-md transition-colors {% if request.url.path == '/dashboard' %}bg-primary text-primary-foreground{% else %}text-muted-foreground hover:text-foreground hover:bg-muted{% endif %}">Dashboard</a>
-                    <a href="/team-members" class="px-3 py-2 text-sm rounded-md transition-colors {% if request.url.path.startswith('/team-members') %}bg-primary text-primary-foreground{% else %}text-muted-foreground hover:text-foreground hover:bg-muted{% endif %}">Team</a>
-                    <a href="/clients" class="px-3 py-2 text-sm rounded-md transition-colors {% if request.url.path.startswith('/clients') %}bg-primary text-primary-foreground{% else %}text-muted-foreground hover:text-foreground hover:bg-muted{% endif %}">Clients</a>
-                    <a href="/engagements" class="px-3 py-2 text-sm rounded-md transition-colors {% if request.url.path.startswith('/engagements') %}bg-primary text-primary-foreground{% else %}text-muted-foreground hover:text-foreground hover:bg-muted{% endif %}">Engagements</a>
-                    <a href="/assignments" class="px-3 py-2 text-sm rounded-md transition-colors {% if request.url.path.startswith('/assignments') %}bg-primary text-primary-foreground{% else %}text-muted-foreground hover:text-foreground hover:bg-muted{% endif %}">Assignments</a>
-                    <a href="/leaves" class="px-3 py-2 text-sm rounded-md transition-colors {% if request.url.path.startswith('/leaves') %}bg-primary text-primary-foreground{% else %}text-muted-foreground hover:text-foreground hover:bg-muted{% endif %}">Leaves</a>
-                    <a href="/dashboard/bench" class="px-3 py-2 text-sm rounded-md transition-colors {% if request.url.path == '/dashboard/bench' %}bg-primary text-primary-foreground{% else %}text-muted-foreground hover:text-foreground hover:bg-muted{% endif %}">Bench</a>
-                    {% if request.session.get("user_role") == "admin" %}
-                    <a href="/users" class="px-3 py-2 text-sm rounded-md transition-colors {% if request.url.path.startswith('/users') %}bg-primary text-primary-foreground{% else %}text-muted-foreground hover:text-foreground hover:bg-muted{% endif %}">Users</a>
-                    <a href="/admin/outbox" class="px-3 py-2 text-sm rounded-md transition-colors {% if request.url.path.startswith('/admin/outbox') %}bg-primary text-primary-foreground{% else %}text-muted-foreground hover:text-foreground hover:bg-muted{% endif %}">Outbox</a>
-                    <a href="/admin/settings" class="px-3 py-2 text-sm rounded-md transition-colors {% if request.url.path.startswith('/admin/settings') %}bg-primary text-primary-foreground{% else %}text-muted-foreground hover:text-foreground hover:bg-muted{% endif %}">Settings</a>
-                    {% endif %}
+        <div class="px-4">
+            <div class="flex items-center justify-between h-14 max-w-screen-2xl mx-auto">
+                <div class="flex items-center gap-3">
+                    <!-- Hamburger button (top left) -->
+                    <button id="hamburger-btn" class="flex items-center justify-center w-9 h-9 rounded-md hover:bg-muted transition-colors" aria-label="Menu">
+                        <uk-icon icon="menu" width="20" height="20"></uk-icon>
+                    </button>
+                    <!-- Logo -->
+                    <a href="/dashboard" class="font-semibold text-lg text-foreground">StaffPlan <span class="text-sm font-normal text-muted-foreground">by SkilledCA</span></a>
                 </div>
                 
-                <!-- User Menu -->
+                <!-- Right side: dark toggle + user menu -->
                 <div class="flex items-center gap-2">
+                    <!-- Dark/Light mode toggle -->
+                    <button id="nav-theme-toggle" class="flex items-center justify-center w-9 h-9 rounded-md hover:bg-muted transition-colors" title="Toggle dark mode">
+                        <uk-icon id="nav-theme-icon" icon="moon" width="18" height="18"></uk-icon>
+                    </button>
+
                     {% if request.session.get("user_name") %}
                     <div class="relative" id="user-menu-container">
-                        <button id="user-menu-button" class="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-muted transition-colors">
+                        <button id="user-menu-button" class="hidden md:flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-muted transition-colors">
                             <span>{{ request.session.user_name }}</span>
                             <span class="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">{{ request.session.user_role | title }}</span>
                             <uk-icon icon="chevron-down" width="14" height="14"></uk-icon>
@@ -139,38 +136,106 @@
                 </div>
             </div>
         </div>
+
+        <!-- Sidebar Overlay -->
+        <div id="sidebar-overlay" class="hidden fixed inset-0 bg-black/40" style="z-index: 200;"></div>
+
+        <!-- Sidebar Drawer -->
+        <div id="sidebar-drawer" class="hidden fixed top-0 left-0 h-full w-72 bg-background border-r border-border shadow-xl overflow-y-auto scrollbar-none" style="z-index: 201; transition: transform 0.25s ease;">
+            <div class="flex items-center justify-between p-4 border-b border-border">
+                <a href="/dashboard" class="font-semibold text-lg text-foreground">StaffPlan <span class="text-sm font-normal text-muted-foreground">by SkilledCA</span></a>
+                <button id="sidebar-close" class="flex items-center justify-center w-8 h-8 rounded-md hover:bg-muted transition-colors">
+                    <uk-icon icon="x" width="18" height="18"></uk-icon>
+                </button>
+            </div>
+            <div class="p-3 space-y-1">
+                <a href="/dashboard" class="flex items-center gap-3 px-3 py-2.5 text-sm rounded-md transition-colors {% if request.url.path == '/dashboard' %}bg-primary text-primary-foreground{% else %}text-muted-foreground hover:text-foreground hover:bg-muted{% endif %}">
+                    <uk-icon icon="layout-dashboard" width="16" height="16"></uk-icon> Dashboard
+                </a>
+                <a href="/team-members" class="flex items-center gap-3 px-3 py-2.5 text-sm rounded-md transition-colors {% if request.url.path.startswith('/team-members') %}bg-primary text-primary-foreground{% else %}text-muted-foreground hover:text-foreground hover:bg-muted{% endif %}">
+                    <uk-icon icon="users" width="16" height="16"></uk-icon> Team Members
+                </a>
+                <a href="/clients" class="flex items-center gap-3 px-3 py-2.5 text-sm rounded-md transition-colors {% if request.url.path.startswith('/clients') %}bg-primary text-primary-foreground{% else %}text-muted-foreground hover:text-foreground hover:bg-muted{% endif %}">
+                    <uk-icon icon="building" width="16" height="16"></uk-icon> Clients
+                </a>
+                <a href="/engagements" class="flex items-center gap-3 px-3 py-2.5 text-sm rounded-md transition-colors {% if request.url.path.startswith('/engagements') %}bg-primary text-primary-foreground{% else %}text-muted-foreground hover:text-foreground hover:bg-muted{% endif %}">
+                    <uk-icon icon="briefcase" width="16" height="16"></uk-icon> Engagements
+                </a>
+                <a href="/assignments" class="flex items-center gap-3 px-3 py-2.5 text-sm rounded-md transition-colors {% if request.url.path.startswith('/assignments') %}bg-primary text-primary-foreground{% else %}text-muted-foreground hover:text-foreground hover:bg-muted{% endif %}">
+                    <uk-icon icon="git-branch" width="16" height="16"></uk-icon> Assignments
+                </a>
+                <a href="/leaves" class="flex items-center gap-3 px-3 py-2.5 text-sm rounded-md transition-colors {% if request.url.path.startswith('/leaves') %}bg-primary text-primary-foreground{% else %}text-muted-foreground hover:text-foreground hover:bg-muted{% endif %}">
+                    <uk-icon icon="calendar" width="16" height="16"></uk-icon> Leaves
+                </a>
+                <a href="/dashboard/bench" class="flex items-center gap-3 px-3 py-2.5 text-sm rounded-md transition-colors {% if request.url.path == '/dashboard/bench' %}bg-primary text-primary-foreground{% else %}text-muted-foreground hover:text-foreground hover:bg-muted{% endif %}">
+                    <uk-icon icon="armchair" width="16" height="16"></uk-icon> Bench
+                </a>
+
+                {% if request.session.get("user_role") == "admin" %}
+                <div class="border-t border-border my-2"></div>
+                <p class="px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Admin</p>
+                <a href="/users" class="flex items-center gap-3 px-3 py-2.5 text-sm rounded-md transition-colors {% if request.url.path.startswith('/users') %}bg-primary text-primary-foreground{% else %}text-muted-foreground hover:text-foreground hover:bg-muted{% endif %}">
+                    <uk-icon icon="user-cog" width="16" height="16"></uk-icon> Users
+                </a>
+                <a href="/admin/outbox" class="flex items-center gap-3 px-3 py-2.5 text-sm rounded-md transition-colors {% if request.url.path.startswith('/admin/outbox') %}bg-primary text-primary-foreground{% else %}text-muted-foreground hover:text-foreground hover:bg-muted{% endif %}">
+                    <uk-icon icon="mail" width="16" height="16"></uk-icon> Outbox
+                </a>
+                <a href="/admin/settings" class="flex items-center gap-3 px-3 py-2.5 text-sm rounded-md transition-colors {% if request.url.path.startswith('/admin/settings') %}bg-primary text-primary-foreground{% else %}text-muted-foreground hover:text-foreground hover:bg-muted{% endif %}">
+                    <uk-icon icon="settings" width="16" height="16"></uk-icon> Settings
+                </a>
+                {% endif %}
+
+                <div class="border-t border-border my-2"></div>
+                <p class="px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Appearance</p>
+                <a href="#" id="sidebar-theme-toggle" class="flex items-center gap-3 px-3 py-2.5 text-sm rounded-md text-muted-foreground hover:text-foreground hover:bg-muted">
+                    <uk-icon icon="moon" width="16" height="16"></uk-icon>
+                    <span id="sidebar-theme-label">Dark Mode</span>
+                </a>
+                <div class="px-3 py-2">
+                    <div class="flex gap-2">
+                        <button class="palette-option-sidebar w-7 h-7 rounded-full border-2 border-border hover:border-primary transition-colors" data-palette="uk-palette-light-blue" style="background:hsl(188 42% 44%)" title="Light Blue"></button>
+                        <button class="palette-option-sidebar w-7 h-7 rounded-full border-2 border-border hover:border-primary transition-colors" data-palette="uk-palette-frozen-water" style="background:hsl(157 50% 38%)" title="Frozen Water"></button>
+                        <button class="palette-option-sidebar w-7 h-7 rounded-full border-2 border-border hover:border-primary transition-colors" data-palette="uk-palette-warm-teal" style="background:hsl(170 50% 34%)" title="Warm Teal"></button>
+                        <button class="palette-option-sidebar w-7 h-7 rounded-full border-2 border-border hover:border-primary transition-colors" data-palette="uk-palette-slate-indigo" style="background:hsl(235 58% 48%)" title="Slate Indigo"></button>
+                        <button class="palette-option-sidebar w-7 h-7 rounded-full border-2 border-border hover:border-primary transition-colors" data-palette="uk-palette-zinc" style="background:hsl(240 5.9% 10%)" title="Zinc"></button>
+                    </div>
+                </div>
+
+                {% if request.session.get("user_name") %}
+                <div class="border-t border-border my-2"></div>
+                <div class="px-3 py-2">
+                    <p class="text-sm font-medium text-foreground">{{ request.session.user_name }}</p>
+                    <p class="text-xs text-muted-foreground">{{ request.session.user_role | title }}</p>
+                </div>
+                <a href="/auth/change-password" class="flex items-center gap-3 px-3 py-2.5 text-sm rounded-md text-muted-foreground hover:text-foreground hover:bg-muted">
+                    <uk-icon icon="key-round" width="16" height="16"></uk-icon> Change Password
+                </a>
+                <a href="/auth/logout" class="flex items-center gap-3 px-3 py-2.5 text-sm rounded-md text-destructive hover:bg-muted">
+                    <uk-icon icon="log-out" width="16" height="16"></uk-icon> Logout
+                </a>
+                {% else %}
+                <div class="border-t border-border my-2"></div>
+                <a href="/auth/login" class="flex items-center justify-center gap-2 px-3 py-2.5 text-sm rounded-md bg-primary text-primary-foreground text-center">
+                    <uk-icon icon="log-in" width="16" height="16"></uk-icon> Login
+                </a>
+                {% endif %}
+            </div>
+        </div>
     </nav>
 
-    <main class="uk-container uk-container-xlarge uk-padding-small">
+    <main class="px-4 py-2 max-w-screen-2xl mx-auto">
         {% block content %}{% endblock %}
     </main>
 
     <footer class="uk-section uk-section-small uk-text-center uk-text-muted uk-background-muted" style="margin-top: auto;">
-        <div class="uk-container">
-            <p class="uk-text-small">StaffPlan &copy; 2026</p>
+        <div class="px-4">
+            <p class="uk-text-small">StaffPlan by SkilledCA &copy; 2026</p>
         </div>
     </footer>
 
     <!-- Theme Toggle Script -->
     <script>
-        document.getElementById('theme-toggle')?.addEventListener('click', function(e) {
-            e.preventDefault();
-            const html = document.documentElement;
-            const isDark = html.classList.contains('dark');
-            const __FRANKEN__ = JSON.parse(localStorage.getItem('__FRANKEN__') || '{}');
-            
-            if (isDark) {
-                html.classList.remove('dark');
-                __FRANKEN__.mode = 'light';
-                document.getElementById('theme-label').textContent = 'Dark Mode';
-            } else {
-                html.classList.add('dark');
-                __FRANKEN__.mode = 'dark';
-                document.getElementById('theme-label').textContent = 'Light Mode';
-            }
-            localStorage.setItem('__FRANKEN__', JSON.stringify(__FRANKEN__));
-        });
-
+        // Desktop palette switcher
         document.querySelectorAll('.palette-option').forEach(function(el) {
             el.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -189,6 +254,93 @@
                 localStorage.setItem('__FRANKEN__', JSON.stringify(__FRANKEN__));
             });
         });
+
+        // Dark mode toggle
+        document.getElementById('nav-theme-toggle')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            toggleDarkMode();
+        });
+        document.getElementById('theme-toggle')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            toggleDarkMode();
+        });
+        document.getElementById('sidebar-theme-toggle')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            toggleDarkMode();
+        });
+
+        function toggleDarkMode() {
+            var html = document.documentElement;
+            var isDark = html.classList.contains('dark');
+            var __FRANKEN__ = JSON.parse(localStorage.getItem('__FRANKEN__') || '{}');
+            if (isDark) {
+                html.classList.remove('dark');
+                __FRANKEN__.mode = 'light';
+            } else {
+                html.classList.add('dark');
+                __FRANKEN__.mode = 'dark';
+            }
+            localStorage.setItem('__FRANKEN__', JSON.stringify(__FRANKEN__));
+            document.querySelectorAll('#theme-label, #sidebar-theme-label').forEach(function(el) {
+                el.textContent = __FRANKEN__.mode === 'dark' ? 'Light Mode' : 'Dark Mode';
+            });
+            updateNavThemeIcon();
+        }
+
+        function updateNavThemeIcon() {
+            var icon = document.getElementById('nav-theme-icon');
+            if (!icon) return;
+            var isDark = document.documentElement.classList.contains('dark');
+            icon.setAttribute('icon', isDark ? 'sun' : 'moon');
+        }
+
+        // Sidebar palette switcher
+        document.querySelectorAll('.palette-option-sidebar').forEach(function(el) {
+            el.addEventListener('click', function(e) {
+                e.preventDefault();
+                var palette = this.dataset.palette;
+                var html = document.documentElement;
+                html.classList.remove(
+                    'uk-palette-light-blue',
+                    'uk-palette-frozen-water',
+                    'uk-palette-warm-teal',
+                    'uk-palette-slate-indigo',
+                    'uk-palette-zinc'
+                );
+                html.classList.add(palette);
+                var __FRANKEN__ = JSON.parse(localStorage.getItem('__FRANKEN__') || '{}');
+                __FRANKEN__.palette = palette;
+                localStorage.setItem('__FRANKEN__', JSON.stringify(__FRANKEN__));
+            });
+        });
+
+        // Sidebar drawer toggle
+        function openSidebar() {
+            document.getElementById('sidebar-drawer').classList.remove('hidden');
+            document.getElementById('sidebar-overlay').classList.remove('hidden');
+        }
+        function closeSidebar() {
+            document.getElementById('sidebar-drawer').classList.add('hidden');
+            document.getElementById('sidebar-overlay').classList.add('hidden');
+        }
+        document.getElementById('hamburger-btn')?.addEventListener('click', openSidebar);
+        document.getElementById('sidebar-close')?.addEventListener('click', closeSidebar);
+        document.getElementById('sidebar-overlay')?.addEventListener('click', closeSidebar);
+
+        // Close sidebar on link click
+        document.querySelectorAll('#sidebar-drawer a').forEach(function(el) {
+            el.addEventListener('click', closeSidebar);
+        });
+
+        // Sync dark mode on page load
+        (function() {
+            var isDark = document.documentElement.classList.contains('dark');
+            var label = isDark ? 'Light Mode' : 'Dark Mode';
+            document.querySelectorAll('#theme-label, #sidebar-theme-label').forEach(function(el) {
+                if (el) el.textContent = label;
+            });
+            updateNavThemeIcon();
+        })();
     </script>
     <!-- Franken UI JS (load after DOM) -->
     <script src="https://cdn.jsdelivr.net/npm/franken-ui@2.1.2/dist/js/core.iife.js"></script>
