@@ -39,7 +39,7 @@ def _set_session(request: Request, user: User) -> None:
 def login_page(request: Request, error: str = ""):
     # Redirect to home if already logged in
     if request.session.get("user_id"):
-        return RedirectResponse(url="/", status_code=303)
+        return RedirectResponse(url="/dashboard", status_code=303)
     ms365 = get_ms365_oauth_client()
     return templates.TemplateResponse(request, "auth/login.html", {
         "csrf_token": get_csrf_token(request),
@@ -79,7 +79,7 @@ async def login(request: Request, db: Session = Depends(get_db)):
 
     _set_session(request, user)
     set_flash(request, f"Welcome back, {user.display_name}!")
-    return RedirectResponse(url="/", status_code=303)
+    return RedirectResponse(url="/dashboard", status_code=303)
 
 
 # ── 2FA ──
@@ -118,7 +118,7 @@ async def twofa_verify(request: Request, db: Session = Depends(get_db)):
     request.session.pop("pending_2fa_user_id", None)
     _set_session(request, user)
     set_flash(request, f"Welcome back, {user.display_name}!")
-    return RedirectResponse(url="/", status_code=303)
+    return RedirectResponse(url="/dashboard", status_code=303)
 
 
 # ── MS365 OAuth ──
@@ -210,7 +210,7 @@ async def ms365_callback(request: Request, db: Session = Depends(get_db)):
 
     _set_session(request, user)
     set_flash(request, f"Welcome, {user.display_name}!")
-    return RedirectResponse(url="/", status_code=303)
+    return RedirectResponse(url="/dashboard", status_code=303)
 
 
 # ── Logout ──
@@ -260,7 +260,7 @@ async def change_password(
         else:
             set_user_password(db, user, new)
             set_flash(request, "Password changed successfully.")
-            return RedirectResponse(url="/", status_code=303)
+            return RedirectResponse(url="/dashboard", status_code=303)
 
     return templates.TemplateResponse(request, "auth/change_password.html", {
         "csrf_token": get_csrf_token(request),
@@ -318,7 +318,7 @@ async def twofa_enable(
 
     if enable_totp(db, user, secret, code):
         set_flash(request, "Two-factor authentication enabled.")
-        return RedirectResponse(url="/", status_code=303)
+        return RedirectResponse(url="/dashboard", status_code=303)
 
     # Regenerate QR for error case
     uri = get_totp_uri(secret, user.email)
@@ -351,4 +351,4 @@ async def twofa_disable(
 
     disable_totp(db, user)
     set_flash(request, "Two-factor authentication disabled.", "warning")
-    return RedirectResponse(url="/", status_code=303)
+    return RedirectResponse(url="/dashboard", status_code=303)
