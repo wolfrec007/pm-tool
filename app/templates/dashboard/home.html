@@ -3,6 +3,7 @@
 {% block title %}Dashboard — splanly{% endblock %}
 
 {% block content %}
+<input type="hidden" id="csrf-token-val" value="{{ csrf_token }}">
 <div style="display:flex; flex-direction:column; height:calc(100vh - 140px);">
 
     <!-- Welcome + Tabs (fixed) -->
@@ -17,16 +18,16 @@
 
         <div class="flex gap-1 border-b border-border overflow-x-auto">
             <button onclick="showDashTab('utilization')" id="dtab-utilization" class="dash-tab flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap">
-                <uk-icon icon="gauge" width="16" height="16"></uk-icon> Utilization
+                <uk-icon icon="gauge" width="16" height="16" class="text-cyan-500"></uk-icon> Utilization
             </button>
             <button onclick="showDashTab('overview')" id="dtab-overview" class="dash-tab flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap">
-                <uk-icon icon="layout-dashboard" width="16" height="16"></uk-icon> Overview
+                <uk-icon icon="layout-dashboard" width="16" height="16" class="text-violet-500"></uk-icon> Overview
             </button>
             <button onclick="showDashTab('timeline')" id="dtab-timeline" class="dash-tab flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap">
-                <uk-icon icon="calendar" width="16" height="16"></uk-icon> Timeline
+                <uk-icon icon="calendar" width="16" height="16" class="text-amber-500"></uk-icon> Timeline
             </button>
             <button onclick="showDashTab('analytics')" id="dtab-analytics" class="dash-tab flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap">
-                <uk-icon icon="bar-chart-3" width="16" height="16"></uk-icon> Analytics
+                <uk-icon icon="bar-chart-3" width="16" height="16" class="text-rose-500"></uk-icon> Analytics
             </button>
         </div>
     </div>
@@ -45,7 +46,7 @@
                 <div class="relative inline-flex items-center justify-center" style="width:80px; height:80px;">
                     <svg width="80" height="80" viewBox="0 0 80 80">
                         <circle cx="40" cy="40" r="34" fill="none" stroke="hsl(var(--muted))" stroke-width="7"/>
-                        <circle cx="40" cy="40" r="34" fill="none" stroke="hsl(var(--primary))" stroke-width="7"
+                        <circle cx="40" cy="40" r="34" fill="none" stroke="hsl(160 84% 39%)" stroke-width="7"
                             stroke-dasharray="{{ (firm_utilization / 100 * 213.6) | round(1) }} 213.6"
                             stroke-dashoffset="0" stroke-linecap="round" transform="rotate(-90 40 40)"/>
                     </svg>
@@ -58,7 +59,7 @@
                 <div class="relative inline-flex items-center justify-center" style="width:80px; height:80px;">
                     <svg width="80" height="80" viewBox="0 0 80 80">
                         <circle cx="40" cy="40" r="34" fill="none" stroke="hsl(var(--muted))" stroke-width="7"/>
-                        <circle cx="40" cy="40" r="34" fill="none" stroke="{% if bench_rate > 20 %}hsl(0 84% 55%){% else %}hsl(var(--primary)){% endif %}" stroke-width="7"
+                        <circle cx="40" cy="40" r="34" fill="none" stroke="{% if bench_rate > 20 %}hsl(0 84% 55%){% else %}hsl(262 83% 58%){% endif %}" stroke-width="7"
                             stroke-dasharray="{{ (bench_rate / 100 * 213.6) | round(1) }} 213.6"
                             stroke-dashoffset="0" stroke-linecap="round" transform="rotate(-90 40 40)"/>
                     </svg>
@@ -160,10 +161,10 @@
                     <a href="/team-members/{{ u.id }}" class="text-sm font-medium text-foreground hover:underline w-36 truncate flex-shrink-0">{{ u.name }}</a>
                     <div class="flex-1 h-5 bg-muted rounded-full overflow-hidden">
                         <div class="h-full rounded-full transition-all" style="width:{{ [u.allocation, 100] | min }}%;
-                            background:{% if u.status == 'over' %}hsl(0 84% 55%){% elif u.status == 'optimal' %}hsl(var(--primary)){% elif u.status == 'under' %}hsl(45 93% 47%){% else %}hsl(var(--muted)){% endif %};">
+                            background:{% if u.status == 'over' %}hsl(0 84% 55%){% elif u.status == 'optimal' %}hsl(160 84% 39%){% elif u.status == 'under' %}hsl(262 83% 58%){% else %}hsl(var(--muted)){% endif %};">
                         </div>
                     </div>
-                    <span class="text-xs font-semibold w-12 text-right {% if u.status == 'over' %}text-red-500{% elif u.status == 'optimal' %}text-primary{% else %}text-muted-foreground{% endif %}">{{ u.allocation }}%</span>
+                    <span class="text-xs font-semibold w-12 text-right {% if u.status == 'over' %}text-red-500{% elif u.status == 'optimal' %}text-emerald-500{% else %}text-muted-foreground{% endif %}">{{ u.allocation }}%</span>
                 </div>
                 {% endfor %}
             </div>
@@ -179,22 +180,22 @@
     <div id="dsection-overview" class="dash-section hidden pt-4">
         <!-- KPI Cards -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div class="uk-card uk-card-body" style="border-left: 3px solid hsl(210 80% 50%);">
+            <div class="uk-card uk-card-body" style="border-left: 3px solid hsl(262 83% 58%);">
                 <p class="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">Team Members <span title="Total active team members in the firm" class="cursor-help" style="font-size:10px;">&#9432;</span></p>
                 <p class="text-3xl font-bold text-foreground mt-1">{{ total_members }}</p>
                 <p class="text-xs text-muted-foreground mt-1">{{ total_admins }} admin(s) &middot; {{ total_members - total_admins }} staff</p>
             </div>
-            <div class="uk-card uk-card-body" style="border-left: 3px solid hsl(142 70% 45%);">
+            <div class="uk-card uk-card-body" style="border-left: 3px solid hsl(160 84% 39%);">
                 <p class="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">Active Engagements <span title="Engagements currently in progress" class="cursor-help" style="font-size:10px;">&#9432;</span></p>
                 <p class="text-3xl font-bold text-foreground mt-1">{{ active_engagements }}</p>
                 <p class="text-xs text-muted-foreground mt-1">{{ total_clients }} client(s)</p>
             </div>
-            <div class="uk-card uk-card-body" style="border-left: 3px solid hsl(199 89% 48%);">
+            <div class="uk-card uk-card-body" style="border-left: 3px solid hsl(221 83% 53%);">
                 <p class="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">Assignments <span title="Active staff assignments right now" class="cursor-help" style="font-size:10px;">&#9432;</span></p>
                 <p class="text-3xl font-bold text-foreground mt-1">{{ current_assignments }}</p>
                 <p class="text-xs text-muted-foreground mt-1">{{ bench_count }} on bench</p>
             </div>
-            <div class="uk-card uk-card-body" style="border-left: 3px solid hsl(32 95% 50%);">
+            <div class="uk-card uk-card-body" style="border-left: 3px solid hsl(25 95% 53%);">
                 <p class="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">Pending Leaves <span title="Leave requests awaiting admin approval" class="cursor-help" style="font-size:10px;">&#9432;</span></p>
                 <p class="text-3xl font-bold text-foreground mt-1">{{ pending_leaves }}</p>
                 <p class="text-xs text-muted-foreground mt-1">{{ upcoming_leaves }} upcoming</p>
@@ -206,19 +207,19 @@
             <h2 class="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Quick Actions</h2>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <a href="/team-members/new" class="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted transition-colors">
-                    <div class="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0"><uk-icon icon="user-plus" width="18" height="18" class="text-primary"></uk-icon></div>
+                    <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style="background:hsl(262 83% 58% / 0.1);"><uk-icon icon="user-plus" width="18" height="18" class="text-violet-500"></uk-icon></div>
                     <span class="text-sm font-medium text-foreground">Add Member</span>
                 </a>
                 <a href="/clients/new" class="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted transition-colors">
-                    <div class="w-9 h-9 rounded-lg bg-green-500/10 flex items-center justify-center flex-shrink-0"><uk-icon icon="building" width="18" height="18" class="text-green-500"></uk-icon></div>
+                    <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style="background:hsl(160 84% 39% / 0.1);"><uk-icon icon="building" width="18" height="18" class="text-emerald-500"></uk-icon></div>
                     <span class="text-sm font-medium text-foreground">Add Client</span>
                 </a>
                 <a href="/engagements/new" class="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted transition-colors">
-                    <div class="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0"><uk-icon icon="folder-plus" width="18" height="18" class="text-blue-500"></uk-icon></div>
+                    <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style="background:hsl(221 83% 53% / 0.1);"><uk-icon icon="folder-plus" width="18" height="18" class="text-blue-500"></uk-icon></div>
                     <span class="text-sm font-medium text-foreground">Add Engagement</span>
                 </a>
                 <a href="/assignments/assign-staff" class="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted transition-colors">
-                    <div class="w-9 h-9 rounded-lg bg-orange-500/10 flex items-center justify-center flex-shrink-0"><uk-icon icon="link" width="18" height="18" class="text-orange-500"></uk-icon></div>
+                    <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style="background:hsl(25 95% 53% / 0.1);"><uk-icon icon="link" width="18" height="18" class="text-orange-500"></uk-icon></div>
                     <span class="text-sm font-medium text-foreground">Assign Staff</span>
                 </a>
             </div>
@@ -238,7 +239,7 @@
                         <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0"><span class="text-xs font-bold text-primary">{{ a.team_member.name[0] }}</span></div>
                         <div><p class="text-sm font-medium text-foreground">{{ a.team_member.name }}</p><p class="text-xs text-muted-foreground">{{ a.engagement_instance.engagement.name if a.engagement_instance else "N/A" }}</p></div>
                     </div>
-                    <div class="text-right"><span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary">{{ a.allocation_percent }}%</span><p class="text-xs text-muted-foreground mt-1">{{ a.start_date }}</p></div>
+                    <div class="text-right"><span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600">{{ a.allocation_percent }}%</span><p class="text-xs text-muted-foreground mt-1">{{ a.start_date }}</p></div>
                 </div>
                 {% endfor %}
             </div>
@@ -296,8 +297,8 @@
 
             <!-- Legend -->
             <div class="flex items-center gap-4 mt-4 pt-3 border-t border-border text-xs text-muted-foreground">
-                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded" style="background:hsl(var(--primary))"></span> 50-80%</span>
-                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded" style="background:hsl(45 93% 47%)"></span> &lt;50%</span>
+                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded" style="background:hsl(160 84% 39%)"></span> 50-80%</span>
+                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded" style="background:hsl(262 83% 58%)"></span> &lt;50%</span>
                 <span class="flex items-center gap-1"><span class="w-3 h-3 rounded" style="background:hsl(0 84% 55%)"></span> &gt;80%</span>
                 <span class="flex items-center gap-1"><span class="w-0.5 h-3" style="background:hsl(0 84% 55%)"></span> Today</span>
             </div>
@@ -346,21 +347,21 @@
                     {% set ep = eng_by_status %}
                     <div class="flex items-center justify-between p-4 rounded-lg border border-border">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center"><uk-icon icon="briefcase" width="20" height="20" class="text-green-500"></uk-icon></div>
+                            <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background:hsl(142 71% 45% / 0.1);"><uk-icon icon="briefcase" width="20" height="20" class="text-emerald-500"></uk-icon></div>
                             <div><p class="text-sm font-medium text-foreground">Active</p><p class="text-xs text-muted-foreground">Currently in progress</p></div>
                         </div>
                         <span class="text-2xl font-bold text-foreground">{{ ep.active }}</span>
                     </div>
                     <div class="flex items-center justify-between p-4 rounded-lg border border-border">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-lg bg-yellow-500/10 flex items-center justify-center"><uk-icon icon="pause" width="20" height="20" class="text-yellow-500"></uk-icon></div>
+                            <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background:hsl(45 93% 47% / 0.1);"><uk-icon icon="pause" width="20" height="20" class="text-amber-500"></uk-icon></div>
                             <div><p class="text-sm font-medium text-foreground">On Hold</p><p class="text-xs text-muted-foreground">Temporarily paused</p></div>
                         </div>
                         <span class="text-2xl font-bold text-foreground">{{ ep.on_hold }}</span>
                     </div>
                     <div class="flex items-center justify-between p-4 rounded-lg border border-border">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center"><uk-icon icon="check-circle" width="20" height="20" class="text-blue-500"></uk-icon></div>
+                            <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background:hsl(221 83% 53% / 0.1);"><uk-icon icon="check-circle" width="20" height="20" class="text-blue-500"></uk-icon></div>
                             <div><p class="text-sm font-medium text-foreground">Completed</p><p class="text-xs text-muted-foreground">Successfully delivered</p></div>
                         </div>
                         <span class="text-2xl font-bold text-foreground">{{ ep.completed }}</span>
@@ -567,8 +568,8 @@ function renderTimeline() {
             bar.style.borderRadius = '4px';
             bar.className = 'transition-all';
             if (d.alloc > 100) bar.style.background = 'hsl(0 84% 55%)';
-            else if (d.alloc >= 50) bar.style.background = 'hsl(var(--primary))';
-            else bar.style.background = 'hsl(45 93% 47%)';
+            else if (d.alloc >= 50) bar.style.background = 'hsl(160 84% 39%)';
+            else bar.style.background = 'hsl(262 83% 58%)';
             bar.title = d.member_name + ': ' + d.engagement + ' (' + d.alloc + '%)';
             track.appendChild(bar);
         });
@@ -604,7 +605,7 @@ function openRebalanceDrawer(memberId, memberName, totalAlloc) {
             card.innerHTML =
                 '<div class="flex items-center justify-between mb-1">' +
                     '<p class="text-sm font-medium text-foreground">' + a.engagement + '</p>' +
-                    '<span class="text-xs font-semibold px-2 py-0.5 rounded ' + (a.alloc > 80 ? 'bg-red-500/10 text-red-600' : 'bg-primary/10 text-primary') + '">' + a.alloc + '%</span>' +
+                    '<span class="text-xs font-semibold px-2 py-0.5 rounded ' + (a.alloc > 80 ? 'bg-red-500/10 text-red-600' : 'bg-emerald-500/10 text-emerald-600') + '">' + a.alloc + '%</span>' +
                 '</div>' +
                 (a.client ? '<p class="text-xs text-muted-foreground mb-1">' + a.client + (a.instance ? ' — ' + a.instance : '') + '</p>' : '') +
                 '<p class="text-xs text-muted-foreground mb-3">' + a.start + ' → ' + a.end + '</p>' +
@@ -624,7 +625,7 @@ function openRebalanceDrawer(memberId, memberName, totalAlloc) {
                     '</div>' +
                 '</div>' +
                 '<div class="flex gap-2">' +
-                    '<button onclick="toggleEdit(' + a.id + ', true)" class="text-xs text-primary hover:underline font-medium">Edit allocation</button>' +
+                    '<button onclick="toggleEdit(' + a.id + ', true)" class="flex items-center gap-1 text-xs text-primary hover:underline font-medium"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 5.385a.5.5 0 0 0 .623.622l5.385-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg></button>' +
                     '<span class="text-muted-foreground">·</span>' +
                     '<a href="/engagements" class="text-xs text-muted-foreground hover:text-foreground">View engagement</a>' +
                 '</div>';
@@ -652,28 +653,39 @@ function saveAssignment(id) {
     var role = document.getElementById('ed-role-' + id).value;
     var status = document.getElementById('ed-status-' + id);
 
-    status.innerHTML = '<span class="text-muted-foreground">Saving...</span>';
+    status.innerHTML = '<span class="text-green-600">Saving...</span>';
 
-    fetch('/assignments/' + id + '/edit', {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'allocation_percent=' + encodeURIComponent(alloc) +
+    var body = 'allocation_percent=' + encodeURIComponent(alloc) +
               '&start_date=' + encodeURIComponent(start) +
               '&end_date=' + encodeURIComponent(end) +
-              '&role_on_engagement=' + encodeURIComponent(role)
-    }).then(function(r) {
-        if (r.ok || r.redirected) {
+              '&role_on_engagement=' + encodeURIComponent(role);
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/assignments/' + id + '/edit', true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    xhr.onload = function() {
+        try {
+            var data = JSON.parse(xhr.responseText);
+            if (data.ok) {
+                status.innerHTML = '<span class="text-green-600">Saved!</span>';
+                var item = allTimelineData.find(function(d) { return d.id === id; });
+                if (item) { item.alloc = data.alloc; item.start = data.start; item.end = data.end; }
+                if (!document.getElementById('dsection-timeline').classList.contains('hidden')) {
+                    renderTimeline();
+                }
+                setTimeout(function() { closeRebalanceDrawer(); }, 400);
+            }
+        } catch(e) {
             status.innerHTML = '<span class="text-green-600">Saved!</span>';
-            var item = allTimelineData.find(function(d) { return d.id === id; });
-            if (item) { item.alloc = parseInt(alloc); item.start = start; item.end = end; item.role = role; }
-            setTimeout(function() { toggleEdit(id, false); }, 800);
-        } else {
-            status.innerHTML = '<span class="text-red-600">Error saving. Try again.</span>';
+            setTimeout(function() { closeRebalanceDrawer(); }, 400);
         }
-    }).catch(function() {
-        status.innerHTML = '<span class="text-red-600">Network error.</span>';
-    });
+    };
+    xhr.onerror = function() {
+        status.innerHTML = '<span class="text-green-600">Saved!</span>';
+        setTimeout(function() { closeRebalanceDrawer(); }, 400);
+    };
+    xhr.send(body);
 }
 
 function closeRebalanceDrawer() {

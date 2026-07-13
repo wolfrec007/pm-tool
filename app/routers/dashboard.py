@@ -20,6 +20,7 @@ from app.models.models import (
     User,
 )
 from app.services import report_service
+from app.csrf_utils import get_csrf_token
 from app.templates_setup import templates
 
 router = APIRouter(prefix="/dashboard", tags=["dashboard"])
@@ -271,6 +272,7 @@ def home_dashboard(
         "workload_buckets": workload_buckets,
         "eng_by_status": eng_by_status,
         "my_recent_requests": my_recent_requests,
+        "csrf_token": get_csrf_token(request),
     })
     resp.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
     resp.headers["Pragma"] = "no-cache"

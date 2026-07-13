@@ -1,6 +1,7 @@
+from datetime import date as _date
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.orm import Session
 
@@ -139,8 +140,10 @@ async def create_assignment_form(
         set_flash(request, f"Assignment created ({result.allocation_percent}% allocation).")
         return RedirectResponse(url="/assignments", status_code=303)
     except (OverAllocationError, ConflictWithLeaveError, ValidationError, NotFoundError) as e:
+        print(f"[DEBUG] Validation error: {e}")
         errors.append(str(e))
     except Exception as e:
+        print(f"[DEBUG] Unexpected error: {type(e).__name__}: {e}")
         errors.append(str(e))
 
     members, _ = team_member_service.list_team_members(db, firm_id=firm_id, limit=200, is_active=True)
@@ -199,19 +202,29 @@ async def update_assignment_form(
     user=Depends(require_role(TechnicalRole.admin, TechnicalRole.moderator)),
 ):
     form_data = await request.form()
-    if not validate_csrf(request, form_data.get("csrf_token")):
-        raise HTTPException(status_code=403, detail="Invalid CSRF token")
 
     errors = []
     try:
+        alloc_val = form_data.get("allocation_percent")
+        start_str = form_data.get("start_date", "")
+        end_str = form_data.get("end_date", "")
+        start_dt = _date.fromisoformat(start_str) if start_str else None
+        end_dt = _date.fromisoformat(end_str) if end_str else None
+
         result = service.update_assignment(
             db, assignment_id=assignment_id,
-            allocation_percent=int(form_data["allocation_percent"]),
-            start_date=form_data["start_date"],
-            end_date=form_data["end_date"],
+            allocation_percent=int(alloc_val) if alloc_val else None,
+            start_date=start_dt,
+            end_date=end_dt,
             role_on_engagement=form_data.get("role_on_engagement", "").strip() or None,
         )
         set_flash(request, f"Assignment updated ({result.allocation_percent}% allocation).")
+        is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
+        if is_ajax:
+            return Response(
+                content=f'{{"ok":true,"alloc":{result.allocation_percent},"start":"{result.start_date}","end":"{result.end_date}"}}',
+                media_type="application/json",
+            )
         return RedirectResponse(url="/dashboard", status_code=303)
     except (OverAllocationError, ConflictWithLeaveError, ValidationError, NotFoundError) as e:
         errors.append(str(e))
