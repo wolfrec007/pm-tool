@@ -136,6 +136,11 @@ def faq_page(request: Request):
     return templates.TemplateResponse(request, "faq.html")
 
 
+@app.get("/book-demo")
+def book_demo_page(request: Request):
+    return templates.TemplateResponse(request, "book_demo.html")
+
+
 @app.get("/docs-app")
 def docs_page(request: Request):
     return templates.TemplateResponse(request, "docs.html")
