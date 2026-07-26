@@ -231,6 +231,19 @@
     background:radial-gradient(circle, var(--steel-light) 0%, transparent 70%);
     opacity:.6; z-index:-1;
   }
+  .board-frame::after{
+    content:""; position:absolute; left:-50px; bottom:-70px;
+    width:180px; height:180px; border-radius:50%;
+    background:radial-gradient(circle, var(--steel) 0%, transparent 72%);
+    opacity:.16; z-index:-1;
+    animation:drift 9s ease-in-out infinite;
+  }
+  @keyframes drift{
+    0%,100%{ transform:translate(0,0) scale(1); }
+    50%{ transform:translate(14px,-10px) scale(1.08); }
+  }
+  .board-row{ opacity:0; transform:translateX(-8px); animation:row-in .5s var(--ease) forwards; animation-delay:var(--rd, 0s); }
+  @keyframes row-in{ to{ opacity:1; transform:translateX(0); } }
   .board-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;}
   .board-title{font-size:13.5px; font-weight:700; color:var(--heading);}
   .board-week{font-size:12px; color:var(--muted); font-weight:500;}
@@ -249,6 +262,11 @@
   html[data-theme="dark"] .cell.fill-3{background:#3a5a7c;}
   .cell.conflict{
     background:var(--amber); position:relative;
+    animation:conflict-pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes conflict-pulse{
+    0%,100%{ box-shadow:0 0 0 0 rgba(238,155,77,.45); }
+    50%{ box-shadow:0 0 0 5px rgba(238,155,77,0); }
   }
   .cell.conflict::after{
     content:""; position:absolute; inset:0; border-radius:7px; border:2px solid var(--card); box-shadow:0 0 0 2px var(--amber);
@@ -299,13 +317,21 @@
   .feature-card{
     background:var(--card); border:1px solid var(--border); border-radius:var(--radius-md);
     padding:26px; transition:transform .22s var(--ease), box-shadow .22s var(--ease), border-color .22s var(--ease), background .25s var(--ease);
+    position:relative; overflow:hidden;
   }
+  .feature-card::before{
+    content:""; position:absolute; top:0; left:0; right:0; height:3px;
+    background:linear-gradient(90deg, var(--steel), var(--navy-2));
+    transform:scaleX(0); transform-origin:left; transition:transform .3s var(--ease);
+  }
+  .feature-card:hover::before{ transform:scaleX(1); }
   .feature-card:hover{transform:translateY(-4px); box-shadow:var(--shadow); border-color:var(--steel-light);}
   .feature-icon{
     width:42px; height:42px; border-radius:11px; background:var(--icon-bg);
     display:flex; align-items:center; justify-content:center; margin-bottom:16px;
-    color:var(--heading);
+    color:var(--heading); transition:transform .3s var(--ease), background .3s var(--ease);
   }
+  .feature-card:hover .feature-icon{ transform:scale(1.08) rotate(-4deg); background:var(--steel-light); }
   .feature-card h3{font-size:16.5px; font-weight:700; margin-bottom:8px;}
   .feature-card p{font-size:14px; color:var(--muted); margin:0;}
 
@@ -346,13 +372,21 @@
     content:""; position:absolute; top:23px; left:calc(100%/6); right:calc(100%/6); height:1px;
     background:repeating-linear-gradient(90deg, var(--border) 0 8px, transparent 8px 16px);
   }
-  @media (max-width: 860px){ .steps::before{display:none;} }
+  .steps::after{
+    content:""; position:absolute; top:23px; left:calc(100%/6); height:1px;
+    background:var(--steel);
+    width:0; transition:width 1.1s var(--ease) .3s;
+  }
+  .steps.in::after{ width:calc(100% - 100%/3); }
+  @media (max-width: 860px){ .steps::before, .steps::after{display:none;} }
   .step{position:relative; padding:0 20px; text-align:left;}
   .step-num{
     width:46px; height:46px; border-radius:50%; background:var(--card); border:1.5px solid var(--navy);
     color:var(--heading); font-family:'Plus Jakarta Sans'; font-weight:800; font-size:17px;
     display:flex; align-items:center; justify-content:center; margin-bottom:18px; position:relative; z-index:1;
+    transition:border-color .3s var(--ease), box-shadow .3s var(--ease);
   }
+  .step.in .step-num{ border-color:var(--steel); box-shadow:0 0 0 4px var(--steel-light); }
   .step h3{font-size:16.5px; font-weight:700; margin-bottom:8px;}
   .step p{font-size:14px; color:var(--muted); margin:0;}
 
@@ -1035,9 +1069,9 @@
       });
     }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
 
-    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+    document.querySelectorAll('.reveal, .steps').forEach(el => io.observe(el));
   } else {
-    document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
+    document.querySelectorAll('.reveal, .steps').forEach(el => el.classList.add('in'));
   }
 
   // Animated number count-up for the stats band. Replays each time the

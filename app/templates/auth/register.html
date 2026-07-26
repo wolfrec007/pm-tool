@@ -8,6 +8,16 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%2314304d'/><circle cx='38' cy='54' r='22' fill='%234f82b0' fill-opacity='0.85'/><circle cx='62' cy='46' r='22' fill='%23eef5fc'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>
+  (function(){
+    try{
+      var franken = JSON.parse(localStorage.getItem('__FRANKEN__') || '{}');
+      var saved = franken.mode || localStorage.getItem('splanly-theme');
+      var theme = saved || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+    }catch(e){ document.documentElement.setAttribute('data-theme','dark'); }
+  })();
+</script>
 <style>
   :root{
     --ink:#080c15; --ink-2:#0c1220;
@@ -17,20 +27,27 @@
     --mist:#8ea0b8; --text:#eaf1f8;
     --focus:0 0 0 3px rgba(34,211,238,0.22);
   }
+  html[data-theme="light"]{
+    --ink:#f8fafc; --ink-2:#f1f5f9;
+    --surface:#ffffff; --surface-2:#f1f5f9;
+    --line:rgba(15,23,42,0.1); --line-soft:rgba(15,23,42,0.05);
+    --mist:#64748b; --text:#0f172a;
+    --focus:0 0 0 3px rgba(20,184,166,0.22);
+  }
   *{box-sizing:border-box;} html,body{height:100%;}
-  body{margin:0;font-family:'Inter',sans-serif;background:var(--ink);color:var(--text);-webkit-font-smoothing:antialiased;}
+  body{margin:0;font-family:'Inter',sans-serif;background:var(--ink);color:var(--text);-webkit-font-smoothing:antialiased;transition:background .25s,color .25s;}
 
   .page{display:grid;grid-template-columns:1.05fr 1fr;min-height:100vh;}
 
-  /* ── Brand Panel ── */
-  .brand-panel{position:relative;overflow:hidden;background:radial-gradient(120% 140% at 15% 10%,#103a35 0%,transparent 55%),linear-gradient(160deg,var(--ink-2) 0%,#071b1a 60%,var(--ink-2) 100%);border-right:1px solid var(--line);display:flex;flex-direction:column;justify-content:space-between;padding:44px 48px;}
+  /* ── Brand Panel — always dark ── */
+  .brand-panel{position:relative;overflow:hidden;background:radial-gradient(120% 140% at 15% 10%,#103a35 0%,transparent 55%),linear-gradient(160deg,#0c1220 0%,#071b1a 60%,#0c1220 100%);border-right:1px solid rgba(148,163,184,0.16);display:flex;flex-direction:column;justify-content:space-between;padding:44px 48px;}
   .grid-stencil{position:absolute;inset:0;display:grid;grid-template-columns:repeat(12,1fr);grid-template-rows:repeat(16,1fr);opacity:.85;pointer-events:none;}
   .grid-stencil .cell{border:1px solid var(--line-soft);position:relative;}
   .grid-stencil .cell.fill{background:color-mix(in srgb,var(--cell-color) 22%,transparent);border-color:color-mix(in srgb,var(--cell-color) 55%,transparent);animation:pulse-cell 5.5s ease-in-out infinite;animation-delay:var(--d);}
   @keyframes pulse-cell{0%,100%{opacity:.15}50%{opacity:1}}
   .brand-panel::after{content:"";position:absolute;inset:0;background:radial-gradient(90% 70% at 20% 85%,rgba(7,15,20,.92) 0%,rgba(7,15,20,.55) 45%,transparent 75%);pointer-events:none;}
   .brand-top,.brand-bottom{position:relative;z-index:2;}
-  .wordmark{display:flex;align-items:center;gap:10px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:15px;letter-spacing:.02em;}
+  .wordmark{display:flex;align-items:center;gap:10px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:15px;letter-spacing:.02em;color:#eaf1f8;}
   .wordmark .dot{width:9px;height:9px;border-radius:2px;background:linear-gradient(135deg,var(--teal),var(--cyan));}
   .brand-headline{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(30px,3vw,40px);line-height:1.15;letter-spacing:-.01em;max-width:9.5ch;margin:26px 0 14px;}
   .brand-headline .accent{background:linear-gradient(100deg,var(--teal),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent;}
@@ -347,6 +364,15 @@
     wrap.querySelector('.eye-o').style.display = show ? 'none' : 'block';
     wrap.querySelector('.eye-c').style.display = show ? 'block' : 'none';
   }
+
+  // Theme toggle
+  document.getElementById('themeToggle').addEventListener('click', function(){
+    var root = document.documentElement;
+    var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try{ localStorage.setItem('splanly-theme', next); }catch(e){}
+    try{ var f = JSON.parse(localStorage.getItem('__FRANKEN__') || '{}'); f.mode = next; localStorage.setItem('__FRANKEN__', JSON.stringify(f)); }catch(e){}
+  });
 </script>
 </body>
 </html>
