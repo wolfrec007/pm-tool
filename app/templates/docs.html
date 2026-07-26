@@ -731,43 +731,28 @@
 
         <!-- API v1 -->
         <h2 id="api-v1">API v1 Endpoints</h2>
-        <p>The <code>/api/v1</code> namespace provides JSON REST endpoints. All endpoints require authentication unless noted. Responses follow a consistent format and use standard HTTP status codes.</p>
+        <p>The <code>/api/v1</code> namespace provides JSON REST endpoints for the planned Next.js frontend. All endpoints require JWT authentication unless noted.</p>
 
-        <h3>Authentication <code>/api/v1/auth</code></h3>
         <table>
             <thead>
-                <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+                <tr><th>Namespace</th><th>Methods</th><th>Description</th></tr>
             </thead>
             <tbody>
-                <tr>
-                    <td><span class="method-badge method-post">POST</span></td>
-                    <td><code>/api/v1/auth/login</code></td>
-                    <td>Email/password login, returns JWT</td>
-                </tr>
-                <tr>
-                    <td><span class="method-badge method-post">POST</span></td>
-                    <td><code>/api/v1/auth/register</code></td>
-                    <td>Register new user and firm</td>
-                </tr>
-                <tr>
-                    <td><span class="method-badge method-get">GET</span></td>
-                    <td><code>/api/v1/auth/me</code></td>
-                    <td>Get current authenticated user</td>
-                </tr>
-                <tr>
-                    <td><span class="method-badge method-get">GET</span></td>
-                    <td><code>/api/v1/auth/oauth/{provider}</code></td>
-                    <td>Initiate OAuth flow (Google, etc.)</td>
-                </tr>
-                <tr>
-                    <td><span class="method-badge method-get">GET</span></td>
-                    <td><code>/api/v1/auth/oauth/{provider}/callback</code></td>
-                    <td>OAuth callback handler</td>
-                </tr>
+                <tr><td><code>/api/v1/auth</code></td><td>POST, GET</td><td>Login, refresh token, get current user, switch firm</td></tr>
+                <tr><td><code>/api/v1/dashboard</code></td><td>GET</td><td>Dashboard stats (members, clients, engagements, bench)</td></tr>
+                <tr><td><code>/api/v1/team-members</code></td><td>GET, POST, PATCH, DELETE</td><td>Team member CRUD with approval checks</td></tr>
+                <tr><td><code>/api/v1/clients</code></td><td>GET, POST, PATCH, DELETE</td><td>Client CRUD with approval checks</td></tr>
+                <tr><td><code>/api/v1/engagements</code></td><td>GET, POST, PATCH, DELETE</td><td>Engagement CRUD with approval checks</td></tr>
+                <tr><td><code>/api/v1/assignments</code></td><td>GET, POST, PATCH</td><td>Assignment CRUD with allocation validation</td></tr>
+                <tr><td><code>/api/v1/leaves</code></td><td>GET, POST, PATCH</td><td>Leave CRUD with approval checks</td></tr>
+                <tr><td><code>/api/v1/approval-requests</code></td><td>GET, POST</td><td>List, approve, reject pending approval requests</td></tr>
+                <tr><td><code>/api/v1/extensions</code></td><td>GET, POST</td><td>Extension requests (auto-creates assignment on approve)</td></tr>
             </tbody>
         </table>
 
-        <h3>Clients <code>/api/v1/clients</code></h3>
+        <p style="margin-top:16px; font-size:14px; color:var(--muted);">Full endpoint documentation with request/response schemas is available in the developer dashboard (internal only).</p>
+
+        <h2 id="authentication">Authentication</h2>
         <table>
             <thead>
                 <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>

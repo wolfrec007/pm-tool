@@ -21,7 +21,7 @@
     {% if tier_reports %}
     <div class="mb-8">
         <div class="flex items-center gap-2 mb-4">
-            <div class="text-muted-foreground">{{ tier_icons[tier] }}</div>
+            <div class="text-muted-foreground">{{ tier_icons[tier] | safe }}</div>
             <h2 class="text-lg font-semibold">{{ tier_names[tier] }}</h2>
         </div>
         

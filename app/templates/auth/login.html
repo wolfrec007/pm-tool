@@ -1,292 +1,293 @@
-{% extends "base.html" %}
 {% from "macros/_csrf.html" import csrf_field %}
-
-{% block title %}Sign in - splanly{% endblock %}
-
-{% block guest_navbar %}{% endblock %}
-
-{% block extra_head %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign in - splanly</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%2314304d'/><circle cx='38' cy='54' r='22' fill='%234f82b0' fill-opacity='0.85'/><circle cx='62' cy='46' r='22' fill='%23eef5fc'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  /* Override main padding for full-page auth layout */
-  main { padding: 0 !important; max-width: none !important; }
-  /* Hide footer on auth pages */
-  footer { display: none !important; }
-  .password-field { position: relative; }
-  .password-toggle {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: hsl(var(--muted-foreground));
-    padding: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-    transition: color 0.15s, background 0.15s;
+  :root{
+    --ink:#080c15; --ink-2:#0c1220;
+    --surface:#111a2b; --surface-2:#0d1524;
+    --line:rgba(148,163,184,0.16); --line-soft:rgba(148,163,184,0.08);
+    --teal:#14b8a6; --cyan:#22d3ee; --amber:#f5a524;
+    --mist:#8ea0b8; --text:#eaf1f8;
+    --focus:0 0 0 3px rgba(34,211,238,0.22);
   }
-  .password-toggle:hover { color: hsl(var(--foreground)); background: hsl(var(--muted)); }
-  .carousel { position: relative; overflow: hidden; height: 100%; }
-  .carousel-track { display: flex; transition: transform 0.5s ease; height: 100%; }
-  .carousel-slide {
-    min-width: 100%; padding: 32px;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    text-align: center;
-  }
-  .carousel-dots { display: flex; gap: 8px; justify-content: center; position: absolute; bottom: 24px; left: 0; right: 0; }
-  .carousel-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.35); cursor: pointer; transition: background 0.3s, transform 0.3s; }
-  .carousel-dot.active { background: white; transform: scale(1.2); }
-  .slide-1 { background: linear-gradient(135deg, #14304d 0%, #1e4468 100%); color: white; }
-  .slide-2 { background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%); color: white; }
-  .slide-3 { background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%); color: white; }
-</style>
-{% endblock %}
+  *{box-sizing:border-box;} html,body{height:100%;}
+  body{margin:0;font-family:'Inter',sans-serif;background:var(--ink);color:var(--text);-webkit-font-smoothing:antialiased;}
 
-{% block content %}
-<div class="flex min-h-screen">
-  <!-- Left panel: Carousel (1/3) -->
-  <div class="hidden lg:flex lg:w-[33.333%]">
-    <div class="carousel w-full" id="login-carousel">
-      <div class="carousel-track" id="carousel-track">
-        <div class="carousel-slide slide-1">
-          <svg width="48" height="48" viewBox="0 0 100 100" style="margin-bottom: 16px;">
-            <rect width="100" height="100" rx="20" fill="rgba(255,255,255,0.15)"/>
-            <circle cx="38" cy="54" r="22" fill="rgba(79,130,176,0.85)"/>
-            <circle cx="62" cy="46" r="22" fill="rgba(238,245,252,0.9)"/>
-          </svg>
-          <h2 style="font-size: 22px; font-weight: 800; margin-bottom: 6px;">splanly</h2>
-          <p style="opacity: 0.9; font-size: 12px; max-width: 180px;">Resource planning for CA firms</p>
+  .page{display:grid;grid-template-columns:1.05fr 1fr;min-height:100vh;}
+
+  /* ── Brand Panel ── */
+  .brand-panel{position:relative;overflow:hidden;background:radial-gradient(120% 140% at 15% 10%,#103a35 0%,transparent 55%),linear-gradient(160deg,var(--ink-2) 0%,#071b1a 60%,var(--ink-2) 100%);border-right:1px solid var(--line);display:flex;flex-direction:column;justify-content:space-between;padding:44px 48px;}
+  .grid-stencil{position:absolute;inset:0;display:grid;grid-template-columns:repeat(12,1fr);grid-template-rows:repeat(16,1fr);opacity:.85;pointer-events:none;}
+  .grid-stencil .cell{border:1px solid var(--line-soft);position:relative;}
+  .grid-stencil .cell.fill{background:color-mix(in srgb,var(--cell-color) 22%,transparent);border-color:color-mix(in srgb,var(--cell-color) 55%,transparent);animation:pulse-cell 5.5s ease-in-out infinite;animation-delay:var(--d);}
+  @keyframes pulse-cell{0%,100%{opacity:.15}50%{opacity:1}}
+  .brand-panel::after{content:"";position:absolute;inset:0;background:radial-gradient(90% 70% at 20% 85%,rgba(7,15,20,.92) 0%,rgba(7,15,20,.55) 45%,transparent 75%);pointer-events:none;}
+  .brand-top,.brand-bottom{position:relative;z-index:2;}
+  .wordmark{display:flex;align-items:center;gap:10px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:15px;letter-spacing:.02em;}
+  .wordmark .dot{width:9px;height:9px;border-radius:2px;background:linear-gradient(135deg,var(--teal),var(--cyan));}
+  .brand-headline{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(30px,3vw,40px);line-height:1.15;letter-spacing:-.01em;max-width:9.5ch;margin:26px 0 14px;}
+  .brand-headline .accent{background:linear-gradient(100deg,var(--teal),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .brand-sub{color:var(--mist);font-size:15px;line-height:1.6;max-width:34ch;}
+
+  .capacity-card{margin-top:34px;display:flex;align-items:center;gap:16px;background:rgba(11,20,30,.55);border:1px solid var(--line);border-radius:14px;padding:14px 16px;backdrop-filter:blur(6px);width:max-content;}
+  .ring-wrap{position:relative;width:52px;height:52px;flex:none;}
+  .ring-wrap svg{transform:rotate(-90deg);}
+  .ring-track{fill:none;stroke:var(--line);stroke-width:5;}
+  .ring-value{fill:none;stroke:url(#ringGrad);stroke-width:5;stroke-linecap:round;stroke-dasharray:141;stroke-dashoffset:141;animation:ring-fill 1.8s .4s cubic-bezier(.3,.9,.4,1) forwards;}
+  @keyframes ring-fill{to{stroke-dashoffset:25}}
+  .ring-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;}
+  .capacity-text .t1{font-size:13px;font-weight:600;}
+  .capacity-text .t2{font-size:12px;color:var(--mist);font-family:'IBM Plex Mono',monospace;margin-top:2px;}
+  .legend{display:flex;gap:18px;margin-top:22px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--mist);}
+  .legend span{display:flex;align-items:center;gap:6px;}
+  .legend i{width:8px;height:8px;border-radius:2px;display:inline-block;}
+
+  .slides-wrap{position:relative;min-height:258px;}
+  .slide{position:absolute;inset:0 0 auto 0;opacity:0;transform:translateY(10px);transition:opacity .55s ease,transform .55s ease;pointer-events:none;}
+  .slide.active{position:relative;opacity:1;transform:translateY(0);pointer-events:auto;}
+  .avatar-stack{display:flex;align-items:center;}
+  .avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;border:2px solid var(--ink-2);margin-left:-10px;color:#04191c;}
+  .avatar:first-child{margin-left:0;}
+  .avatar.more{background:var(--surface);color:var(--mist);border-color:var(--line);}
+  .conflict-icon{width:52px;height:52px;flex:none;border-radius:12px;border:1px solid var(--line);background:var(--surface-2);display:flex;align-items:center;justify-content:center;}
+  .conflict-icon svg .bar-a{animation:bar-flag 3.2s ease-in-out infinite;}
+  .conflict-icon svg .bar-b{animation:bar-flag 3.2s ease-in-out infinite;animation-delay:.15s;}
+  @keyframes bar-flag{0%,100%{stroke:var(--amber)}55%{stroke:var(--teal)}}
+  .dots{display:flex;gap:8px;margin-top:26px;}
+  .dots button{width:22px;height:4px;border-radius:2px;border:none;background:var(--line);cursor:pointer;padding:0;transition:background .25s ease,width .25s ease;}
+  .dots button.active{width:34px;background:linear-gradient(120deg,var(--teal),var(--cyan));}
+
+  /* ── Form Panel ── */
+  .form-panel{position:relative;background:var(--ink);display:flex;flex-direction:column;}
+  .top-bar{display:flex;justify-content:space-between;align-items:center;padding:24px 28px;}
+  .icon-btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--mist);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .18s ease,color .18s ease,transform .18s ease;text-decoration:none;}
+  .icon-btn:hover{border-color:color-mix(in srgb,var(--cyan) 50%,var(--line));color:var(--text);transform:translateY(-1px);}
+  .form-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:0 32px 40px;}
+  .card{width:100%;max-width:400px;animation:card-in .6s cubic-bezier(.2,.8,.2,1) both;}
+  @keyframes card-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+  .tabs{display:flex;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:4px;width:max-content;margin:0 auto 28px;}
+  .tabs a{border:none;background:transparent;color:var(--mist);font-family:'Inter',sans-serif;font-weight:600;font-size:14px;padding:9px 22px;border-radius:9px;cursor:pointer;transition:color .15s ease;text-decoration:none;display:inline-block;}
+  .tabs a.active{color:#04191c;background:linear-gradient(120deg,var(--teal),var(--cyan));}
+
+  h1.title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:26px;text-align:center;margin:0 0 6px;}
+  .subtitle{text-align:center;color:var(--mist);font-size:14px;margin:0 0 30px;}
+  .field{margin-bottom:18px;}
+  .field label{display:block;font-size:13px;font-weight:600;margin-bottom:7px;}
+  .input-wrap{position:relative;}
+  .field input{width:100%;background:var(--surface);border:1px solid var(--line);color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:16px;border-radius:10px;padding:12px 14px;outline:none;transition:border-color .15s ease,box-shadow .15s ease;}
+  .field input:focus{border-color:var(--cyan);box-shadow:var(--focus);}
+  .field input::placeholder{color:#4c5a70;font-family:'Inter',sans-serif;}
+  .eye-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--mist);cursor:pointer;display:flex;padding:2px;}
+  .eye-btn:hover{color:var(--text);}
+  .row-between{display:flex;align-items:center;justify-content:space-between;margin:4px 0 22px;font-size:13px;}
+  .remember{display:flex;align-items:center;gap:8px;color:var(--mist);cursor:pointer;user-select:none;}
+  .remember input{accent-color:var(--cyan);width:15px;height:15px;}
+  .forgot{color:var(--cyan);text-decoration:none;font-weight:500;}
+  .forgot:hover{text-decoration:underline;}
+  .cta{width:100%;border:none;border-radius:11px;padding:14px;font-family:'Inter',sans-serif;font-weight:700;font-size:15px;color:#04191c;background:linear-gradient(120deg,var(--teal),var(--cyan));cursor:pointer;position:relative;overflow:hidden;transition:transform .15s ease,box-shadow .15s ease;box-shadow:0 8px 24px -8px rgba(34,211,238,.45);display:block;text-align:center;text-decoration:none;}
+  .cta:hover{transform:translateY(-1px);box-shadow:0 10px 30px -6px rgba(34,211,238,.55);}
+  .cta:active{transform:translateY(0);}
+  .switch{text-align:center;color:var(--mist);font-size:13.5px;margin:22px 0 0;}
+  .switch a{color:var(--text);font-weight:600;text-decoration:none;border-bottom:1px solid var(--teal);}
+  .legal{text-align:center;color:#5a6a80;font-size:12px;margin-top:26px;}
+  .legal a{color:#8ea0b8;}
+
+  @media (max-width:880px){
+    .page{grid-template-columns:1fr;grid-template-rows:auto 1fr;}
+    .brand-panel{border-right:none;border-bottom:1px solid var(--line);padding:22px 24px 20px;min-height:0;}
+    .grid-stencil{grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(7,1fr);}
+    .brand-top{margin-bottom:2px;}
+    .slides-wrap{min-height:150px;}
+    .brand-headline{font-size:21px;max-width:16ch;margin:14px 0 8px;}
+    .brand-sub{font-size:13px;max-width:40ch;}
+    .capacity-card{margin-top:16px;padding:11px 13px;gap:12px;}
+    .legend{display:none;}
+    .dots{margin-top:14px;}
+    .form-wrap{padding:24px 22px 32px;align-items:flex-start;}
+    .top-bar{padding:16px 20px;}
+  }
+  @media (max-width:420px){
+    .brand-headline{font-size:19px;}
+    .capacity-text .t1{font-size:12.5px;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .grid-stencil .cell.fill,.ring-value,.card{animation:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- BRAND PANEL -->
+  <section class="brand-panel">
+    <div class="grid-stencil" id="gridStencil"></div>
+    <div class="brand-top">
+      <a href="/" class="wordmark"><span class="dot"></span>splanly</a>
+    </div>
+    <div class="brand-bottom">
+      <div class="slides-wrap" id="slidesWrap">
+        <div class="slide active" data-slide="0">
+          <h1 class="brand-headline">See who's <span class="accent">stretched thin</span>, before they are.</h1>
+          <p class="brand-sub">One grid of your team's time — allocations, availability, and utilization, updated as work moves.</p>
+          <div class="capacity-card">
+            <div class="ring-wrap">
+              <svg width="52" height="52" viewBox="0 0 52 52"><defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#14b8a6"/><stop offset="100%" stop-color="#22d3ee"/></linearGradient></defs><circle class="ring-track" cx="26" cy="26" r="22.4"/><circle class="ring-value" cx="26" cy="26" r="22.4"/></svg>
+              <div class="ring-label">82%</div>
+            </div>
+            <div class="capacity-text"><div class="t1">Team capacity</div><div class="t2">82% allocated · this sprint</div></div>
+          </div>
+          <div class="legend"><span><i style="background:var(--teal)"></i>on track</span><span><i style="background:var(--amber)"></i>near limit</span><span><i style="background:var(--cyan)"></i>available</span></div>
         </div>
-        <div class="carousel-slide slide-2">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 12px; opacity: 0.9;">
-            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-            <circle cx="9" cy="7" r="4"/>
-            <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
-            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-          </svg>
-          <h2 style="font-size: 16px; font-weight: 700; margin-bottom: 6px;">Team</h2>
-          <p style="opacity: 0.9; font-size: 12px; max-width: 160px;">Track allocations & utilization</p>
+        <div class="slide" data-slide="1">
+          <h1 class="brand-headline">Catch <span class="accent">double-bookings</span> before they ship late.</h1>
+          <p class="brand-sub">Overlapping allocations get flagged the moment they happen — not after the sprint slips.</p>
+          <div class="capacity-card">
+            <div class="conflict-icon"><svg width="26" height="26" viewBox="0 0 26 26" fill="none"><rect class="bar-a" x="3" y="7" width="16" height="5" rx="2.5" stroke="var(--amber)" stroke-width="2"/><rect class="bar-b" x="7" y="14" width="16" height="5" rx="2.5" stroke="var(--amber)" stroke-width="2"/></svg></div>
+            <div class="capacity-text"><div class="t1">3 conflicts caught</div><div class="t2">resolved before standup</div></div>
+          </div>
+          <div class="legend"><span><i style="background:var(--amber)"></i>overlapping</span><span><i style="background:var(--teal)"></i>adjusted</span><span><i style="background:var(--cyan)"></i>clear</span></div>
         </div>
-        <div class="carousel-slide slide-3">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 12px; opacity: 0.9;">
-            <path d="M3 3v18h18"/>
-            <path d="m19 9-5 5-4-4-3 3"/>
-          </svg>
-          <h2 style="font-size: 16px; font-weight: 700; margin-bottom: 6px;">Reports</h2>
-          <p style="opacity: 0.9; font-size: 12px; max-width: 160px;">Budget vs actual analysis</p>
+        <div class="slide" data-slide="2">
+          <h1 class="brand-headline">Everyone's workload, <span class="accent">one shared view</span>.</h1>
+          <p class="brand-sub">Managers and teammates see the same plan — no spreadsheets, no guessing.</p>
+          <div class="capacity-card">
+            <div class="avatar-stack"><div class="avatar" style="background:var(--teal)">JN</div><div class="avatar" style="background:var(--cyan)">AK</div><div class="avatar" style="background:var(--amber)">RS</div><div class="avatar more">+9</div></div>
+            <div class="capacity-text"><div class="t1">12 people synced</div><div class="t2">updated in real time</div></div>
+          </div>
+          <div class="legend"><span><i style="background:var(--teal)"></i>owner</span><span><i style="background:var(--cyan)"></i>contributor</span><span><i style="background:var(--amber)"></i>viewer</span></div>
         </div>
       </div>
-      <div class="carousel-dots">
-        <div class="carousel-dot active" data-slide="0"></div>
-        <div class="carousel-dot" data-slide="1"></div>
-        <div class="carousel-dot" data-slide="2"></div>
+      <div class="dots" id="dots">
+        <button class="active" data-go="0" aria-label="Slide 1"></button>
+        <button data-go="1" aria-label="Slide 2"></button>
+        <button data-go="2" aria-label="Slide 3"></button>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- Right panel: form (2/3) -->
-  <div class="flex flex-col w-full lg:w-[66.667%]">
-    <!-- Back arrow + Theme toggle -->
-    <div class="flex flex-none items-center justify-between p-4">
-      <a href="/" class="flex items-center justify-center w-9 h-9 rounded-lg bg-muted hover:bg-muted/80 transition-colors text-muted-foreground hover:text-foreground" title="Back to home">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+  <!-- FORM PANEL -->
+  <section class="form-panel">
+    <div class="top-bar">
+      <a href="/" class="icon-btn" title="Back to home">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       </a>
-      <button id="theme-toggle-btn" onclick="toggleTheme()" class="flex items-center justify-center w-9 h-9 rounded-lg bg-muted hover:bg-muted/80 transition-colors" title="Toggle dark mode">
-        <svg id="theme-icon-sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
-        <svg id="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+      <button class="icon-btn" id="themeToggle" type="button" title="Toggle theme">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
       </button>
     </div>
 
-    <!-- Form area with toggle just above -->
-    <div class="flex flex-1 items-center justify-center px-4 pb-8">
-      <div class="w-full max-w-sm space-y-5">
-        <!-- Sign In / Sign Up toggle -->
-        <div class="flex justify-center">
-          <div class="flex gap-1 p-1 rounded-lg bg-muted">
-            <a href="/auth/login" class="py-1.5 px-5 rounded-md text-sm font-medium bg-background shadow no-underline">Sign In</a>
-            <a href="/auth/register" class="py-1.5 px-5 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground no-underline">Sign Up</a>
-          </div>
+    <div class="form-wrap">
+      <div class="card">
+        <div class="tabs">
+          <a href="/auth/login" class="active">Sign in</a>
+          <a href="/auth/register">Sign up</a>
         </div>
 
-        <div class="flex flex-col space-y-2 text-center">
-          <h1 class="text-2xl font-semibold tracking-tight text-foreground">Welcome back</h1>
-          <p class="text-muted-foreground text-sm">Sign in to your splanly account</p>
-        </div>
+        <h1 class="title">Welcome back</h1>
+        <p class="subtitle">Sign in to your splanly account</p>
 
-        <form method="POST" action="/auth/login" class="space-y-4">
+        {% if error %}
+        <div style="background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.3);border-radius:10px;padding:10px 14px;margin-bottom:18px;font-size:13px;color:#fca5a5;display:flex;align-items:center;gap:8px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          {{ error }}
+        </div>
+        {% endif %}
+
+        <form method="POST" action="/auth/login">
           {{ csrf_field(csrf_token) }}
-
-          {% if error %}
-          <div class="flex items-center gap-2 p-3 rounded-md text-sm font-medium" style="background:hsl(0 84% 95%); color:hsl(0 84% 40%); border:1px solid hsl(0 84% 88%);">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-            {{ error }}
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" placeholder="you@company.com" required autofocus autocomplete="email">
           </div>
-          {% endif %}
-
-          <div class="space-y-2">
-            <label for="email" class="text-sm font-medium text-foreground">Email</label>
-            <input
-              id="email"
-              class="uk-input"
-              name="email"
-              type="email"
-              placeholder="you@company.com"
-              required
-              autofocus
-              style="border-radius:0.375rem;"
-            />
-          </div>
-
-          <div class="space-y-2">
-            <label for="password" class="text-sm font-medium text-foreground">Password</label>
-            <div class="password-field">
-              <input
-                id="password"
-                class="uk-input"
-                name="password"
-                type="password"
-                placeholder="Enter your password"
-                required
-                style="border-radius:0.375rem; padding-right: 48px;"
-              />
-              <button type="button" class="password-toggle" onclick="togglePassword('password')">
-                <svg id="password-eye" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                <svg id="password-eye-off" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" x2="23" y1="1" y2="23"/></svg>
+          <div class="field">
+            <label for="password">Password</label>
+            <div class="input-wrap">
+              <input id="password" name="password" type="password" placeholder="Enter your password" required autocomplete="current-password">
+              <button type="button" class="eye-btn" id="eyeBtn" aria-label="Show password">
+                <svg id="eye-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg id="eye-closed" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" x2="23" y1="1" y2="23"/></svg>
               </button>
             </div>
           </div>
-
-          <div class="flex items-center justify-between">
-            <label class="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" name="remember_me" class="uk-checkbox" />
-              <span class="text-sm text-muted-foreground">Remember me</span>
-            </label>
-            <a href="/auth/forgot-password" class="text-sm text-primary hover:underline font-medium">Forgot password?</a>
+          <div class="row-between">
+            <label class="remember"><input type="checkbox" name="remember_me"> Remember me</label>
+            <a href="/auth/forgot-password" class="forgot">Forgot password?</a>
           </div>
-
-          <button type="submit" class="uk-btn uk-btn-primary w-full" style="border-radius:999px; height:44px; font-weight:600;">
-            Sign in
-          </button>
+          <button type="submit" class="cta">Sign in</button>
         </form>
 
         {% if ms365_enabled %}
-        <div class="relative">
-          <div class="absolute inset-0 flex items-center">
-            <span class="w-full border-t border-border"></span>
-          </div>
-          <div class="relative flex justify-center text-xs uppercase">
-            <span class="bg-background px-2 text-muted-foreground">or continue with</span>
-          </div>
+        <div style="margin:20px 0;text-align:center;position:relative;">
+          <div style="border-top:1px solid var(--line);"></div>
+          <span style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--ink);padding:0 10px;font-size:11px;color:var(--mist);text-transform:uppercase;letter-spacing:.05em;">or</span>
         </div>
-        <a href="/auth/ms365" class="uk-btn uk-btn-outline w-full" style="border-radius:999px; height:44px;">
-          <svg class="w-5 h-5" viewBox="0 0 24 24">
-            <path fill="#F25022" d="M1 1h10v10H1z"/>
-            <path fill="#00A4EF" d="M1 13h10v10H1z"/>
-            <path fill="#7FBA00" d="M13 1h10v10H13z"/>
-            <path fill="#FFB900" d="M13 13h10v10H13z"/>
-          </svg>
+        <a href="/auth/ms365" class="cta" style="background:var(--surface);color:var(--text);border:1px solid var(--line);box-shadow:none;font-weight:600;">
+          <svg width="18" height="18" viewBox="0 0 24 24" style="display:inline;vertical-align:-3px;margin-right:6px;"><path fill="#F25022" d="M1 1h10v10H1z"/><path fill="#00A4EF" d="M1 13h10v10H1z"/><path fill="#7FBA00" d="M13 1h10v10H13z"/><path fill="#FFB900" d="M13 13h10v10H13z"/></svg>
           Sign in with Microsoft 365
         </a>
         {% endif %}
 
-        <p class="text-center text-sm text-muted-foreground">
-          Don't have an account? <a href="/auth/register" class="text-primary hover:underline font-medium">Create one</a>
-        </p>
-
-        <!-- Footer -->
-        <div class="text-center pt-4 space-y-1">
-          <p class="text-xs text-muted-foreground">By signing in, you agree to our <a href="/terms" class="hover:underline">Terms</a> and <a href="/privacy" class="hover:underline">Privacy Policy</a></p>
-          <p class="text-xs text-muted-foreground">splanly by SkilledCA © 2026</p>
-        </div>
+        <p class="switch">Don't have an account? <a href="/auth/register">Create one</a></p>
+        <p class="legal">By signing in, you agree to our <a href="/terms">Terms</a> and <a href="/privacy">Privacy Policy</a></p>
       </div>
     </div>
-  </div>
+  </section>
 </div>
 
 <script>
-// Theme toggle - saves to localStorage and session
-function toggleTheme() {
-  const html = document.documentElement;
-  const isDark = html.classList.contains('dark');
-  const newMode = isDark ? 'light' : 'dark';
-  
-  // Update DOM
-  if (isDark) {
-    html.classList.remove('dark');
-  } else {
-    html.classList.add('dark');
+  // Grid stencil
+  const grid = document.getElementById('gridStencil');
+  const colors = ['#14b8a6','#22d3ee','#f5a524'];
+  for (let i = 0; i < 12 * 16; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    if (Math.random() < 0.16) {
+      cell.classList.add('fill');
+      cell.style.setProperty('--cell-color', colors[Math.floor(Math.random() * 3)]);
+      cell.style.setProperty('--d', (Math.random() * 5).toFixed(2) + 's');
+    }
+    grid.appendChild(cell);
   }
-  
-  // Save to localStorage
-  const franken = JSON.parse(localStorage.getItem('__FRANKEN__') || '{}');
-  franken.mode = newMode;
-  localStorage.setItem('__FRANKEN__', JSON.stringify(franken));
-  
-  // Save to session via API call (optional - for persistence)
-  fetch('/auth/theme', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({theme: newMode})
-  }).catch(() => {}); // Silent fail if endpoint doesn't exist
-  
-  updateThemeIcon();
-}
 
-function updateThemeIcon() {
-  const isDark = document.documentElement.classList.contains('dark');
-  const sun = document.getElementById('theme-icon-sun');
-  const moon = document.getElementById('theme-icon-moon');
-  
-  if (isDark) {
-    sun.classList.add('hidden');
-    moon.classList.remove('hidden');
-  } else {
-    sun.classList.remove('hidden');
-    moon.classList.add('hidden');
+  // Password toggle
+  const pw = document.getElementById('password');
+  document.getElementById('eyeBtn').addEventListener('click', () => {
+    const show = pw.type === 'password';
+    pw.type = show ? 'text' : 'password';
+    document.getElementById('eye-open').style.display = show ? 'none' : 'block';
+    document.getElementById('eye-closed').style.display = show ? 'block' : 'none';
+  });
+
+  // Carousel
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const dots = Array.from(document.querySelectorAll('#dots button'));
+  const brandPanel = document.querySelector('.brand-panel');
+  let current = 0, timer;
+  function goTo(i) {
+    slides[current].classList.remove('active');
+    dots[current].classList.remove('active');
+    current = (i + slides.length) % slides.length;
+    slides[current].classList.add('active');
+    dots[current].classList.add('active');
   }
-}
-
-// Initialize theme icon on page load
-document.addEventListener('DOMContentLoaded', updateThemeIcon);
-
-// Password toggle
-function togglePassword(fieldId) {
-  const field = document.getElementById(fieldId);
-  const eye = document.getElementById(fieldId + '-eye');
-  const eyeOff = document.getElementById(fieldId + '-eye-off');
-  if (field.type === 'password') {
-    field.type = 'text';
-    eye.classList.add('hidden');
-    eyeOff.classList.remove('hidden');
-  } else {
-    field.type = 'password';
-    eye.classList.remove('hidden');
-    eyeOff.classList.add('hidden');
-  }
-}
-
-// Carousel auto-play
-let currentSlide = 0;
-const totalSlides = 3;
-const track = document.getElementById('carousel-track');
-const dots = document.querySelectorAll('.carousel-dot');
-
-function goToSlide(index) {
-  currentSlide = index;
-  track.style.transform = `translateX(-${index * 100}%)`;
-  dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
-}
-
-dots.forEach(dot => {
-  dot.addEventListener('click', () => goToSlide(parseInt(dot.dataset.slide)));
-});
-
-setInterval(() => {
-  currentSlide = (currentSlide + 1) % totalSlides;
-  goToSlide(currentSlide);
-}, 4000);
+  function startTimer() { timer = setInterval(() => goTo(current + 1), 5000); }
+  function resetTimer() { clearInterval(timer); startTimer(); }
+  dots.forEach(d => d.addEventListener('click', () => { goTo(parseInt(d.dataset.go)); resetTimer(); }));
+  brandPanel.addEventListener('mouseenter', () => clearInterval(timer));
+  brandPanel.addEventListener('mouseleave', startTimer);
+  let touchX = 0;
+  document.getElementById('slidesWrap').addEventListener('touchstart', e => { touchX = e.touches[0].clientX; clearInterval(timer); }, {passive:true});
+  document.getElementById('slidesWrap').addEventListener('touchend', e => { if (Math.abs(e.changedTouches[0].clientX - touchX) > 40) goTo(current + (e.changedTouches[0].clientX < touchX ? 1 : -1)); resetTimer(); }, {passive:true});
+  startTimer();
 </script>
-{% endblock %}
+</body>
+</html>
