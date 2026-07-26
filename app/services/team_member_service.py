@@ -4,7 +4,8 @@ from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from app.exceptions import NotFoundError, ValidationError
-from app.models.models import TeamMember
+from app.models.models import Firm, TeamMember
+from app.services.license_tiers import check_team_member_limit
 
 
 def list_team_members(
@@ -49,6 +50,21 @@ def get_team_member(db: Session, member_id: int, firm_id: int | None = None) -> 
 
 
 def create_team_member(db: Session, data: dict) -> TeamMember:
+    # Check license limit
+    firm_id = data.get("firm_id")
+    if firm_id:
+        firm = db.query(Firm).filter(Firm.id == firm_id).first()
+        if firm and firm.license_tier:
+            current_count = db.query(TeamMember).filter(
+                TeamMember.firm_id == firm_id,
+                TeamMember.is_active == True,
+            ).count()
+            if not check_team_member_limit(firm.license_tier, current_count):
+                raise ValidationError(
+                    f"Team member limit reached for {firm.license_tier} tier. "
+                    f"Upgrade your license to add more team members."
+                )
+
     existing = db.query(TeamMember).filter(TeamMember.email == data["email"]).first()
     if existing:
         raise ValidationError(f"Email {data['email']} already exists")

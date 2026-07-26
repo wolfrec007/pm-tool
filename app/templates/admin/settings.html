@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Admin Settings — splanly{% endblock %}
+{% block title %}Admin Settings - splanly{% endblock %}
 
 {% block content %}
 <div style="max-width:700px;">
@@ -19,6 +19,22 @@
         <button onclick="showTab('domains')" id="tab-domains" class="settings-tab flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-t-md border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             Domains
+        </button>
+        <button onclick="showTab('license')" id="tab-license" class="settings-tab flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-t-md border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+            License
+        </button>
+        <button onclick="showTab('auth')" id="tab-auth" class="settings-tab flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-t-md border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Authentication
+        </button>
+        <button onclick="showTab('roles')" id="tab-roles" class="settings-tab flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-t-md border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Business Roles
+        </button>
+        <button onclick="showTab('security')" id="tab-security" class="settings-tab flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-t-md border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Security
         </button>
     </div>
 
@@ -234,6 +250,312 @@
     <div id="domain-msg" class="text-xs mt-1" style="display:none;"></div>
 </div>
 
+<!-- License Information -->
+<div id="section-license" class="settings-section hidden">
+    <div class="uk-card uk-card-body">
+        <p class="text-sm text-muted-foreground mb-4">View your firm's license details and usage limits.</p>
+
+        <!-- Status Banner -->
+        {% if license_status == "active" %}
+        <div class="rounded-lg border border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/30 p-3 mb-4">
+            <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600 dark:text-green-400"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <span class="text-sm font-medium text-green-800 dark:text-green-200">License Active</span>
+            </div>
+        </div>
+        {% elif license_status == "grace" %}
+        <div class="rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30 p-3 mb-4">
+            <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-600 dark:text-amber-400"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
+                <span class="text-sm font-medium text-amber-800 dark:text-amber-200">Grace Period — License expired, access will be restricted soon</span>
+            </div>
+        </div>
+        {% elif license_status == "expired" %}
+        <div class="rounded-lg border border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/30 p-3 mb-4">
+            <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-red-600 dark:text-red-400"><circle cx="12" cy="12" r="10"/><line x1="15" x2="9" y1="9" y2="15"/><line x1="9" x2="15" y1="9" y2="15"/></svg>
+                <span class="text-sm font-medium text-red-800 dark:text-red-200">License Expired</span>
+            </div>
+        </div>
+        {% else %}
+        <div class="rounded-lg border border-muted bg-muted/30 p-3 mb-4">
+            <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted-foreground"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+                <span class="text-sm font-medium">No License — Activate a license to use splanly</span>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if firm %}
+        <!-- License Details -->
+        <div class="space-y-3 mb-6">
+            <div class="flex items-center justify-between py-2 border-b border-border">
+                <span class="text-sm text-muted-foreground">License Key</span>
+                <code class="text-xs px-2 py-1 rounded bg-muted font-mono">{{ firm.license_key_hash }}</code>
+            </div>
+            <div class="flex items-center justify-between py-2 border-b border-border">
+                <span class="text-sm text-muted-foreground">Status</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
+                    {% if license_status == 'active' %}bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300
+                    {% elif license_status == 'grace' %}bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300
+                    {% elif license_status == 'expired' %}bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300
+                    {% else %}bg-muted text-muted-foreground{% endif %}">
+                    {{ license_status | replace('_', ' ') | title }}
+                </span>
+            </div>
+            {% if firm.license_tier %}
+            <div class="flex items-center justify-between py-2 border-b border-border">
+                <span class="text-sm text-muted-foreground">Tier</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
+                    {% if firm.license_tier == 'enterprise' %}bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300
+                    {% else %}bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300{% endif %}">
+                    {{ firm.license_tier | title }}
+                </span>
+            </div>
+            {% endif %}
+            {% if firm.license_activated_at %}
+            <div class="flex items-center justify-between py-2 border-b border-border">
+                <span class="text-sm text-muted-foreground">Activated</span>
+                <span class="text-sm">{{ firm.license_activated_at.strftime('%b %d, %Y at %I:%M %p') }}</span>
+            </div>
+            {% endif %}
+            <div class="flex items-center justify-between py-2">
+                <span class="text-sm text-muted-foreground">Expires</span>
+                {% if firm.license_expires_at %}
+                <span class="text-sm">{{ firm.license_expires_at.strftime('%b %d, %Y') }}</span>
+                {% else %}
+                <span class="text-sm text-green-600 dark:text-green-400 font-medium">Perpetual</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Usage Limits -->
+        {% if tier_limits %}
+        <h4 class="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Usage & Limits</h4>
+        <div class="grid grid-cols-2 gap-3">
+            <div class="p-3 rounded-lg bg-muted/30 border border-border">
+                <p class="text-xs text-muted-foreground mb-1">Users</p>
+                <div class="flex items-baseline gap-1">
+                    <span class="text-xl font-bold">{{ current_users }}</span>
+                    <span class="text-sm text-muted-foreground">/ {{ tier_limits.max_users or '∞' }}</span>
+                </div>
+                {% if tier_limits.max_users %}
+                <div class="mt-2 h-1.5 rounded-full bg-muted overflow-hidden">
+                    <div class="h-full rounded-full {% if current_users / tier_limits.max_users > 0.8 %}bg-red-500{% elif current_users / tier_limits.max_users > 0.6 %}bg-amber-500{% else %}bg-green-500{% endif %}" style="width: {{ (current_users / tier_limits.max_users * 100) | int }}%"></div>
+                </div>
+                {% endif %}
+            </div>
+            <div class="p-3 rounded-lg bg-muted/30 border border-border">
+                <p class="text-xs text-muted-foreground mb-1">Team Members</p>
+                <div class="flex items-baseline gap-1">
+                    <span class="text-xl font-bold">{{ current_team_members }}</span>
+                    <span class="text-sm text-muted-foreground">/ {{ tier_limits.max_team_members or '∞' }}</span>
+                </div>
+                {% if tier_limits.max_team_members %}
+                <div class="mt-2 h-1.5 rounded-full bg-muted overflow-hidden">
+                    <div class="h-full rounded-full {% if current_team_members / tier_limits.max_team_members > 0.8 %}bg-red-500{% elif current_team_members / tier_limits.max_team_members > 0.6 %}bg-amber-500{% else %}bg-green-500{% endif %}" style="width: {{ (current_team_members / tier_limits.max_team_members * 100) | int }}%"></div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+        {% endif %}
+
+        <!-- Action -->
+        <div class="pt-4 mt-4 border-t border-border">
+            <a href="/license/status" class="text-sm text-primary hover:underline">
+                View full license details →
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Authentication Settings -->
+<div id="section-auth" class="settings-section hidden">
+    <div class="uk-card uk-card-body">
+        <p class="text-sm text-muted-foreground mb-4">Configure how users authenticate when logging in.</p>
+
+        {% if auth_saved %}
+        <div class="uk-alert uk-alert-success mb-4" uk-alert><p>Authentication settings saved.</p></div>
+        {% endif %}
+
+        <form method="POST" action="/admin/settings/auth-method">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+            <div class="space-y-4">
+                <div>
+                    <label class="uk-form-label text-sm font-medium">Authentication Method</label>
+                    <p class="text-xs text-muted-foreground mb-3">Choose how users verify their identity when logging in.</p>
+
+                    <div class="space-y-3">
+                        <!-- 2FA Option -->
+                        <label class="flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition-colors {% if auth_method == '2fa' %}border-primary bg-primary/5{% else %}border-border hover:border-muted-foreground{% endif %}">
+                            <input type="radio" name="auth_method" value="2fa" {% if auth_method == '2fa' %}checked{% endif %} class="mt-1">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="{% if auth_method == '2fa' %}text-primary{% else %}text-muted-foreground{% endif %}"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                    <span class="font-medium text-sm">Authenticator App (2FA)</span>
+                                </div>
+                                <p class="text-xs text-muted-foreground mt-1">Users scan a QR code with Google Authenticator, Authy, or similar apps. More secure, works offline.</p>
+                            </div>
+                        </label>
+
+                        <!-- OTP Option -->
+                        <label class="flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition-colors {% if auth_method == 'otp' %}border-primary bg-primary/5{% else %}border-border hover:border-muted-foreground{% endif %}">
+                            <input type="radio" name="auth_method" value="otp" {% if auth_method == 'otp' %}checked{% endif %} class="mt-1">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="{% if auth_method == 'otp' %}text-primary{% else %}text-muted-foreground{% endif %}"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
+                                    <span class="font-medium text-sm">Email OTP</span>
+                                </div>
+                                <p class="text-xs text-muted-foreground mt-1">Users receive a 6-digit code via email. Easier for users but requires email delivery.</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Info Box -->
+                <div class="p-3 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
+                    <div class="flex gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg>
+                        <div class="text-xs text-blue-600 dark:text-blue-400">
+                            <p><strong>Note:</strong> This setting applies to new registrations and login verification. Existing users with 2FA already enabled will keep their authenticator app.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-4 mt-4 border-t border-border">
+                <button type="submit" class="uk-btn uk-btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><polyline points="20 6 9 17 4 12"/></svg>
+                    Save Authentication Settings
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Business Roles Section -->
+<div id="section-roles" class="settings-section hidden">
+    <div class="uk-card uk-card-body">
+        <p class="text-sm text-muted-foreground mb-4">Configure business roles and their cost rates for budget calculations.</p>
+
+        {% if roles_saved %}
+        <div class="uk-alert uk-alert-success mb-4" uk-alert><p>Business roles saved.</p></div>
+        {% endif %}
+
+        <form method="POST" action="/admin/settings/business-roles">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+            <!-- Currency -->
+            <div class="mb-6">
+                <label class="uk-form-label">Currency</label>
+                <select name="currency" class="uk-input" style="max-width: 200px;">
+                    <option value="INR" {% if default_currency == 'INR' %}selected{% endif %}>INR (₹)</option>
+                    <option value="USD" {% if default_currency == 'USD' %}selected{% endif %}>USD ($)</option>
+                    <option value="EUR" {% if default_currency == 'EUR' %}selected{% endif %}>EUR (€)</option>
+                    <option value="GBP" {% if default_currency == 'GBP' %}selected{% endif %}>GBP (£)</option>
+                    <option value="AED" {% if default_currency == 'AED' %}selected{% endif %}>AED (د.إ)</option>
+                </select>
+            </div>
+
+            <!-- Roles Table -->
+            <div class="overflow-auto">
+                <table class="uk-table uk-table-divider uk-table-small">
+                    <thead>
+                        <tr>
+                            <th class="uk-text-center" style="width: 60px;">Active</th>
+                            <th>Role</th>
+                            <th style="width: 150px;">Rate Type</th>
+                            <th style="width: 180px;">Rate Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for role in business_roles %}
+                        <tr class="{% if not role.is_enabled %}opacity-50{% endif %}">
+                            <td class="uk-text-center">
+                                <input type="checkbox" 
+                                    name="role_{{ role.role_code }}_enabled" 
+                                    class="uk-checkbox"
+                                    {% if role.is_enabled %}checked{% endif %}
+                                    onchange="toggleRole(this, '{{ role.role_code }}')">
+                            </td>
+                            <td class="font-medium">
+                                {{ role.role_code | replace('_', ' ') | title }}
+                            </td>
+                            <td>
+                                <select name="role_{{ role.role_code }}_rate_type" 
+                                    class="uk-input uk-input-sm"
+                                    id="rate_type_{{ role.role_code }}"
+                                    {% if not role.is_enabled %}disabled{% endif %}>
+                                    <option value="daily" {% if role.rate_type == 'daily' %}selected{% endif %}>Daily</option>
+                                    <option value="hourly" {% if role.rate_type == 'hourly' %}selected{% endif %}>Hourly</option>
+                                </select>
+                            </td>
+                            <td>
+                                <div class="flex items-center gap-2">
+                                    <input type="number" 
+                                        name="role_{{ role.role_code }}_rate_value" 
+                                        class="uk-input uk-input-sm"
+                                        id="rate_value_{{ role.role_code }}"
+                                        value="{{ role.rate_value or 0 }}"
+                                        min="0" step="100"
+                                        {% if not role.is_enabled %}disabled{% endif %}>
+                                    <span class="text-sm text-muted-foreground">{{ default_currency }}</span>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pt-4 mt-4 border-t border-border">
+                <button type="submit" class="uk-btn uk-btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><polyline points="20 6 9 17 4 12"/></svg>
+                    Save Business Roles
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Security Section -->
+<div id="section-security" class="settings-section hidden">
+    <div class="uk-card uk-card-body">
+        <p class="text-sm text-muted-foreground mb-4">Configure password security policies for your firm.</p>
+
+        {% if security_saved %}
+        <div class="uk-alert uk-alert-success mb-4" style="border-radius:0.375rem;">
+            Security settings saved successfully.
+        </div>
+        {% endif %}
+
+        <form method="POST" action="/admin/settings/security" class="space-y-4">
+            {{ csrf_field(csrf_token) }}
+
+            <div class="space-y-2">
+                <label for="password_expiry_days" class="text-sm font-medium text-foreground">Password Expiry (days)</label>
+                <p class="text-xs text-muted-foreground mb-2">Force users to change their password after this many days. Set to 0 to disable. Max 90 days.</p>
+                <input
+                    id="password_expiry_days"
+                    name="password_expiry_days"
+                    type="number"
+                    min="0"
+                    max="90"
+                    value="{{ password_expiry_days }}"
+                    class="uk-input"
+                    style="border-radius:0.375rem; max-width:120px;"
+                />
+            </div>
+
+            <button type="submit" class="uk-btn uk-btn-primary uk-btn-sm">
+                Save Security Settings
+            </button>
+        </form>
+    </div>
+</div>
+
 <style>
     .settings-tab.active {
         color: hsl(var(--foreground));
@@ -249,6 +571,23 @@ function showTab(tab) {
     document.getElementById('section-' + tab).classList.remove('hidden');
     document.getElementById('tab-' + tab).classList.add('active');
 }
+
+function toggleRole(checkbox, roleCode) {
+    var rateType = document.getElementById('rate_type_' + roleCode);
+    var rateValue = document.getElementById('rate_value_' + roleCode);
+    var row = checkbox.closest('tr');
+    
+    if (checkbox.checked) {
+        rateType.disabled = false;
+        rateValue.disabled = false;
+        row.classList.remove('opacity-50');
+    } else {
+        rateType.disabled = true;
+        rateValue.disabled = true;
+        row.classList.add('opacity-50');
+    }
+}
+
 // Default to general tab
 showTab('general');
 </script>

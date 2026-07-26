@@ -1,6 +1,7 @@
 """Seed realistic demo data for the splanly dashboard.
 Run:  py -m app.seed_data
 """
+import os
 import random
 from datetime import date, timedelta
 
@@ -56,16 +57,25 @@ ENGAGEMENTS = [
 
 
 def seed():
+    # Safety guard: prevent running against production
+    from app.config import settings
+    db_url = settings.DATABASE_URL
+    if "test" not in db_url.lower() and not settings.TESTING:
+        print("ERROR: Refusing to seed — set DATABASE_URL to a test database or TESTING=true")
+        return
+
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
 
     try:
-        # Get the first firm
+        # Get or create a firm
         from app.models.models import Firm
         firm = db.query(Firm).first()
         if not firm:
-            print("No firm found. Please create a firm first.")
-            return
+            firm = Firm(name="PKF Sridhar & Santhanam", code="PKF", is_active=True)
+            db.add(firm)
+            db.flush()
+            print("Created firm: PKF Sridhar & Santhanam")
         firm_id = firm.id
 
         # ── Clients ──

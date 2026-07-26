@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service — splanly</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #16324f;
+            --steel: #4f82b0;
+            --bg: #f6fafe;
+            --bg-secondary: #eaf1f8;
+            --text: #1a2a3a;
+            --text-muted: #5a7a9a;
+            --border: #d0dde8;
+            --card-bg: #ffffff;
+            --nav-bg: rgba(255,255,255,0.85);
+            --footer-bg: #16324f;
+            --footer-text: #c8d8e8;
+            --shadow: 0 1px 3px rgba(22,50,79,0.08);
+        }
+
+        [data-theme="dark"] {
+            --bg: #0b1a29;
+            --bg-secondary: #112238;
+            --text: #d8e4f0;
+            --text-muted: #7a9ab8;
+            --border: #1e3a54;
+            --card-bg: #0f2438;
+            --nav-bg: rgba(11,26,41,0.9);
+            --footer-bg: #061018;
+            --footer-text: #7a9ab8;
+            --shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            color: var(--navy);
+            line-height: 1.3;
+        }
+
+        [data-theme="dark"] h1,
+        [data-theme="dark"] h2,
+        [data-theme="dark"] h3,
+        [data-theme="dark"] h4 {
+            color: #e8f0f8;
+        }
+
+        /* ── Navigation ── */
+        .nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--nav-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 1.5rem;
+        }
+
+        .nav-inner {
+            max-width: 1120px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .nav-brand {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 800;
+            font-size: 1.35rem;
+            color: var(--navy);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        [data-theme="dark"] .nav-brand { color: #e8f0f8; }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--navy); }
+        [data-theme="dark"] .nav-links a:hover { color: #e8f0f8; }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--steel);
+            color: var(--steel);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1.15rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-ghost {
+            color: var(--text-muted);
+            background: transparent;
+        }
+
+        .btn-ghost:hover { color: var(--navy); background: var(--bg-secondary); }
+        [data-theme="dark"] .btn-ghost:hover { color: #e8f0f8; }
+
+        .btn-primary {
+            background: var(--steel);
+            color: #fff;
+        }
+
+        .btn-primary:hover { background: var(--navy); }
+
+        .nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text);
+        }
+
+        @media (max-width: 768px) {
+            .nav-toggle { display: block; }
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 64px;
+                left: 0;
+                right: 0;
+                background: var(--nav-bg);
+                backdrop-filter: blur(12px);
+                flex-direction: column;
+                padding: 1rem 1.5rem;
+                gap: 0.75rem;
+                border-bottom: 1px solid var(--border);
+            }
+            .nav-links.open { display: flex; }
+            .nav-actions .btn-ghost { display: none; }
+        }
+
+        /* ── Main Content ── */
+        .page-header {
+            text-align: center;
+            padding: 3.5rem 1.5rem 2rem;
+        }
+
+        .page-header h1 {
+            font-size: 2.25rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header .meta {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 1.5rem 4rem;
+            flex: 1;
+        }
+
+        .content h2 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-top: 2.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .content p {
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+        }
+
+        .content li {
+            margin-bottom: 0.4rem;
+        }
+
+        .content a {
+            color: var(--steel);
+            text-decoration: underline;
+            text-decoration-color: rgba(79,130,176,0.3);
+            text-underline-offset: 2px;
+            transition: text-decoration-color 0.2s;
+        }
+
+        .content a:hover {
+            text-decoration-color: var(--steel);
+        }
+
+        .highlight-box {
+            background: var(--bg-secondary);
+            border-left: 3px solid var(--steel);
+            border-radius: 0 8px 8px 0;
+            padding: 1rem 1.25rem;
+            margin: 1.5rem 0;
+        }
+
+        .highlight-box p:last-child { margin-bottom: 0; }
+
+        /* ── Footer ── */
+        .footer {
+            background: var(--footer-bg);
+            color: var(--footer-text);
+            padding: 2rem 1.5rem;
+            text-align: center;
+            font-size: 0.85rem;
+            line-height: 1.8;
+            margin-top: auto;
+        }
+
+        .footer a {
+            color: #8ab4d8;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer a:hover { color: #b8daf0; }
+
+        .footer-links {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-links a {
+            margin: 0 0.5rem;
+        }
+
+        .footer-copy {
+            opacity: 0.7;
+        }
+
+        @media (max-width: 600px) {
+            .page-header h1 { font-size: 1.75rem; }
+            .content h2 { font-size: 1.15rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="/" class="nav-brand">splanly</a>
+            <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Toggle menu">☰</button>
+            <ul class="nav-links">
+                <li><a href="/#features">Features</a></li>
+                <li><a href="/faq">FAQ</a></li>
+                <li><a href="/docs-app">Docs</a></li>
+                <li><a href="/contact">Contact</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme" id="themeBtn">🌙</button>
+                <a href="/auth/login" class="btn btn-ghost">Sign in</a>
+                <a href="/auth/register" class="btn btn-primary">Get started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <div class="page-header">
+        <h1>Terms of Service</h1>
+        <p class="meta">Effective date: July 2026 &middot; splanly by SkilledCA Enterprises</p>
+    </div>
+
+    <!-- Content -->
+    <main class="content">
+        <p>Welcome to splanly. These Terms of Service ("Terms") govern your access to and use of the splanly platform, operated by SkilledCA Enterprises ("we", "us", "our"). By creating an account or using our services, you agree to be bound by these Terms.</p>
+
+        <h2>1. Acceptance of Terms</h2>
+        <p>By accessing or using splanly, you confirm that you are at least 18 years of age and have the legal capacity to enter into a binding agreement. If you are using splanly on behalf of a firm or organization, you represent that you have the authority to bind that entity to these Terms.</p>
+        <p>If you do not agree with any part of these Terms, you must not access or use splanly.</p>
+
+        <h2>2. Description of Service</h2>
+        <p>splanly is a staffing and resource planning web application designed specifically for Chartered Accountant (CA) firms. The platform enables firms to manage team members, client engagements, assignments, leave tracking, and related planning activities.</p>
+        <p>We reserve the right to modify, suspend, or discontinue any part of the service at any time with reasonable notice.</p>
+
+        <h2>3. Account Responsibilities</h2>
+        <p>When you create an account on splanly, you agree to:</p>
+        <ul>
+            <li>Provide accurate, current, and complete registration information.</li>
+            <li>Maintain the security and confidentiality of your login credentials.</li>
+            <li>Notify us immediately at <a href="mailto:samarth@skilledca.in">samarth@skilledca.in</a> if you suspect unauthorized access to your account.</li>
+            <li>Accept responsibility for all activities that occur under your account.</li>
+            <li>Ensure that your firm's administrator(s) manage team member access appropriately.</li>
+        </ul>
+        <p>We are not liable for any loss or damage arising from your failure to maintain the confidentiality of your account credentials.</p>
+
+        <h2>4. Acceptable Use</h2>
+        <p>You agree to use splanly only for lawful purposes and in accordance with these Terms. You shall not:</p>
+        <ul>
+            <li>Use the platform for any unlawful, fraudulent, or malicious purpose.</li>
+            <li>Attempt to gain unauthorized access to other users' data, the platform's systems, or related infrastructure.</li>
+            <li>Upload or transmit viruses, malware, or any harmful code.</li>
+            <li>Reverse engineer, decompile, or attempt to extract the source code of splanly.</li>
+            <li>Use automated tools, bots, or scrapers to access or collect data from the platform without our written consent.</li>
+            <li>Resell, sublicense, or redistribute access to splanly without authorization.</li>
+            <li>Interfere with or disrupt the integrity, performance, or availability of the service.</li>
+        </ul>
+
+        <h2>5. Intellectual Property</h2>
+        <p>All content, features, functionality, code, design, and trademarks associated with splanly are the exclusive property of SkilledCA Enterprises and are protected by Indian and international intellectual property laws.</p>
+        <p>You retain ownership of any data you input into splanly (such as firm details, client information, and engagement records). By using the platform, you grant us a limited, non-exclusive license to process this data solely for the purpose of providing the service to you.</p>
+        <p>Nothing in these Terms grants you any right to use our trademarks, logos, or brand names without prior written consent.</p>
+
+        <h2>6. Subscription &amp; Payment</h2>
+        <p>splanly may offer both free and paid subscription plans. For paid plans:</p>
+        <ul>
+            <li>Fees are billed in advance on a recurring basis (monthly or annually, as selected).</li>
+            <li>All fees are exclusive of applicable taxes unless stated otherwise.</li>
+            <li>We reserve the right to change pricing with at least 30 days' prior notice.</li>
+            <li>Failure to pay may result in suspension or termination of your account.</li>
+        </ul>
+        <p>For refund information, please refer to our <a href="/legal/refund">Refund Policy</a>.</p>
+
+        <h2>7. Data &amp; Privacy</h2>
+        <p>Your use of splanly is also governed by our <a href="/legal/privacy">Privacy Policy</a>, which describes how we collect, use, and protect your data. By using splanly, you consent to the data practices described in the Privacy Policy.</p>
+        <p>We comply with India's Digital Personal Data Protection Act, 2023 (DPDP Act). For details, see our <a href="/legal/dpdp">DPDP Act Compliance</a> page.</p>
+
+        <h2>8. Limitation of Liability</h2>
+        <p>To the maximum extent permitted by applicable law:</p>
+        <ul>
+            <li>splanly is provided on an "as is" and "as available" basis without warranties of any kind, whether express or implied.</li>
+            <li>We do not warrant that the service will be uninterrupted, error-free, or completely secure.</li>
+            <li>SkilledCA Enterprises shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to loss of profits, data, business opportunities, or goodwill.</li>
+            <li>Our total aggregate liability for any claim arising out of or related to these Terms or the service shall not exceed the amount you paid to us in the 12 months preceding the claim.</li>
+        </ul>
+        <div class="highlight-box">
+            <p><strong>Disclaimer:</strong> splanly is a planning and management tool. It does not provide professional accounting, auditing, legal, or financial advice. Users are solely responsible for professional decisions made using the platform.</p>
+        </div>
+
+        <h2>9. Termination</h2>
+        <p>Either party may terminate this agreement:</p>
+        <ul>
+            <li><strong>By You:</strong> You may cancel your account at any time through the application settings or by contacting us at <a href="mailto:samarth@skilledca.in">samarth@skilledca.in</a>.</li>
+            <li><strong>By Us:</strong> We may suspend or terminate your access if you violate these Terms, engage in prohibited activities, or if required by law.</li>
+        </ul>
+        <p>Upon termination:</p>
+        <ul>
+            <li>Your right to access splanly ceases immediately.</li>
+            <li>We will retain your data for 90 days to allow for data export, after which it will be permanently deleted.</li>
+            <li>Provisions that by their nature should survive termination will remain in effect, including intellectual property, limitation of liability, and governing law.</li>
+        </ul>
+
+        <h2>10. Indemnification</h2>
+        <p>You agree to indemnify, defend, and hold harmless SkilledCA Enterprises, its officers, directors, employees, and agents from any claims, liabilities, damages, losses, or expenses (including legal fees) arising out of:</p>
+        <ul>
+            <li>Your use of splanly in violation of these Terms.</li>
+            <li>Your violation of any applicable law or third-party rights.</li>
+            <li>Any data or content you submit through the platform.</li>
+        </ul>
+
+        <h2>11. Governing Law &amp; Dispute Resolution</h2>
+        <p>These Terms are governed by and construed in accordance with the laws of India. Any disputes arising from or relating to these Terms or your use of splanly shall be subject to the exclusive jurisdiction of the courts in India.</p>
+        <p>Before initiating legal proceedings, both parties agree to attempt to resolve disputes through good-faith negotiation for a period of at least 30 days.</p>
+
+        <h2>12. Changes to These Terms</h2>
+        <p>We reserve the right to update these Terms at any time. We will notify you of material changes via email or through a notice within the application at least 15 days before the changes take effect. Your continued use of splanly after such changes constitutes acceptance of the updated Terms.</p>
+
+        <h2>13. Severability</h2>
+        <p>If any provision of these Terms is found to be invalid or unenforceable, the remaining provisions shall remain in full force and effect. The invalid provision will be modified to the minimum extent necessary to make it valid and enforceable.</p>
+
+        <h2>14. Contact Us</h2>
+        <p>If you have any questions about these Terms of Service, please contact:</p>
+        <div class="highlight-box">
+            <p><strong>SkilledCA Enterprises</strong><br>
+            Email: <a href="mailto:samarth@skilledca.in">samarth@skilledca.in</a></p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="/legal/privacy">Privacy Policy</a> |
+            <a href="/legal/terms">Terms of Service</a> |
+            <a href="/legal/dpdp">DPDP Act</a> |
+            <a href="/legal/cookies">Cookie Policy</a> |
+            <a href="/legal/refund">Refund Policy</a>
+        </div>
+        <div class="footer-copy">splanly by SkilledCA Enterprises &copy; 2026. All rights reserved.</div>
+    </footer>
+
+    <script>
+        function getTheme() {
+            return localStorage.getItem('splanly-theme') || 'light';
+        }
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            const btn = document.getElementById('themeBtn');
+            if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+
+        function toggleTheme() {
+            const current = getTheme();
+            const next = current === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('splanly-theme', next);
+            applyTheme(next);
+        }
+
+        applyTheme(getTheme());
+    </script>
+</body>
+</html>

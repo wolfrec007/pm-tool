@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DPDP Act Compliance — splanly</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #16324f;
+            --steel: #4f82b0;
+            --bg: #f6fafe;
+            --bg-secondary: #eaf1f8;
+            --text: #1a2a3a;
+            --text-muted: #5a7a9a;
+            --border: #d0dde8;
+            --card-bg: #ffffff;
+            --nav-bg: rgba(255,255,255,0.85);
+            --footer-bg: #16324f;
+            --footer-text: #c8d8e8;
+            --shadow: 0 1px 3px rgba(22,50,79,0.08);
+        }
+
+        [data-theme="dark"] {
+            --bg: #0b1a29;
+            --bg-secondary: #112238;
+            --text: #d8e4f0;
+            --text-muted: #7a9ab8;
+            --border: #1e3a54;
+            --card-bg: #0f2438;
+            --nav-bg: rgba(11,26,41,0.9);
+            --footer-bg: #061018;
+            --footer-text: #7a9ab8;
+            --shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            color: var(--navy);
+            line-height: 1.3;
+        }
+
+        [data-theme="dark"] h1,
+        [data-theme="dark"] h2,
+        [data-theme="dark"] h3,
+        [data-theme="dark"] h4 {
+            color: #e8f0f8;
+        }
+
+        /* ── Navigation ── */
+        .nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--nav-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 1.5rem;
+        }
+
+        .nav-inner {
+            max-width: 1120px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .nav-brand {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 800;
+            font-size: 1.35rem;
+            color: var(--navy);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        [data-theme="dark"] .nav-brand { color: #e8f0f8; }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--navy); }
+        [data-theme="dark"] .nav-links a:hover { color: #e8f0f8; }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--steel);
+            color: var(--steel);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1.15rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-ghost {
+            color: var(--text-muted);
+            background: transparent;
+        }
+
+        .btn-ghost:hover { color: var(--navy); background: var(--bg-secondary); }
+        [data-theme="dark"] .btn-ghost:hover { color: #e8f0f8; }
+
+        .btn-primary {
+            background: var(--steel);
+            color: #fff;
+        }
+
+        .btn-primary:hover { background: var(--navy); }
+
+        .nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text);
+        }
+
+        @media (max-width: 768px) {
+            .nav-toggle { display: block; }
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 64px;
+                left: 0;
+                right: 0;
+                background: var(--nav-bg);
+                backdrop-filter: blur(12px);
+                flex-direction: column;
+                padding: 1rem 1.5rem;
+                gap: 0.75rem;
+                border-bottom: 1px solid var(--border);
+            }
+            .nav-links.open { display: flex; }
+            .nav-actions .btn-ghost { display: none; }
+        }
+
+        /* ── Main Content ── */
+        .page-header {
+            text-align: center;
+            padding: 3.5rem 1.5rem 2rem;
+        }
+
+        .page-header h1 {
+            font-size: 2.25rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header .subtitle {
+            color: var(--steel);
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .page-header .meta {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 1.5rem 4rem;
+            flex: 1;
+        }
+
+        .content h2 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-top: 2.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .content p {
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+        }
+
+        .content li {
+            margin-bottom: 0.4rem;
+        }
+
+        .content a {
+            color: var(--steel);
+            text-decoration: underline;
+            text-decoration-color: rgba(79,130,176,0.3);
+            text-underline-offset: 2px;
+            transition: text-decoration-color 0.2s;
+        }
+
+        .content a:hover {
+            text-decoration-color: var(--steel);
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .content th, .content td {
+            text-align: left;
+            padding: 0.65rem 0.85rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .content th {
+            font-weight: 600;
+            color: var(--navy);
+            background: var(--bg-secondary);
+        }
+
+        [data-theme="dark"] .content th { color: #c8d8e8; }
+
+        .highlight-box {
+            background: var(--bg-secondary);
+            border-left: 3px solid var(--steel);
+            border-radius: 0 8px 8px 0;
+            padding: 1rem 1.25rem;
+            margin: 1.5rem 0;
+        }
+
+        .highlight-box p:last-child { margin-bottom: 0; }
+
+        .badge {
+            display: inline-block;
+            background: var(--steel);
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            vertical-align: middle;
+            margin-left: 0.5rem;
+        }
+
+        /* ── Footer ── */
+        .footer {
+            background: var(--footer-bg);
+            color: var(--footer-text);
+            padding: 2rem 1.5rem;
+            text-align: center;
+            font-size: 0.85rem;
+            line-height: 1.8;
+            margin-top: auto;
+        }
+
+        .footer a {
+            color: #8ab4d8;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer a:hover { color: #b8daf0; }
+
+        .footer-links {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-links a {
+            margin: 0 0.5rem;
+        }
+
+        .footer-copy {
+            opacity: 0.7;
+        }
+
+        @media (max-width: 600px) {
+            .page-header h1 { font-size: 1.75rem; }
+            .content h2 { font-size: 1.15rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="/" class="nav-brand">splanly</a>
+            <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Toggle menu">☰</button>
+            <ul class="nav-links">
+                <li><a href="/#features">Features</a></li>
+                <li><a href="/faq">FAQ</a></li>
+                <li><a href="/docs-app">Docs</a></li>
+                <li><a href="/contact">Contact</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme" id="themeBtn">🌙</button>
+                <a href="/auth/login" class="btn btn-ghost">Sign in</a>
+                <a href="/auth/register" class="btn btn-primary">Get started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <div class="page-header">
+        <h1>DPDP Act Compliance</h1>
+        <p class="subtitle">Digital Personal Data Protection Act, 2023</p>
+        <p class="meta">Effective date: July 2026 &middot; splanly by SkilledCA Enterprises</p>
+    </div>
+
+    <!-- Content -->
+    <main class="content">
+        <p>splanly is committed to full compliance with India's Digital Personal Data Protection Act, 2023 (DPDP Act). This page outlines how we meet our obligations as a Data Fiduciary and how we protect the rights of Data Principals (our users).</p>
+
+        <h2>1. Data Fiduciary <span class="badge">SkilledCA Enterprises</span></h2>
+        <p>Under the DPDP Act, SkilledCA Enterprises is the <strong>Data Fiduciary</strong> — the entity that determines the purpose and means of processing personal data. We are responsible for ensuring that personal data is processed in accordance with the Act.</p>
+        <table>
+            <thead>
+                <tr><th>Detail</th><th>Information</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Entity Name</strong></td>
+                    <td>SkilledCA Enterprises</td>
+                </tr>
+                <tr>
+                    <td><strong>Platform</strong></td>
+                    <td>splanly — Staffing &amp; Resource Planning for CA Firms</td>
+                </tr>
+                <tr>
+                    <td><strong>Nature of Business</strong></td>
+                    <td>SaaS platform for professional services firms</td>
+                </tr>
+                <tr>
+                    <td><strong>Jurisdiction</strong></td>
+                    <td>India</td>
+                </tr>
+                <tr>
+                    <td><strong>Contact</strong></td>
+                    <td><a href="mailto:samarth@skilledca.in">samarth@skilledca.in</a></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>2. Purpose of Data Processing</h2>
+        <p>We process personal data only for specific, lawful purposes. As a Data Fiduciary, we ensure that every data processing activity has a clear legal basis:</p>
+        <table>
+            <thead>
+                <tr><th>Purpose</th><th>Legal Basis</th><th>Data Types</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Service delivery &amp; account management</td>
+                    <td>Consent &amp; Contractual necessity</td>
+                    <td>Name, email, firm details</td>
+                </tr>
+                <tr>
+                    <td>Authentication &amp; security</td>
+                    <td>Consent &amp; Legitimate interest</td>
+                    <td>Email, encrypted passwords</td>
+                </tr>
+                <tr>
+                    <td>Communication &amp; notifications</td>
+                    <td>Consent</td>
+                    <td>Email address</td>
+                </tr>
+                <tr>
+                    <td>Analytics &amp; platform improvement</td>
+                    <td>Consent</td>
+                    <td>Anonymized usage data</td>
+                </tr>
+                <tr>
+                    <td>Legal &amp; regulatory compliance</td>
+                    <td>Legal obligation</td>
+                    <td>As required by law</td>
+                </tr>
+            </tbody>
+        </table>
+        <p>We do not process personal data for purposes beyond what is necessary for the functioning of the splanly platform.</p>
+
+        <h2>3. Consent Management</h2>
+        <p>In accordance with Section 6 of the DPDP Act, we obtain free, specific, informed, unconditional, and unambiguous consent from Data Principals before processing their personal data.</p>
+        <ul>
+            <li><strong>At Registration</strong> — Consent is obtained explicitly when users create an account, with clear disclosure of what data is collected and why.</li>
+            <li><strong>Granular Control</strong> — Users can manage their consent preferences through their account settings.</li>
+            <li><strong>Withdrawal of Consent</strong> — Data Principals may withdraw consent at any time. Withdrawal does not affect the lawfulness of processing carried out before withdrawal. Upon withdrawal, we will cease processing the relevant data within a reasonable period.</li>
+            <li><strong>Consent for Minors</strong> — splanly is designed for professional use and is not intended for individuals under 18. We do not knowingly collect data from children or minors. If we become aware that a minor's data has been collected, we will delete it promptly.</li>
+        </ul>
+
+        <h2>4. Data Principal Rights</h2>
+        <p>Under the DPDP Act, Data Principals (users) have the following rights. We provide mechanisms to exercise each of these rights:</p>
+
+        <h3>Right to Access Information</h3>
+        <p>You have the right to obtain a summary of the personal data we process about you and the purposes for which it is processed. To request this, contact us at <a href="mailto:samarth@skilledca.in">samarth@skilledca.in</a>.</p>
+
+        <h3>Right to Correction &amp; Erasure</h3>
+        <p>You may request correction of inaccurate or incomplete personal data. You may also request erasure of your personal data, subject to any legal retention obligations we may have. We will process correction or erasure requests within 30 days.</p>
+
+        <h3>Right to Grievance Redressal</h3>
+        <p>If you believe your data protection rights have been violated, you have the right to file a grievance with our designated Grievance Officer (see Section 8 below). We will acknowledge your grievance within 48 hours and resolve it within 30 days.</p>
+
+        <h3>Right to Nominate</h3>
+        <p>In the event of your death or incapacity, you have the right to nominate another individual to exercise your data protection rights on your behalf. You can set a nominee through your account settings.</p>
+
+        <h2>5. Data Retention Policy</h2>
+        <p>We retain personal data only for as long as necessary to fulfill the purpose for which it was collected, or as required by applicable law:</p>
+        <table>
+            <thead>
+                <tr><th>Data Category</th><th>Retention Period</th><th>After Expiry</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Account &amp; identity data</td>
+                    <td>Duration of subscription + 90 days</td>
+                    <td>Permanently deleted</td>
+                </tr>
+                <tr>
+                    <td>Firm &amp; engagement data</td>
+                    <td>Duration of subscription + 90 days</td>
+                    <td>Permanently deleted</td>
+                </tr>
+                <tr>
+                    <td>Usage &amp; analytics data</td>
+                    <td>24 months (anonymized)</td>
+                    <td>Anonymized data retained indefinitely</td>
+                </tr>
+                <tr>
+                    <td>Authentication logs</td>
+                    <td>12 months</td>
+                    <td>Permanently deleted</td>
+                </tr>
+                <tr>
+                    <td>Support communications</td>
+                    <td>12 months after resolution</td>
+                    <td>Permanently deleted</td>
+                </tr>
+            </tbody>
+        </table>
+        <p>Upon account deletion, all personal data is erased within 30 days, except where retention is mandated by law (e.g., tax or regulatory requirements in India).</p>
+
+        <h2>6. Data Security Safeguards</h2>
+        <p>As required under Section 8(5) of the DPDP Act, we implement reasonable security safeguards to protect personal data:</p>
+        <ul>
+            <li><strong>Encryption</strong> — All data is encrypted in transit (TLS 1.2+) and at rest (AES-256).</li>
+            <li><strong>Access Controls</strong> — Role-based access ensures that only authorized individuals can access personal data. Multi-factor authentication is supported.</li>
+            <li><strong>Infrastructure Security</strong> — Our hosting provider (Render) and database provider (Supabase) maintain SOC 2 and ISO 27001 compliance.</li>
+            <li><strong>Audit Logging</strong> — Access to personal data is logged for accountability and audit purposes.</li>
+            <li><strong>Incident Response</strong> — We maintain a data breach response plan. In the event of a breach, we will notify affected Data Principals and the Data Protection Board of India as required by the Act.</li>
+        </ul>
+
+        <h2>7. Cross-Border Data Transfers</h2>
+        <p>splanly's primary data storage and processing infrastructure is located in India and jurisdictions approved by the Central Government under the DPDP Act.</p>
+        <p>If data is transferred to or processed in jurisdictions outside India (for example, through third-party service providers such as cloud hosting or analytics), we ensure that:</p>
+        <ul>
+            <li>The transfer is to a jurisdiction approved by the Central Government, or</li>
+            <li>Appropriate contractual and technical safeguards are in place to protect the data to a standard equivalent to the DPDP Act.</li>
+        </ul>
+        <p>We continuously monitor government notifications regarding restricted jurisdictions and update our practices accordingly.</p>
+
+        <h2>8. Grievance Officer</h2>
+        <p>In compliance with the DPDP Act, we have designated a Grievance Officer to address complaints and concerns related to personal data processing:</p>
+        <div class="highlight-box">
+            <p><strong>Grievance Officer</strong><br>
+            SkilledCA Enterprises<br>
+            Email: <a href="mailto:samarth@skilledca.in">samarth@skilledca.in</a><br><br>
+            <strong>Response Timeline:</strong><br>
+            Acknowledgement: Within 48 hours<br>
+            Resolution: Within 30 days of receipt</p>
+        </div>
+        <p>If you are not satisfied with the resolution provided by our Grievance Officer, you have the right to file a complaint with the <strong>Data Protection Board of India</strong> as established under the DPDP Act.</p>
+
+        <h2>9. Changes to This Policy</h2>
+        <p>We may update this DPDP compliance page to reflect changes in our practices, legal requirements, or regulatory guidance. Material changes will be communicated via email or in-app notification at least 15 days before taking effect.</p>
+
+        <h2>10. Related Policies</h2>
+        <p>For additional details, please refer to:</p>
+        <ul>
+            <li><a href="/legal/privacy">Privacy Policy</a> — Comprehensive information on data collection, use, and sharing.</li>
+            <li><a href="/legal/cookies">Cookie Policy</a> — Details on cookies and tracking technologies used.</li>
+            <li><a href="/legal/terms">Terms of Service</a> — General terms governing use of splanly.</li>
+        </ul>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="/legal/privacy">Privacy Policy</a> |
+            <a href="/legal/terms">Terms of Service</a> |
+            <a href="/legal/dpdp">DPDP Act</a> |
+            <a href="/legal/cookies">Cookie Policy</a> |
+            <a href="/legal/refund">Refund Policy</a>
+        </div>
+        <div class="footer-copy">splanly by SkilledCA Enterprises &copy; 2026. All rights reserved.</div>
+    </footer>
+
+    <script>
+        function getTheme() {
+            return localStorage.getItem('splanly-theme') || 'light';
+        }
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            const btn = document.getElementById('themeBtn');
+            if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+
+        function toggleTheme() {
+            const current = getTheme();
+            const next = current === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('splanly-theme', next);
+            applyTheme(next);
+        }
+
+        applyTheme(getTheme());
+    </script>
+</body>
+</html>

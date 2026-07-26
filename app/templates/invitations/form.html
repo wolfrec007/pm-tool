@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% from "macros/_csrf.html" import csrf_field %}
+
+{% block title %}Invite Admin - splanly{% endblock %}
+
+{% block content %}
+<div style="max-width: 500px;">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-foreground" style="font-family:'Plus Jakarta Sans',sans-serif;">Invite Admin</h1>
+        <p class="text-sm text-muted-foreground mt-1">Send an invitation to join your firm as an admin</p>
+    </div>
+
+    <div class="uk-card uk-card-body">
+        <form method="POST" action="/invitations/new" class="space-y-4">
+            {{ csrf_field(csrf_token) }}
+            
+            {% if errors %}
+            <div class="flex items-center gap-2 p-3 rounded-md text-sm font-medium" style="background:hsl(0 84% 95%); color:hsl(0 84% 40%); border:1px solid hsl(0 84% 88%);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                {{ errors | join(', ') }}
+            </div>
+            {% endif %}
+
+            <div class="space-y-2">
+                <label for="email" class="uk-form-label">Email Address</label>
+                <input id="email" class="uk-input" name="email" type="email" placeholder="user@example.com" required value="{{ email or '' }}" />
+                <p class="text-xs text-muted-foreground">The user will receive an invitation email with a link to join</p>
+            </div>
+
+            <div class="space-y-2">
+                <label for="role" class="uk-form-label">Role</label>
+                <select id="role" class="uk-input" name="role" required>
+                    {% for r in roles %}
+                    <option value="{{ r }}" {% if role == r %}selected{% endif %}>
+                        {{ r | title }}
+                        {% if r == 'admin' %} — Full access{% elif r == 'moderator' %} — Create/edit access{% else %} — View only{% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+                <p class="text-xs text-muted-foreground">
+                    <strong>Admin:</strong> Full access including user management<br>
+                    <strong>Moderator:</strong> Create and edit resources<br>
+                    <strong>Viewer:</strong> Read-only access
+                </p>
+            </div>
+
+            <div class="pt-4 border-t border-border">
+                <button type="submit" class="uk-btn uk-btn-primary w-full" style="border-radius:999px; height:44px; font-weight:600;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
+                    Send Invitation
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="mt-4">
+        <a href="/invitations" class="text-sm text-muted-foreground hover:text-foreground">
+            ← Back to Invitations
+        </a>
+    </div>
+</div>
+{% endblock %}

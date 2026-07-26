@@ -90,6 +90,47 @@ def soft_delete_branch(db: Session, branch_id: int) -> Branch:
     return branch
 
 
+def create_firm_with_trial(db: Session, user, email: str) -> Firm:
+    """Create a new firm with a 14-day trial license for the user."""
+    from datetime import datetime, timedelta
+
+    # Generate firm name from email domain
+    domain = email.split("@")[-1].lower().strip()
+    firm_name = domain.split(".")[0].title()
+    firm_code = domain.split(".")[0].upper()[:10]
+
+    # Ensure unique code
+    counter = 1
+    original_code = firm_code
+    while db.query(Firm).filter(Firm.code == firm_code).first():
+        firm_code = f"{original_code}{counter}"
+        counter += 1
+
+    # Create firm
+    firm = Firm(
+        name=firm_name,
+        code=firm_code,
+        is_active=True,
+    )
+    db.add(firm)
+    db.flush()
+
+    # Create trial license (14 days)
+    import hashlib
+    trial_key = f"TRIAL-{firm.id}-{datetime.utcnow().timestamp()}"
+    firm.license_key_hash = hashlib.sha256(trial_key.encode()).hexdigest()
+    firm.license_tier = "standard"
+    firm.license_activated_at = datetime.utcnow()
+    firm.license_expires_at = datetime.utcnow() + timedelta(days=14)
+
+    # Add user to firm as admin
+    add_user_to_firm(db, user.id, firm.id, TechnicalRole.admin)
+
+    db.commit()
+    db.refresh(firm)
+    return firm
+
+
 # ── FirmUser ──
 
 def list_firm_users(db: Session, firm_id: int) -> list[FirmUser]:

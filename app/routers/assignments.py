@@ -1,3 +1,4 @@
+import logging
 from datetime import date as _date
 from typing import Optional
 
@@ -15,6 +16,8 @@ from app.schemas.schemas import AssignmentCreate, AssignmentRead, AssignmentUpda
 from app.services import allocation_service as service
 from app.services import team_member_service, engagement_service
 from app.templates_setup import templates
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/assignments", tags=["assignments"])
 
@@ -140,10 +143,10 @@ async def create_assignment_form(
         set_flash(request, f"Assignment created ({result.allocation_percent}% allocation).")
         return RedirectResponse(url="/assignments", status_code=303)
     except (OverAllocationError, ConflictWithLeaveError, ValidationError, NotFoundError) as e:
-        print(f"[DEBUG] Validation error: {e}")
+        logger.debug("Validation error: %s", e)
         errors.append(str(e))
     except Exception as e:
-        print(f"[DEBUG] Unexpected error: {type(e).__name__}: {e}")
+        logger.warning("Unexpected error creating assignment: %s: %s", type(e).__name__, e)
         errors.append(str(e))
 
     members, _ = team_member_service.list_team_members(db, firm_id=firm_id, limit=200, is_active=True)

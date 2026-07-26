@@ -21,16 +21,20 @@ from app.routers import (
     assignments,
     auth,
     clients,
+    contact,
     dashboard,
     engagements,
     health,
+    invitations,
     leaves,
+    license,
     outbox,
     reports,
     team_members,
     users,
 )
 from app.api.v1 import router as api_v1_router
+from app.middleware.license import LicenseMiddleware
 
 
 @asynccontextmanager
@@ -39,7 +43,14 @@ async def lifespan(app):
         yield
 
 
-app = FastAPI(title=settings.APP_NAME, version="0.1.0", lifespan=lifespan)
+app = FastAPI(
+    title=settings.APP_NAME,
+    version="0.1.0",
+    lifespan=lifespan,
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None,
+)
 
 class FlashMiddleware(BaseHTTPMiddleware):
     """Pop flash message before rendering so it shows only once."""
@@ -49,7 +60,10 @@ class FlashMiddleware(BaseHTTPMiddleware):
         return response
 
 
-# Flash middleware first (innermost), then session middleware (wraps around it)
+# Middleware order: outermost → innermost
+app.add_middleware(LicenseMiddleware)
+from app.middleware.password_expiry import PasswordExpiryMiddleware
+app.add_middleware(PasswordExpiryMiddleware)
 app.add_middleware(FlashMiddleware)
 app.add_middleware(
     SessionMiddleware,
@@ -96,6 +110,8 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 # Include routers
 app.include_router(health.router)
 app.include_router(auth.router)
+app.include_router(contact.router)
+app.include_router(invitations.router)
 app.include_router(team_members.router)
 app.include_router(clients.router)
 app.include_router(engagements.router)
@@ -106,12 +122,48 @@ app.include_router(admin_settings.router)
 app.include_router(dashboard.router)
 app.include_router(users.router)
 app.include_router(outbox.router)
+app.include_router(license.router)
 app.include_router(api_v1_router)
 
 
 @app.get("/test")
 def test_page(request: Request):
     return templates.TemplateResponse(request, "test.html")
+
+
+@app.get("/faq")
+def faq_page(request: Request):
+    return templates.TemplateResponse(request, "faq.html")
+
+
+@app.get("/docs-app")
+def docs_page(request: Request):
+    return templates.TemplateResponse(request, "docs.html")
+
+
+@app.get("/privacy")
+def privacy_page(request: Request):
+    return templates.TemplateResponse(request, "legal/privacy.html")
+
+
+@app.get("/terms")
+def terms_page(request: Request):
+    return templates.TemplateResponse(request, "legal/terms.html")
+
+
+@app.get("/dpdp")
+def dpdp_page(request: Request):
+    return templates.TemplateResponse(request, "legal/dpdp.html")
+
+
+@app.get("/cookies")
+def cookies_page(request: Request):
+    return templates.TemplateResponse(request, "legal/cookies.html")
+
+
+@app.get("/refund")
+def refund_page(request: Request):
+    return templates.TemplateResponse(request, "legal/refund.html")
 
 
 @app.get("/")
@@ -161,7 +213,19 @@ def http_exception_handler(request: Request, exc: HTTPException):
     if exc.status_code == 401 and "text/html" in request.headers.get("accept", ""):
         return RedirectResponse(url="/auth/login", status_code=303)
     if "text/html" in request.headers.get("accept", ""):
+        if exc.status_code == 403:
+            return templates.TemplateResponse(request, "errors/403.html", status_code=403)
+        if exc.status_code == 404:
+            return templates.TemplateResponse(request, "errors/404.html", status_code=404)
         return templates.TemplateResponse(request, "errors/error.html", {
             "status_code": exc.status_code, "detail": exc.detail,
         }, status_code=exc.status_code)
     return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
+
+
+@app.exception_handler(404)
+async def not_found_page_handler(request: Request, exc):
+    """Handle 404 for missing routes (Starlette-level, before HTTPException handler)."""
+    if "text/html" in request.headers.get("accept", ""):
+        return templates.TemplateResponse(request, "errors/404.html", status_code=404)
+    return JSONResponse(status_code=404, content={"detail": "Not Found"})

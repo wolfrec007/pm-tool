@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookie Policy — splanly</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #16324f;
+            --steel: #4f82b0;
+            --bg: #f6fafe;
+            --bg-secondary: #eaf1f8;
+            --text: #1a2a3a;
+            --text-muted: #5a7a9a;
+            --border: #d0dde8;
+            --card-bg: #ffffff;
+            --nav-bg: rgba(255,255,255,0.85);
+            --footer-bg: #16324f;
+            --footer-text: #c8d8e8;
+            --shadow: 0 1px 3px rgba(22,50,79,0.08);
+        }
+
+        [data-theme="dark"] {
+            --bg: #0b1a29;
+            --bg-secondary: #112238;
+            --text: #d8e4f0;
+            --text-muted: #7a9ab8;
+            --border: #1e3a54;
+            --card-bg: #0f2438;
+            --nav-bg: rgba(11,26,41,0.9);
+            --footer-bg: #061018;
+            --footer-text: #7a9ab8;
+            --shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            color: var(--navy);
+            line-height: 1.3;
+        }
+
+        [data-theme="dark"] h1,
+        [data-theme="dark"] h2,
+        [data-theme="dark"] h3,
+        [data-theme="dark"] h4 {
+            color: #e8f0f8;
+        }
+
+        /* ── Navigation ── */
+        .nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--nav-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 1.5rem;
+        }
+
+        .nav-inner {
+            max-width: 1120px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .nav-brand {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 800;
+            font-size: 1.35rem;
+            color: var(--navy);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        [data-theme="dark"] .nav-brand { color: #e8f0f8; }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--navy); }
+        [data-theme="dark"] .nav-links a:hover { color: #e8f0f8; }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--steel);
+            color: var(--steel);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1.15rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-ghost {
+            color: var(--text-muted);
+            background: transparent;
+        }
+
+        .btn-ghost:hover { color: var(--navy); background: var(--bg-secondary); }
+        [data-theme="dark"] .btn-ghost:hover { color: #e8f0f8; }
+
+        .btn-primary {
+            background: var(--steel);
+            color: #fff;
+        }
+
+        .btn-primary:hover { background: var(--navy); }
+
+        .nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text);
+        }
+
+        @media (max-width: 768px) {
+            .nav-toggle { display: block; }
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 64px;
+                left: 0;
+                right: 0;
+                background: var(--nav-bg);
+                backdrop-filter: blur(12px);
+                flex-direction: column;
+                padding: 1rem 1.5rem;
+                gap: 0.75rem;
+                border-bottom: 1px solid var(--border);
+            }
+            .nav-links.open { display: flex; }
+            .nav-actions .btn-ghost { display: none; }
+        }
+
+        /* ── Main Content ── */
+        .page-header {
+            text-align: center;
+            padding: 3.5rem 1.5rem 2rem;
+        }
+
+        .page-header h1 {
+            font-size: 2.25rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header .meta {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 1.5rem 4rem;
+            flex: 1;
+        }
+
+        .content h2 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-top: 2.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .content h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .content p {
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+        }
+
+        .content li {
+            margin-bottom: 0.4rem;
+        }
+
+        .content a {
+            color: var(--steel);
+            text-decoration: underline;
+            text-decoration-color: rgba(79,130,176,0.3);
+            text-underline-offset: 2px;
+            transition: text-decoration-color 0.2s;
+        }
+
+        .content a:hover {
+            text-decoration-color: var(--steel);
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .content th, .content td {
+            text-align: left;
+            padding: 0.65rem 0.85rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .content th {
+            font-weight: 600;
+            color: var(--navy);
+            background: var(--bg-secondary);
+        }
+
+        [data-theme="dark"] .content th { color: #c8d8e8; }
+
+        .highlight-box {
+            background: var(--bg-secondary);
+            border-left: 3px solid var(--steel);
+            border-radius: 0 8px 8px 0;
+            padding: 1rem 1.25rem;
+            margin: 1.5rem 0;
+        }
+
+        .highlight-box p:last-child { margin-bottom: 0; }
+
+        .tag {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.1rem 0.45rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            vertical-align: middle;
+        }
+
+        .tag-essential { background: #2a9d8f; color: #fff; }
+        .tag-functional { background: #4f82b0; color: #fff; }
+        .tag-analytics { background: #e9a820; color: #1a2a3a; }
+
+        /* ── Footer ── */
+        .footer {
+            background: var(--footer-bg);
+            color: var(--footer-text);
+            padding: 2rem 1.5rem;
+            text-align: center;
+            font-size: 0.85rem;
+            line-height: 1.8;
+            margin-top: auto;
+        }
+
+        .footer a {
+            color: #8ab4d8;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer a:hover { color: #b8daf0; }
+
+        .footer-links {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-links a {
+            margin: 0 0.5rem;
+        }
+
+        .footer-copy {
+            opacity: 0.7;
+        }
+
+        @media (max-width: 600px) {
+            .page-header h1 { font-size: 1.75rem; }
+            .content h2 { font-size: 1.15rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="/" class="nav-brand">splanly</a>
+            <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Toggle menu">☰</button>
+            <ul class="nav-links">
+                <li><a href="/#features">Features</a></li>
+                <li><a href="/faq">FAQ</a></li>
+                <li><a href="/docs-app">Docs</a></li>
+                <li><a href="/contact">Contact</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme" id="themeBtn">🌙</button>
+                <a href="/auth/login" class="btn btn-ghost">Sign in</a>
+                <a href="/auth/register" class="btn btn-primary">Get started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <div class="page-header">
+        <h1>Cookie Policy</h1>
+        <p class="meta">Effective date: July 2026 &middot; splanly by SkilledCA Enterprises</p>
+    </div>
+
+    <!-- Content -->
+    <main class="content">
+        <p>This Cookie Policy explains how splanly, operated by SkilledCA Enterprises, uses cookies and similar technologies when you visit our platform. It explains what these technologies are, why we use them, and your rights to control their use.</p>
+
+        <h2>1. What Are Cookies?</h2>
+        <p>Cookies are small text files that are stored on your device (computer, tablet, or mobile) when you visit a website. They are widely used to make websites work efficiently, improve user experience, and provide information to the site owners.</p>
+        <p>Cookies can be "persistent" (remaining on your device until deleted or expired) or "session" cookies (deleted when you close your browser).</p>
+
+        <h2>2. Cookies We Use</h2>
+        <p>splanly uses a minimal set of cookies. We do not use cookies for advertising or cross-site tracking. Below is a detailed breakdown:</p>
+
+        <h3>Essential Cookies <span class="tag tag-essential">Required</span></h3>
+        <p>These cookies are necessary for splanly to function correctly. They cannot be disabled.</p>
+        <table>
+            <thead>
+                <tr><th>Cookie Name</th><th>Purpose</th><th>Duration</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>session_id</code></td>
+                    <td>Maintains your authenticated session. Without this cookie, you would need to log in on every page.</td>
+                    <td>Session (expires on logout or browser close)</td>
+                </tr>
+                <tr>
+                    <td><code>csrf_token</code></td>
+                    <td>Protects against Cross-Site Request Forgery (CSRF) attacks by validating that form submissions originate from splanly.</td>
+                    <td>Session</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Functional Cookies <span class="tag tag-functional">Optional</span></h3>
+        <p>These cookies remember your preferences to provide a personalized experience.</p>
+        <table>
+            <thead>
+                <tr><th>Cookie / Storage Key</th><th>Purpose</th><th>Duration</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>splanly-theme</code> (localStorage)</td>
+                    <td>Stores your dark/light theme preference so it persists across visits.</td>
+                    <td>Persistent (until cleared by user)</td>
+                </tr>
+                <tr>
+                    <td><code>splanly-locale</code></td>
+                    <td>Remembers your language or locale preference (if applicable).</td>
+                    <td>Persistent (1 year)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Analytics Cookies <span class="tag tag-analytics">Optional</span></h3>
+        <p>These cookies help us understand how splanly is used so we can improve the platform.</p>
+        <table>
+            <thead>
+                <tr><th>Cookie Name</th><th>Purpose</th><th>Duration</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>_analytics_id</code></td>
+                    <td>Assigns an anonymized identifier to track aggregated usage patterns (page views, feature usage). No personal data is collected through this cookie.</td>
+                    <td>24 months</td>
+                </tr>
+            </tbody>
+        </table>
+        <p>We may use lightweight, privacy-focused analytics tools. We do not use Google Analytics or any tool that shares your data with third-party advertising networks.</p>
+
+        <h2>3. Third-Party Cookies</h2>
+        <p>splanly does not intentionally set third-party cookies. However, certain embedded services may set their own cookies:</p>
+        <ul>
+            <li><strong>Payment Processor</strong> — If you make a payment through our third-party payment processor, that service may set cookies on its own domain to facilitate the transaction and detect fraud. These cookies are governed by the payment processor's own privacy and cookie policies.</li>
+            <li><strong>Embedded Fonts</strong> — We load Inter and Plus Jakarta Sans from Google Fonts. Google may collect limited usage data (such as the number of requests) as described in <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google's Privacy Policy</a>. No cookies are set by Google Fonts.</li>
+        </ul>
+        <p>We do not use social media tracking pixels, advertising networks, or cross-site remarketing cookies.</p>
+
+        <h2>4. How to Manage Cookies</h2>
+        <p>You have full control over cookies used by splanly:</p>
+        <ul>
+            <li><strong>Browser Settings</strong> — Most browsers allow you to block or delete cookies. You can typically find these settings in the "Privacy" or "Security" section of your browser preferences. Note that blocking essential cookies may prevent splanly from functioning properly.</li>
+            <li><strong>Theme Preference</strong> — The <code>splanly-theme</code> setting is stored in localStorage, not as a cookie. You can clear it through your browser's developer tools or by toggling the theme in the application.</li>
+            <li><strong>Analytics Opt-Out</strong> — If we offer an in-app toggle for analytics, you can opt out through your account settings. Alternatively, you can block the analytics cookie through your browser.</li>
+        </ul>
+
+        <div class="highlight-box">
+            <p><strong>Browser-specific cookie management guides:</strong></p>
+            <p>
+                <a href="https://support.google.com/chrome/answer/95647" target="_blank" rel="noopener">Google Chrome</a> &middot;
+                <a href="https://support.mozilla.org/en-US/kb/enhanced-tracking-protection-firefox-desktop" target="_blank" rel="noopener">Mozilla Firefox</a> &middot;
+                <a href="https://support.apple.com/guide/safari/manage-cookies-sfri11471/mac" target="_blank" rel="noopener">Safari</a> &middot;
+                <a href="https://support.microsoft.com/en-us/microsoft-edge/delete-cookies-in-microsoft-edge-63947406-40ac-c3b8-57b9-2a946a29ae09" target="_blank" rel="noopener">Microsoft Edge</a>
+            </p>
+        </div>
+
+        <h2>5. Do Not Track Signals</h2>
+        <p>Some browsers offer a "Do Not Track" (DNT) setting. splanly respects DNT signals — if your browser sends a DNT signal, we will not set analytics cookies on your visit.</p>
+
+        <h2>6. Updates to This Policy</h2>
+        <p>We may update this Cookie Policy from time to time to reflect changes in our practices, technology, or legal requirements. The "Effective date" at the top of this page will be updated accordingly. We encourage you to review this policy periodically.</p>
+
+        <h2>7. Contact Us</h2>
+        <p>If you have questions about our use of cookies or this Cookie Policy, please contact:</p>
+        <div class="highlight-box">
+            <p><strong>SkilledCA Enterprises</strong><br>
+            Email: <a href="mailto:samarth@skilledca.in">samarth@skilledca.in</a></p>
+        </div>
+
+        <h2>8. Related Policies</h2>
+        <ul>
+            <li><a href="/legal/privacy">Privacy Policy</a> — How we collect, use, and protect your personal data.</li>
+            <li><a href="/legal/dpdp">DPDP Act Compliance</a> — Our compliance with India's Digital Personal Data Protection Act, 2023.</li>
+            <li><a href="/legal/terms">Terms of Service</a> — General terms governing your use of splanly.</li>
+        </ul>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="/legal/privacy">Privacy Policy</a> |
+            <a href="/legal/terms">Terms of Service</a> |
+            <a href="/legal/dpdp">DPDP Act</a> |
+            <a href="/legal/cookies">Cookie Policy</a> |
+            <a href="/legal/refund">Refund Policy</a>
+        </div>
+        <div class="footer-copy">splanly by SkilledCA Enterprises &copy; 2026. All rights reserved.</div>
+    </footer>
+
+    <script>
+        function getTheme() {
+            return localStorage.getItem('splanly-theme') || 'light';
+        }
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            const btn = document.getElementById('themeBtn');
+            if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+
+        function toggleTheme() {
+            const current = getTheme();
+            const next = current === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('splanly-theme', next);
+            applyTheme(next);
+        }
+
+        applyTheme(getTheme());
+    </script>
+</body>
+</html>

@@ -2,6 +2,7 @@
 
 import logging
 import secrets
+from datetime import datetime, timezone
 from typing import Optional
 
 import bcrypt
@@ -36,6 +37,7 @@ def authenticate_user(db: Session, email: str, password: str) -> Optional[User]:
 
 def set_user_password(db: Session, user: User, password: str) -> None:
     user.password_hash = hash_password(password)
+    user.password_changed_at = datetime.now(timezone.utc)
     db.commit()
 
 

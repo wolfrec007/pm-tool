@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Developer Documentation — splanly</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #16324f;
+            --steel: #4f82b0;
+            --bg: #f6fafe;
+            --bg-secondary: #eaf1f8;
+            --text: #1a2a3a;
+            --text-muted: #5a7a9a;
+            --border: #d0dde8;
+            --card-bg: #ffffff;
+            --nav-bg: rgba(255,255,255,0.85);
+            --footer-bg: #16324f;
+            --footer-text: #c8d8e8;
+            --shadow: 0 1px 3px rgba(22,50,79,0.08);
+            --code-bg: #edf2f7;
+            --code-text: #d6336c;
+        }
+
+        [data-theme="dark"] {
+            --bg: #0b1a29;
+            --bg-secondary: #112238;
+            --text: #d8e4f0;
+            --text-muted: #7a9ab8;
+            --border: #1e3a54;
+            --card-bg: #0f2438;
+            --nav-bg: rgba(11,26,41,0.9);
+            --footer-bg: #061018;
+            --footer-text: #7a9ab8;
+            --shadow: 0 1px 3px rgba(0,0,0,0.3);
+            --code-bg: #162a3e;
+            --code-text: #f08ca0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            color: var(--navy);
+            line-height: 1.3;
+        }
+
+        [data-theme="dark"] h1,
+        [data-theme="dark"] h2,
+        [data-theme="dark"] h3,
+        [data-theme="dark"] h4 {
+            color: #e8f0f8;
+        }
+
+        code, pre {
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+        }
+
+        /* ── Navigation ── */
+        .nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--nav-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 1.5rem;
+        }
+
+        .nav-inner {
+            max-width: 1120px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .nav-brand {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 800;
+            font-size: 1.35rem;
+            color: var(--navy);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        [data-theme="dark"] .nav-brand { color: #e8f0f8; }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--navy); }
+        [data-theme="dark"] .nav-links a:hover { color: #e8f0f8; }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--steel);
+            color: var(--steel);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1.15rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-ghost {
+            color: var(--text-muted);
+            background: transparent;
+        }
+
+        .btn-ghost:hover { color: var(--navy); background: var(--bg-secondary); }
+        [data-theme="dark"] .btn-ghost:hover { color: #e8f0f8; }
+
+        .btn-primary {
+            background: var(--steel);
+            color: #fff;
+        }
+
+        .btn-primary:hover { background: var(--navy); }
+
+        .nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text);
+        }
+
+        @media (max-width: 768px) {
+            .nav-toggle { display: block; }
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 64px;
+                left: 0;
+                right: 0;
+                background: var(--nav-bg);
+                backdrop-filter: blur(12px);
+                flex-direction: column;
+                padding: 1rem 1.5rem;
+                gap: 0.75rem;
+                border-bottom: 1px solid var(--border);
+            }
+            .nav-links.open { display: flex; }
+            .nav-actions .btn-ghost { display: none; }
+        }
+
+        /* ── Main Content ── */
+        .page-header {
+            text-align: center;
+            padding: 3.5rem 1.5rem 2rem;
+        }
+
+        .page-header h1 {
+            font-size: 2.25rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header .meta {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            max-width: 560px;
+            margin: 0 auto;
+        }
+
+        /* ── TOC ── */
+        .toc {
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            padding: 0 1.5rem;
+        }
+
+        .toc-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .toc-card h3 {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 0.35rem;
+        }
+
+        .toc-grid a {
+            color: var(--steel);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 0.3rem 0;
+            transition: color 0.2s;
+        }
+
+        .toc-grid a:hover { color: var(--navy); }
+        [data-theme="dark"] .toc-grid a:hover { color: #e8f0f8; }
+
+        .content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 1.5rem 4rem;
+            flex: 1;
+        }
+
+        .content h2 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-top: 2.75rem;
+            margin-bottom: 0.75rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .content h2:first-of-type {
+            border-top: none;
+            padding-top: 0;
+        }
+
+        .content h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-top: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .content p {
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+        }
+
+        .content li {
+            margin-bottom: 0.4rem;
+        }
+
+        .content a {
+            color: var(--steel);
+            text-decoration: underline;
+            text-decoration-color: rgba(79,130,176,0.3);
+            text-underline-offset: 2px;
+            transition: text-decoration-color 0.2s;
+        }
+
+        .content a:hover {
+            text-decoration-color: var(--steel);
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0 1.5rem;
+            font-size: 0.875rem;
+        }
+
+        .content th, .content td {
+            text-align: left;
+            padding: 0.6rem 0.85rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .content th {
+            font-weight: 600;
+            color: var(--navy);
+            background: var(--bg-secondary);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        [data-theme="dark"] .content th { color: #c8d8e8; }
+
+        .content code {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.85em;
+        }
+
+        .content pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin: 1rem 0 1.5rem;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        .content pre code {
+            background: none;
+            color: var(--text);
+            padding: 0;
+            font-size: inherit;
+        }
+
+        .highlight-box {
+            background: var(--bg-secondary);
+            border-left: 3px solid var(--steel);
+            border-radius: 0 8px 8px 0;
+            padding: 1rem 1.25rem;
+            margin: 1.5rem 0;
+        }
+
+        .highlight-box p:last-child { margin-bottom: 0; }
+
+        .badge {
+            display: inline-block;
+            background: var(--steel);
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            vertical-align: middle;
+        }
+
+        .method-badge {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.1rem 0.45rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .method-get { background: #2a9d8f; color: #fff; }
+        .method-post { background: #4f82b0; color: #fff; }
+        .method-put { background: #e9a820; color: #1a2a3a; }
+        .method-patch { background: #e9a820; color: #1a2a3a; }
+        .method-delete { background: #d45d5d; color: #fff; }
+
+        .tree {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.8;
+            color: var(--text);
+        }
+
+        .tree .dir { color: var(--steel); font-weight: 600; }
+        .tree .comment { color: var(--text-muted); font-style: italic; }
+
+        /* ── Footer ── */
+        .footer {
+            background: var(--footer-bg);
+            color: var(--footer-text);
+            padding: 2rem 1.5rem;
+            text-align: center;
+            font-size: 0.85rem;
+            line-height: 1.8;
+            margin-top: auto;
+        }
+
+        .footer a {
+            color: #8ab4d8;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer a:hover { color: #b8daf0; }
+
+        .footer-links {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-links a {
+            margin: 0 0.5rem;
+        }
+
+        .footer-copy {
+            opacity: 0.7;
+        }
+
+        @media (max-width: 600px) {
+            .page-header h1 { font-size: 1.75rem; }
+            .content h2 { font-size: 1.15rem; }
+            .toc-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="/" class="nav-brand">splanly</a>
+            <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Toggle menu">☰</button>
+            <ul class="nav-links">
+                <li><a href="/#features">Features</a></li>
+                <li><a href="/faq">FAQ</a></li>
+                <li><a href="/docs-app">Docs</a></li>
+                <li><a href="/contact">Contact</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme" id="themeBtn">🌙</button>
+                <a href="/auth/login" class="btn btn-ghost">Sign in</a>
+                <a href="/auth/register" class="btn btn-primary">Get started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <div class="page-header">
+        <h1>Developer Documentation</h1>
+        <p class="meta">Architecture, models, APIs, and deployment reference for splanly — the staffing &amp; resource planning platform for CA firms.</p>
+    </div>
+
+    <!-- Table of Contents -->
+    <div class="toc">
+        <div class="toc-card">
+            <h3>On this page</h3>
+            <div class="toc-grid">
+                <a href="#tech-stack">Tech Stack</a>
+                <a href="#architecture">Architecture</a>
+                <a href="#project-structure">Project Structure</a>
+                <a href="#models">Data Models</a>
+                <a href="#api-v1">API v1 Endpoints</a>
+                <a href="#authentication">Authentication</a>
+                <a href="#deployment">Deployment</a>
+                <a href="#env-vars">Environment Variables</a>
+                <a href="#local-dev">Local Development</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <main class="content">
+
+        <!-- Tech Stack -->
+        <h2 id="tech-stack">Tech Stack</h2>
+        <table>
+            <thead>
+                <tr><th>Layer</th><th>Technology</th><th>Notes</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Backend Framework</td>
+                    <td><strong>FastAPI</strong> (Python 3.11+)</td>
+                    <td>Async-first, type-safe</td>
+                </tr>
+                <tr>
+                    <td>Templating</td>
+                    <td><strong>Jinja2</strong></td>
+                    <td>Server-side rendered HTML pages</td>
+                </tr>
+                <tr>
+                    <td>ORM</td>
+                    <td><strong>SQLAlchemy 2.0</strong></td>
+                    <td>Async-compatible, declarative models</td>
+                </tr>
+                <tr>
+                    <td>Database</td>
+                    <td><strong>PostgreSQL</strong> (Neon)</td>
+                    <td>Serverless Postgres in production</td>
+                </tr>
+                <tr>
+                    <td>Migrations</td>
+                    <td><strong>Alembic</strong></td>
+                    <td>Schema versioning and migrations</td>
+                </tr>
+                <tr>
+                    <td>CSS Framework</td>
+                    <td><strong>Tailwind CSS</strong></td>
+                    <td>Utility-first styling</td>
+                </tr>
+                <tr>
+                    <td>UI Components</td>
+                    <td><strong>Franken UI</strong></td>
+                    <td>Component library built on UIkit + Tailwind</td>
+                </tr>
+                <tr>
+                    <td>Authentication</td>
+                    <td>Session cookies + JWT + OAuth (Authlib)</td>
+                    <td>Multi-auth support</td>
+                </tr>
+                <tr>
+                    <td>Hosting</td>
+                    <td><strong>Render</strong></td>
+                    <td>Web service + managed database (Neon)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Architecture -->
+        <h2 id="architecture">Architecture</h2>
+        <p>splanly follows a <strong>server-side rendered (SSR)</strong> architecture with FastAPI serving Jinja2 templates for the main application. A separate <code>/api/v1</code> namespace provides RESTful JSON endpoints designed for consumption by a Next.js frontend (or any SPA/mobile client).</p>
+
+        <h3>Request Flow</h3>
+        <pre><code>Browser / SPA
+    │
+    ├─ SSR Pages ──→ FastAPI Routers ──→ Jinja2 Templates ──→ HTML
+    │
+    └─ API v1 ────→ FastAPI API Routers ──→ JSON Responses
+                        │
+                        ├──→ Services (business logic)
+                        │
+                        └──→ SQLAlchemy ORM ──→ PostgreSQL</code></pre>
+
+        <h3>Key Design Decisions</h3>
+        <ul>
+            <li><strong>Multi-tenant by design</strong> — Every model is scoped to a <code>firm_id</code>. Row-level security ensures firms cannot access each other's data.</li>
+            <li><strong>SSR first, API second</strong> — The primary interface is server-rendered HTML. The API layer (<code>/api/v1</code>) exists for the planned Next.js frontend migration.</li>
+            <li><strong>Middleware-driven auth</strong> — A session middleware (<code>app/middleware/</code>) handles authentication state across both SSR and API requests.</li>
+            <li><strong>Approval workflows</strong> — Built-in approval system for leave requests, engagement extensions, and other firm-defined actions.</li>
+        </ul>
+
+        <!-- Project Structure -->
+        <h2 id="project-structure">Project Structure</h2>
+        <pre><code class="tree"><span class="dir">pm-tool/</span>
+├── <span class="dir">app/</span>
+│   ├── <span class="dir">api/</span>
+│   │   └── <span class="dir">v1/</span>              <span class="comment"># REST API endpoints (JSON)</span>
+│   │       ├── auth.py          <span class="comment"># Auth endpoints (JWT, OAuth)</span>
+│   │       ├── clients.py       <span class="comment"># Client CRUD</span>
+│   │       ├── engagements.py   <span class="comment"># Engagement management</span>
+│   │       ├── assignments.py   <span class="comment"># Assignment operations</span>
+│   │       ├── team_members.py  <span class="comment"># Team member management</span>
+│   │       ├── leaves.py        <span class="comment"># Leave management</span>
+│   │       ├── dashboard.py     <span class="comment"># Dashboard data endpoints</span>
+│   │       ├── approval.py      <span class="comment"># Approval workflow endpoints</span>
+│   │       ├── extensions.py    <span class="comment"># Engagement extension requests</span>
+│   │       └── deps.py          <span class="comment"># Shared dependencies</span>
+│   ├── <span class="dir">routers/</span>             <span class="comment"># SSR page routes (Jinja2)</span>
+│   │   ├── auth.py, dashboard.py, clients.py
+│   │   ├── engagements.py, assignments.py
+│   │   ├── team_members.py, leaves.py
+│   │   ├── invitations.py, reports.py
+│   │   ├── license.py, admin_settings.py
+│   │   └── contact.py, health.py, outbox.py
+│   ├── <span class="dir">models/</span>              <span class="comment"># SQLAlchemy models</span>
+│   │   ├── models.py            <span class="comment"># Core models</span>
+│   │   ├── invitation.py        <span class="comment"># Invitation model</span>
+│   │   ├── super_admin.py       <span class="comment"># Super admin model</span>
+│   │   └── firm_business_role.py<span class="comment"># Business role model</span>
+│   ├── <span class="dir">schemas/</span>             <span class="comment"># Pydantic validation schemas</span>
+│   ├── <span class="dir">services/</span>            <span class="comment"># Business logic layer</span>
+│   ├── <span class="dir">middleware/</span>           <span class="comment"># Auth middleware, request context</span>
+│   ├── <span class="dir">templates/</span>           <span class="comment"># Jinja2 HTML templates</span>
+│   │   ├── auth/, dashboard/, clients/
+│   │   ├── engagements/, team_members/
+│   │   ├── legal/               <span class="comment"># Legal pages (this file's siblings)</span>
+│   │   └── docs.html, faq.html
+│   ├── <span class="dir">static/</span>              <span class="comment"># CSS, JS, images</span>
+│   ├── main.py                  <span class="comment"># FastAPI app entry point</span>
+│   ├── config.py                <span class="comment"># Settings (pydantic-settings)</span>
+│   ├── database.py              <span class="comment"># SQLAlchemy engine & session</span>
+│   ├── csrf.py, csrf_utils.py   <span class="comment"># CSRF protection</span>
+│   ├── email_worker.py          <span class="comment"># Email sending service</span>
+│   ├── flash.py                 <span class="comment"># Flash message helpers</span>
+│   └── exceptions.py            <span class="comment"># Custom exception handlers</span>
+├── <span class="dir">alembic/</span>                   <span class="comment"># Database migrations</span>
+├── <span class="dir">tests/</span>                     <span class="comment"># Pytest test suite</span>
+├── requirements.txt
+├── run_server.py                <span class="comment"># Dev server runner</span>
+├── alembic.ini
+├── render.yaml                  <span class="comment"># Render deployment config</span>
+└── .env.example                 <span class="comment"># Environment variable template</span></code></pre>
+
+        <!-- Data Models -->
+        <h2 id="models">Data Models</h2>
+        <p>All models inherit from SQLAlchemy's declarative <code>Base</code> and are defined in <code>app/models/models.py</code> (plus supplementary files). Every business entity is scoped to a firm for multi-tenancy.</p>
+
+        <table>
+            <thead>
+                <tr><th>Model</th><th>Description</th><th>Key Relationships</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>User</code></td>
+                    <td>Individual user account with email, hashed password, and OAuth fields</td>
+                    <td>→ FirmUser → Firm</td>
+                </tr>
+                <tr>
+                    <td><code>Firm</code></td>
+                    <td>A CA firm (tenant). Contains name, license details, and plan info</td>
+                    <td>→ FirmUsers, Branches, Clients, TeamMembers</td>
+                </tr>
+                <tr>
+                    <td><code>FirmUser</code></td>
+                    <td>Junction table linking Users to Firms with role (admin, manager, member)</td>
+                    <td>User ↔ Firm, Role</td>
+                </tr>
+                <tr>
+                    <td><code>Branch</code></td>
+                    <td>Office branch within a firm (e.g., Chennai, Mumbai)</td>
+                    <td>→ Firm</td>
+                </tr>
+                <tr>
+                    <td><code>TeamMember</code></td>
+                    <td>A staff member within the firm, with designation, skills, and availability</td>
+                    <td>→ Firm, Branch, Assignments, Leaves</td>
+                </tr>
+                <tr>
+                    <td><code>Client</code></td>
+                    <td>A client of the CA firm</td>
+                    <td>→ Firm, Engagements</td>
+                </tr>
+                <tr>
+                    <td><code>Engagement</code></td>
+                    <td>A service engagement (audit, tax filing, etc.) for a client</td>
+                    <td>→ Client, Firm, Assignments, EngagementInstances</td>
+                </tr>
+                <tr>
+                    <td><code>EngagementInstance</code></td>
+                    <td>A recurring instance of an engagement (e.g., FY 2025-26 audit)</td>
+                    <td>→ Engagement</td>
+                </tr>
+                <tr>
+                    <td><code>Assignment</code></td>
+                    <td>Links a TeamMember to an EngagementInstance with dates and hours</td>
+                    <td>→ TeamMember, EngagementInstance</td>
+                </tr>
+                <tr>
+                    <td><code>Leave</code></td>
+                    <td>Leave request/record for a team member</td>
+                    <td>→ TeamMember, ApprovalRequest</td>
+                </tr>
+                <tr>
+                    <td><code>ApprovalRule</code></td>
+                    <td>Configurable approval workflow rules per firm</td>
+                    <td>→ Firm</td>
+                </tr>
+                <tr>
+                    <td><code>ApprovalRequest</code></td>
+                    <td>Pending/approved/rejected approval for a workflow action</td>
+                    <td>→ ApprovalRule, FirmUser</td>
+                </tr>
+                <tr>
+                    <td><code>Invitation</code></td>
+                    <td>Firm invitation to onboard a new user</td>
+                    <td>→ Firm</td>
+                </tr>
+                <tr>
+                    <td><code>FirmBusinessRole</code></td>
+                    <td>Custom business roles defined within a firm (e.g., Senior Associate)</td>
+                    <td>→ Firm</td>
+                </tr>
+                <tr>
+                    <td><code>SuperAdmin</code></td>
+                    <td>Platform-level admin accounts (SkilledCA team)</td>
+                    <td>—</td>
+                </tr>
+                <tr>
+                    <td><code>SystemSetting</code></td>
+                    <td>Key-value configuration settings per firm or global</td>
+                    <td>→ Firm (optional)</td>
+                </tr>
+                <tr>
+                    <td><code>EmailOutbox</code></td>
+                    <td>Queued outbound emails for reliable delivery</td>
+                    <td>—</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- API v1 -->
+        <h2 id="api-v1">API v1 Endpoints</h2>
+        <p>The <code>/api/v1</code> namespace provides JSON REST endpoints. All endpoints require authentication unless noted. Responses follow a consistent format and use standard HTTP status codes.</p>
+
+        <h3>Authentication <code>/api/v1/auth</code></h3>
+        <table>
+            <thead>
+                <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="method-badge method-post">POST</span></td>
+                    <td><code>/api/v1/auth/login</code></td>
+                    <td>Email/password login, returns JWT</td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-post">POST</span></td>
+                    <td><code>/api/v1/auth/register</code></td>
+                    <td>Register new user and firm</td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-get">GET</span></td>
+                    <td><code>/api/v1/auth/me</code></td>
+                    <td>Get current authenticated user</td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-get">GET</span></td>
+                    <td><code>/api/v1/auth/oauth/{provider}</code></td>
+                    <td>Initiate OAuth flow (Google, etc.)</td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-get">GET</span></td>
+                    <td><code>/api/v1/auth/oauth/{provider}/callback</code></td>
+                    <td>OAuth callback handler</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Clients <code>/api/v1/clients</code></h3>
+        <table>
+            <thead>
+                <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="method-badge method-get">GET</span></td>
+                    <td><code>/api/v1/clients</code></td>
+                    <td>List all clients for the firm</td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-post">POST</span></td>
+                    <td><code>/api/v1/clients</code></td>
+                    <td>Create a new client</td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-get">GET</span></td>
+                    <td><code>/api/v1/clients/{id}</code></td>
+                    <td>Get client details</td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-put">PUT</span></td>
+                    <td><code>/api/v1/clients/{id}</code></td>
+                    <td>Update client</td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-delete">DELETE</span></td>
+                    <td><code>/api/v1/clients/{id}</code></td>
+                    <td>Delete client</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Engagements <code>/api/v1/engagements</code></h3>
+        <table>
+            <thead>
+                <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="method-badge method-get">GET</span></td>
+                    <td><code>/api/v1/engagements</code></td>
+                    <td>List engagements (filterable by client, status)</td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-post">POST</span></td>
+                    <td><code>/api/v1/engagements</code></td>
+                    <td>Create a new engagement</td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-get">GET</span></td>
+                    <td><code>/api/v1/engagements/{id}</code></td>
+                    <td>Get engagement details with instances</td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-put">PUT</span></td>
+                    <td><code>/api/v1/engagements/{id}</code></td>
+                    <td>Update engagement</td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-delete">DELETE</span></td>
+                    <td><code>/api/v1/engagements/{id}</code></td>
+                    <td>Delete engagement</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Assignments <code>/api/v1/assignments</code></h3>
+        <table>
+            <thead>
+                <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="method-badge method-get">GET</span></td>
+                    <td><code>/api/v1/assignments</code></td>
+                    <td>List assignments (filterable by member, engagement, date)</td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-post">POST</span></td>
+                    <td><code>/api/v1/assignments</code></td>
+                    <td>Create a new assignment</td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-get">GET</span></td>
+                    <td><code>/api/v1/assignments/{id}</code></td>
+                    <td>Get assignment details</td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-put">PUT</span></td>
+                    <td><code>/api/v1/assignments/{id}</code></td>
+                    <td>Update assignment</td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-delete">DELETE</span></td>
+                    <td><code>/api/v1/assignments/{id}</code></td>
+                    <td>Delete assignment</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Team Members <code>/api/v1/team-members</code></h3>
+        <table>
+            <thead>
+                <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="method-badge method-get">GET</span></td>
+                    <td><code>/api/v1/team-members</code></td>
+                    <td>List all team members for the firm</td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-post">POST</span></td>
+                    <td><code>/api/v1/team-members</code></td>
+                    <td>Add a new team member</td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-get">GET</span></td>
+                    <td><code>/api/v1/team-members/{id}</code></td>
+                    <td>Get team member details with assignments</td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-put">PUT</span></td>
+                    <td><code>/api/v1/team-members/{id}</code></td>
+                    <td>Update team member</td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-delete">DELETE</span></td>
+                    <td><code>/api/v1/team-members/{id}</code></td>
+                    <td>Remove team member</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Leaves <code>/api/v1/leaves</code></h3>
+        <table>
+            <thead>
+                <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="method-badge method-get">GET</span></td>
+                    <td><code>/api/v1/leaves</code></td>
+                    <td>List leave records (filterable by member, status, date range)</td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-post">POST</span></td>
+                    <td><code>/api/v1/leaves</code></td>
+                    <td>Submit a leave request</td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-patch">PATCH</span></td>
+                    <td><code>/api/v1/leaves/{id}/approve</code></td>
+                    <td>Approve a leave request</td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-patch">PATCH</span></td>
+                    <td><code>/api/v1/leaves/{id}/reject</code></td>
+                    <td>Reject a leave request</td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-delete">DELETE</span></td>
+                    <td><code>/api/v1/leaves/{id}</code></td>
+                    <td>Cancel/delete a leave record</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Dashboard <code>/api/v1/dashboard</code></h3>
+        <table>
+            <thead>
+                <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="method-badge method-get">GET</span></td>
+                    <td><code>/api/v1/dashboard/summary</code></td>
+                    <td>Dashboard summary (team count, active engagements, etc.)</td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-get">GET</span></td>
+                    <td><code>/api/v1/dashboard/workload</code></td>
+                    <td>Team workload overview and utilization</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Approvals <code>/api/v1/approvals</code></h3>
+        <table>
+            <thead>
+                <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="method-badge method-get">GET</span></td>
+                    <td><code>/api/v1/approvals</code></td>
+                    <td>List pending approval requests</td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-patch">PATCH</span></td>
+                    <td><code>/api/v1/approvals/{id}</code></td>
+                    <td>Approve or reject a request</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Authentication -->
+        <h2 id="authentication">Authentication</h2>
+        <p>splanly supports three authentication methods, all accessible through the SSR and API layers:</p>
+
+        <h3>1. Session-Based (SSR)</h3>
+        <p>Default for server-rendered pages. Upon login, a signed session cookie is set using <code>itsdangerous</code>. The session stores the <code>user_id</code> and <code>firm_id</code>, validated by middleware on every request.</p>
+        <pre><code>Cookie: staffplan_session=&lt;signed-token&gt;</code></pre>
+
+        <h3>2. JWT (API)</h3>
+        <p>For API v1 endpoints, authentication uses Bearer tokens generated via <code>PyJWT</code>. Tokens are issued on login and include <code>user_id</code>, <code>firm_id</code>, and an expiry claim.</p>
+        <pre><code>Authorization: Bearer &lt;jwt-token&gt;</code></pre>
+
+        <h3>3. OAuth 2.0 (Google)</h3>
+        <p>Users can sign in with Google using <code>Authlib</code>. The flow is handled at <code>/api/v1/auth/oauth/google</code>, which redirects to Google and processes the callback to create or link a user account.</p>
+
+        <div class="highlight-box">
+            <p><strong>CSRF Protection:</strong> All state-changing requests (POST, PUT, DELETE) on SSR routes require a valid CSRF token, enforced via <code>fastapi-csrf-protect</code>. API endpoints using Bearer JWT are exempt from CSRF checks.</p>
+        </div>
+
+        <!-- Deployment -->
+        <h2 id="deployment">Deployment</h2>
+        <p>splanly is deployed on <strong>Render</strong> with a <strong>Neon PostgreSQL</strong> database.</p>
+
+        <h3>Render Configuration</h3>
+        <p>The <code>render.yaml</code> blueprint configures the web service:</p>
+        <pre><code>services:
+  - type: web
+    name: staffplan
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: alembic upgrade head &amp;&amp; uvicorn app.main:app --host 0.0.0.0 --port $PORT</code></pre>
+        <p>Migrations run automatically on every deploy (<code>alembic upgrade head</code>) before the server starts.</p>
+
+        <h3>Database</h3>
+        <p>Neon provides a serverless PostgreSQL instance. The <code>DATABASE_URL</code> is injected from Render's linked database resource. Connection pooling is handled at the Neon level.</p>
+
+        <h3>CI/CD</h3>
+        <p>Render auto-deploys on push to the <code>main</code> branch. Pre-deploy, Alembic runs any pending migrations. There is no separate CI pipeline configured — tests can be run locally with <code>pytest</code>.</p>
+
+        <!-- Environment Variables -->
+        <h2 id="env-vars">Environment Variables</h2>
+        <p>Configuration is managed through environment variables, loaded by <code>pydantic-settings</code> in <code>app/config.py</code>. See <code>.env.example</code> for the full template.</p>
+
+        <table>
+            <thead>
+                <tr><th>Variable</th><th>Required</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>DATABASE_URL</code></td>
+                    <td>Yes</td>
+                    <td>PostgreSQL connection string (e.g., <code>postgresql+psycopg2://...</code>)</td>
+                </tr>
+                <tr>
+                    <td><code>SECRET_KEY</code></td>
+                    <td>Yes</td>
+                    <td>Secret for signing sessions and CSRF tokens. Auto-generated on Render.</td>
+                </tr>
+                <tr>
+                    <td><code>ENV</code></td>
+                    <td>No</td>
+                    <td>Environment: <code>development</code>, <code>production</code>, or <code>test</code>. Defaults to <code>development</code>.</td>
+                </tr>
+                <tr>
+                    <td><code>SESSION_COOKIE_NAME</code></td>
+                    <td>No</td>
+                    <td>Custom session cookie name. Defaults to <code>staffplan_session</code>.</td>
+                </tr>
+                <tr>
+                    <td><code>SMTP_HOST</code></td>
+                    <td>No</td>
+                    <td>SMTP server for sending transactional emails.</td>
+                </tr>
+                <tr>
+                    <td><code>SMTP_PORT</code></td>
+                    <td>No</td>
+                    <td>SMTP port (e.g., <code>587</code>).</td>
+                </tr>
+                <tr>
+                    <td><code>SMTP_USER</code></td>
+                    <td>No</td>
+                    <td>SMTP authentication username.</td>
+                </tr>
+                <tr>
+                    <td><code>SMTP_PASSWORD</code></td>
+                    <td>No</td>
+                    <td>SMTP authentication password.</td>
+                </tr>
+                <tr>
+                    <td><code>GOOGLE_CLIENT_ID</code></td>
+                    <td>No</td>
+                    <td>Google OAuth client ID for SSO.</td>
+                </tr>
+                <tr>
+                    <td><code>GOOGLE_CLIENT_SECRET</code></td>
+                    <td>No</td>
+                    <td>Google OAuth client secret.</td>
+                </tr>
+                <tr>
+                    <td><code>JWT_SECRET_KEY</code></td>
+                    <td>No</td>
+                    <td>Secret for signing JWTs. Falls back to <code>SECRET_KEY</code> if not set.</td>
+                </tr>
+                <tr>
+                    <td><code>JWT_ALGORITHM</code></td>
+                    <td>No</td>
+                    <td>JWT algorithm. Defaults to <code>HS256</code>.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Local Development -->
+        <h2 id="local-dev">Local Development</h2>
+        <p>Get splanly running locally in a few steps:</p>
+
+        <h3>Prerequisites</h3>
+        <ul>
+            <li>Python 3.11+</li>
+            <li>PostgreSQL (local or remote)</li>
+            <li><code>pip</code> or a virtual environment manager</li>
+        </ul>
+
+        <h3>Setup</h3>
+        <pre><code># Clone the repository
+git clone &lt;repo-url&gt;
+cd pm-tool
+
+# Create and activate virtual environment
+python -m venv venv
+source venv/bin/activate        # Linux/macOS
+venv\Scripts\activate           # Windows
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Copy environment template and configure
+cp .env.example .env
+# Edit .env with your DATABASE_URL and SECRET_KEY
+
+# Run database migrations
+alembic upgrade head
+
+# Start the development server
+python run_server.py</code></pre>
+        <p>The server starts at <code>http://localhost:8000</code>. API documentation is available via the developer dashboard.</p>
+
+        <h3>Running Tests</h3>
+        <pre><code># Run all tests
+pytest
+
+# Run with verbose output
+pytest -v
+
+# Run specific test file
+pytest tests/test_auth.py</code></pre>
+
+        <div class="highlight-box">
+            <p><strong>Questions or issues?</strong> Reach out to <a href="mailto:samarth@skilledca.in">samarth@skilledca.in</a> or refer to the <code>README.md</code> and <code>CONTEXT.md</code> files in the repository root for additional context.</p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="/legal/privacy">Privacy Policy</a> |
+            <a href="/legal/terms">Terms of Service</a> |
+            <a href="/legal/dpdp">DPDP Act</a> |
+            <a href="/legal/cookies">Cookie Policy</a> |
+            <a href="/legal/refund">Refund Policy</a>
+        </div>
+        <div class="footer-copy">splanly by SkilledCA Enterprises &copy; 2026. All rights reserved.</div>
+    </footer>
+
+    <script>
+        function getTheme() {
+            return localStorage.getItem('splanly-theme') || 'light';
+        }
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            const btn = document.getElementById('themeBtn');
+            if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+
+        function toggleTheme() {
+            const current = getTheme();
+            const next = current === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('splanly-theme', next);
+            applyTheme(next);
+        }
+
+        applyTheme(getTheme());
+
+        // Smooth scroll for TOC links
+        document.querySelectorAll('.toc-grid a').forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                var target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

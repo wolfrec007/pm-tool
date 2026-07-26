@@ -1,11 +1,15 @@
+"""User service layer."""
+
+from datetime import datetime, timezone
 from typing import Optional
 
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from app.exceptions import NotFoundError, ValidationError
-from app.models.models import User
+from app.models.models import Firm, FirmUser, User
 from app.services.auth_service import hash_password
+from app.services.license_tiers import check_user_limit
 
 
 def list_users(
@@ -30,6 +34,39 @@ def list_users(
     return items, total
 
 
+def list_deleted_users(
+    db: Session,
+    firm_id: int,
+    limit: int = 50,
+    offset: int = 0,
+):
+    """List deleted users for a firm."""
+    # Get users that were deleted and had access to this firm
+    query = (
+        db.query(User)
+        .join(FirmUser, FirmUser.user_id == User.id)
+        .filter(
+            FirmUser.firm_id == firm_id,
+            User.deleted_at.isnot(None),
+        )
+    )
+    total = query.count()
+    items = query.order_by(User.deleted_at.desc()).limit(limit).offset(offset).all()
+    
+    # Get deleter info
+    result = []
+    for user in items:
+        deleter = None
+        if user.deleted_by_user_id:
+            deleter = db.query(User).filter(User.id == user.deleted_by_user_id).first()
+        result.append({
+            "user": user,
+            "deleted_by": deleter,
+        })
+    
+    return result, total
+
+
 def get_user(db: Session, user_id: int) -> User:
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
@@ -37,7 +74,21 @@ def get_user(db: Session, user_id: int) -> User:
     return user
 
 
-def create_user(db: Session, data: dict, password: Optional[str] = None) -> User:
+def create_user(db: Session, data: dict, password: Optional[str] = None, firm_id: Optional[int] = None) -> User:
+    # Check license limit if firm_id provided
+    if firm_id:
+        firm = db.query(Firm).filter(Firm.id == firm_id).first()
+        if firm and firm.license_tier:
+            current_count = db.query(FirmUser).filter(
+                FirmUser.firm_id == firm_id,
+                FirmUser.is_active == True,
+            ).count()
+            if not check_user_limit(firm.license_tier, current_count):
+                raise ValidationError(
+                    f"User limit reached for {firm.license_tier} tier. "
+                    f"Upgrade your license to add more users."
+                )
+
     if not data.get("email"):
         raise ValidationError("Email is required")
     existing = db.query(User).filter(User.email == data["email"]).first()
@@ -66,9 +117,23 @@ def update_user(db: Session, user_id: int, data: dict) -> User:
     return user
 
 
-def soft_delete_user(db: Session, user_id: int) -> User:
+def soft_delete_user(db: Session, user_id: int, deleted_by_user_id: int) -> User:
+    """Soft delete a user and track who deleted them."""
     user = get_user(db, user_id)
     user.is_active = False
+    user.deleted_at = datetime.now(timezone.utc)
+    user.deleted_by_user_id = deleted_by_user_id
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+def restore_user(db: Session, user_id: int) -> User:
+    """Restore a soft-deleted user."""
+    user = get_user(db, user_id)
+    user.is_active = True
+    user.deleted_at = None
+    user.deleted_by_user_id = None
     db.commit()
     db.refresh(user)
     return user

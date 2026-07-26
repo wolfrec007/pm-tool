@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy — splanly</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #16324f;
+            --steel: #4f82b0;
+            --bg: #f6fafe;
+            --bg-secondary: #eaf1f8;
+            --text: #1a2a3a;
+            --text-muted: #5a7a9a;
+            --border: #d0dde8;
+            --card-bg: #ffffff;
+            --nav-bg: rgba(255,255,255,0.85);
+            --footer-bg: #16324f;
+            --footer-text: #c8d8e8;
+            --shadow: 0 1px 3px rgba(22,50,79,0.08);
+        }
+
+        [data-theme="dark"] {
+            --bg: #0b1a29;
+            --bg-secondary: #112238;
+            --text: #d8e4f0;
+            --text-muted: #7a9ab8;
+            --border: #1e3a54;
+            --card-bg: #0f2438;
+            --nav-bg: rgba(11,26,41,0.9);
+            --footer-bg: #061018;
+            --footer-text: #7a9ab8;
+            --shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            color: var(--navy);
+            line-height: 1.3;
+        }
+
+        [data-theme="dark"] h1,
+        [data-theme="dark"] h2,
+        [data-theme="dark"] h3,
+        [data-theme="dark"] h4 {
+            color: #e8f0f8;
+        }
+
+        /* ── Navigation ── */
+        .nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--nav-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 1.5rem;
+        }
+
+        .nav-inner {
+            max-width: 1120px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .nav-brand {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 800;
+            font-size: 1.35rem;
+            color: var(--navy);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        [data-theme="dark"] .nav-brand { color: #e8f0f8; }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--navy); }
+        [data-theme="dark"] .nav-links a:hover { color: #e8f0f8; }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--steel);
+            color: var(--steel);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1.15rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-ghost {
+            color: var(--text-muted);
+            background: transparent;
+        }
+
+        .btn-ghost:hover { color: var(--navy); background: var(--bg-secondary); }
+        [data-theme="dark"] .btn-ghost:hover { color: #e8f0f8; }
+
+        .btn-primary {
+            background: var(--steel);
+            color: #fff;
+        }
+
+        .btn-primary:hover { background: var(--navy); }
+
+        /* ── Mobile nav ── */
+        .nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text);
+        }
+
+        @media (max-width: 768px) {
+            .nav-toggle { display: block; }
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 64px;
+                left: 0;
+                right: 0;
+                background: var(--nav-bg);
+                backdrop-filter: blur(12px);
+                flex-direction: column;
+                padding: 1rem 1.5rem;
+                gap: 0.75rem;
+                border-bottom: 1px solid var(--border);
+            }
+            .nav-links.open { display: flex; }
+            .nav-actions .btn-ghost { display: none; }
+        }
+
+        /* ── Main Content ── */
+        .page-header {
+            text-align: center;
+            padding: 3.5rem 1.5rem 2rem;
+        }
+
+        .page-header h1 {
+            font-size: 2.25rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header .meta {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 1.5rem 4rem;
+            flex: 1;
+        }
+
+        .content h2 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-top: 2.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .content p {
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+        }
+
+        .content li {
+            margin-bottom: 0.4rem;
+        }
+
+        .content a {
+            color: var(--steel);
+            text-decoration: underline;
+            text-decoration-color: rgba(79,130,176,0.3);
+            text-underline-offset: 2px;
+            transition: text-decoration-color 0.2s;
+        }
+
+        .content a:hover {
+            text-decoration-color: var(--steel);
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .content th, .content td {
+            text-align: left;
+            padding: 0.65rem 0.85rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .content th {
+            font-weight: 600;
+            color: var(--navy);
+            background: var(--bg-secondary);
+        }
+
+        [data-theme="dark"] .content th { color: #c8d8e8; }
+
+        .content td { color: var(--text); }
+
+        .highlight-box {
+            background: var(--bg-secondary);
+            border-left: 3px solid var(--steel);
+            border-radius: 0 8px 8px 0;
+            padding: 1rem 1.25rem;
+            margin: 1.5rem 0;
+        }
+
+        .highlight-box p:last-child { margin-bottom: 0; }
+
+        /* ── Footer ── */
+        .footer {
+            background: var(--footer-bg);
+            color: var(--footer-text);
+            padding: 2rem 1.5rem;
+            text-align: center;
+            font-size: 0.85rem;
+            line-height: 1.8;
+            margin-top: auto;
+        }
+
+        .footer a {
+            color: #8ab4d8;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer a:hover { color: #b8daf0; }
+
+        .footer-links {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-links a {
+            margin: 0 0.5rem;
+        }
+
+        .footer-copy {
+            opacity: 0.7;
+        }
+
+        /* ── Mobile ── */
+        @media (max-width: 600px) {
+            .page-header h1 { font-size: 1.75rem; }
+            .content h2 { font-size: 1.15rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="/" class="nav-brand">splanly</a>
+            <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Toggle menu">☰</button>
+            <ul class="nav-links">
+                <li><a href="/#features">Features</a></li>
+                <li><a href="/faq">FAQ</a></li>
+                <li><a href="/docs-app">Docs</a></li>
+                <li><a href="/contact">Contact</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme" id="themeBtn">🌙</button>
+                <a href="/auth/login" class="btn btn-ghost">Sign in</a>
+                <a href="/auth/register" class="btn btn-primary">Get started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <div class="page-header">
+        <h1>Privacy Policy</h1>
+        <p class="meta">Effective date: July 2026 &middot; splanly by SkilledCA Enterprises</p>
+    </div>
+
+    <!-- Content -->
+    <main class="content">
+        <p>At splanly, operated by SkilledCA Enterprises ("we", "us", "our"), your privacy is important to us. This Privacy Policy explains how we collect, use, store, and protect your personal data when you use our staffing and resource planning platform designed for Chartered Accountant (CA) firms.</p>
+
+        <h2>1. Data We Collect</h2>
+        <p>We collect the following categories of personal data:</p>
+        <table>
+            <thead>
+                <tr><th>Category</th><th>Examples</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Identity Data</strong></td>
+                    <td>Full name, email address, phone number</td>
+                </tr>
+                <tr>
+                    <td><strong>Firm Data</strong></td>
+                    <td>Firm name, registration details, firm size, practice areas</td>
+                </tr>
+                <tr>
+                    <td><strong>Usage Data</strong></td>
+                    <td>Pages visited, features used, session duration, click patterns</td>
+                </tr>
+                <tr>
+                    <td><strong>Technical Data</strong></td>
+                    <td>IP address, browser type, device information, operating system</td>
+                </tr>
+                <tr>
+                    <td><strong>Authentication Data</strong></td>
+                    <td>Encrypted passwords, OAuth tokens (if applicable)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>2. How We Use Your Data</h2>
+        <p>We process your personal data for the following purposes:</p>
+        <ul>
+            <li><strong>Service Delivery</strong> — To provide, maintain, and improve splanly's staffing and resource planning features for your firm.</li>
+            <li><strong>Account Management</strong> — To create and manage your account, authenticate users, and handle firm-level team access.</li>
+            <li><strong>Communication</strong> — To send service-related notifications, account alerts, and respond to support requests.</li>
+            <li><strong>Analytics &amp; Improvement</strong> — To understand how splanly is used, identify areas for improvement, and develop new features. Usage data is aggregated and anonymized where possible.</li>
+            <li><strong>Legal Compliance</strong> — To comply with applicable laws, regulations, and legal processes in India.</li>
+        </ul>
+
+        <h2>3. Data Storage &amp; Security</h2>
+        <p>Your data is stored securely using the following infrastructure:</p>
+        <ul>
+            <li><strong>Database</strong> — Supabase (PostgreSQL), hosted on secure cloud infrastructure with encryption at rest.</li>
+            <li><strong>Encryption</strong> — All data is encrypted in transit using TLS 1.2+ and at rest using AES-256 encryption.</li>
+            <li><strong>Access Controls</strong> — Role-based access ensures that only authorized personnel within your firm can view relevant data.</li>
+            <li><strong>Backups</strong> — Regular automated backups are maintained to prevent data loss.</li>
+        </ul>
+        <div class="highlight-box">
+            <p><strong>Important:</strong> We do not store payment card details on our servers. All payment processing is handled by third-party payment processors compliant with PCI-DSS standards.</p>
+        </div>
+
+        <h2>4. Third-Party Services</h2>
+        <p>We share limited data with the following third-party service providers:</p>
+        <table>
+            <thead>
+                <tr><th>Service</th><th>Purpose</th><th>Data Shared</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>SMTP / Email Provider</td>
+                    <td>Sending transactional and notification emails</td>
+                    <td>Email address, name</td>
+                </tr>
+                <tr>
+                    <td>Analytics Provider</td>
+                    <td>Understanding usage patterns (anonymized)</td>
+                    <td>Anonymized usage data</td>
+                </tr>
+                <tr>
+                    <td>Payment Processor</td>
+                    <td>Processing subscription payments</td>
+                    <td>Billing details (handled externally)</td>
+                </tr>
+                <tr>
+                    <td>Hosting Provider (Render)</td>
+                    <td>Application hosting and infrastructure</td>
+                    <td>Application data (encrypted)</td>
+                </tr>
+            </tbody>
+        </table>
+        <p>We do not sell, rent, or trade your personal data to any third parties for marketing purposes.</p>
+
+        <h2>5. Your Rights</h2>
+        <p>As a user of splanly, you have the following rights regarding your personal data:</p>
+        <ul>
+            <li><strong>Right of Access</strong> — You may request a copy of the personal data we hold about you.</li>
+            <li><strong>Right to Correction</strong> — You may request correction of inaccurate or incomplete data.</li>
+            <li><strong>Right to Deletion</strong> — You may request deletion of your personal data, subject to legal retention requirements.</li>
+            <li><strong>Right to Data Portability</strong> — You may request your data in a structured, machine-readable format.</li>
+            <li><strong>Right to Withdraw Consent</strong> — Where processing is based on consent, you may withdraw it at any time.</li>
+            <li><strong>Right to Object</strong> — You may object to processing of your data for specific purposes.</li>
+        </ul>
+        <p>To exercise any of these rights, please contact us at <a href="mailto:samarth@skilledca.in">samarth@skilledca.in</a>. We will respond to your request within 30 days.</p>
+
+        <h2>6. Data Retention</h2>
+        <p>We retain your personal data for as long as your account is active or as needed to provide you services. Specifically:</p>
+        <ul>
+            <li>Account data is retained for the duration of your subscription plus 90 days after cancellation.</li>
+            <li>Usage analytics data is retained in anonymized form for up to 24 months.</li>
+            <li>Support communications are retained for 12 months after resolution.</li>
+        </ul>
+        <p>Upon account deletion, we will delete or anonymize your personal data within 30 days, except where retention is required by law.</p>
+
+        <h2>7. Cookies</h2>
+        <p>splanly uses cookies to maintain your session and remember your preferences (such as theme settings). For full details, please see our <a href="/legal/cookies">Cookie Policy</a>.</p>
+
+        <h2>8. Children's Privacy</h2>
+        <p>splanly is designed for use by professionals and is not intended for individuals under the age of 18. We do not knowingly collect data from minors.</p>
+
+        <h2>9. Changes to This Policy</h2>
+        <p>We may update this Privacy Policy from time to time. We will notify you of any material changes via email or through a prominent notice within the application. Continued use of splanly after changes constitutes acceptance of the updated policy.</p>
+
+        <h2>10. Contact Us</h2>
+        <p>If you have any questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact:</p>
+        <div class="highlight-box">
+            <p><strong>SkilledCA Enterprises</strong><br>
+            Data Protection Contact<br>
+            Email: <a href="mailto:samarth@skilledca.in">samarth@skilledca.in</a></p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="/legal/privacy">Privacy Policy</a> |
+            <a href="/legal/terms">Terms of Service</a> |
+            <a href="/legal/dpdp">DPDP Act</a> |
+            <a href="/legal/cookies">Cookie Policy</a> |
+            <a href="/legal/refund">Refund Policy</a>
+        </div>
+        <div class="footer-copy">splanly by SkilledCA Enterprises &copy; 2026. All rights reserved.</div>
+    </footer>
+
+    <script>
+        // Theme management
+        function getTheme() {
+            return localStorage.getItem('splanly-theme') || 'light';
+        }
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            const btn = document.getElementById('themeBtn');
+            if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+
+        function toggleTheme() {
+            const current = getTheme();
+            const next = current === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('splanly-theme', next);
+            applyTheme(next);
+        }
+
+        applyTheme(getTheme());
+    </script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Server Error - splanly{% endblock %}
+
+{% block content %}
+<style>
+  .error-face {
+    width: 110px; height: 110px; margin: 0 auto 22px;
+    border-radius: 50%; background: hsl(var(--card));
+    border: 3px solid hsl(var(--foreground));
+    position: relative;
+    box-shadow: 0 14px 30px -14px rgba(0,0,0,.2);
+  }
+  .error-eye {
+    position: absolute; top: 38px;
+    width: 11px; height: 11px; border-radius: 50%;
+    background: hsl(var(--foreground));
+    animation: blink 4s infinite;
+  }
+  @keyframes blink { 0%,94%,100%{transform:scaleY(1)} 97%{transform:scaleY(.1)} }
+  .error-mouth {
+    position: absolute; bottom: 26px; left: 50%;
+    width: 34px; height: 17px;
+    border: 3px solid hsl(var(--foreground));
+    border-top: 0; border-radius: 0 0 40px 40px;
+    transform: translateX(-50%) rotate(180deg);
+  }
+</style>
+
+<div class="flex items-center justify-center min-h-[80vh] px-4">
+  <div class="text-center" style="max-width: 460px;">
+    <div class="error-face">
+      <span class="error-eye" style="left:30px"></span>
+      <span class="error-eye" style="right:30px"></span>
+      <span class="error-mouth"></span>
+    </div>
+
+    <h1 class="text-2xl font-semibold tracking-tight mb-2">Well, this is awkward</h1>
+    <p class="text-muted-foreground text-sm mb-6" style="line-height:1.65;">
+      Something went wrong on our side — not yours. We've logged it and a fix is already in motion. A refresh usually does the trick.
+    </p>
+
+    {% if error_detail %}
+    <details class="text-left mb-6 p-3 rounded-lg border border-border text-xs" style="max-height:200px; overflow-y:auto;">
+      <summary class="cursor-pointer font-medium text-muted-foreground">View error details</summary>
+      <pre class="mt-2 whitespace-pre-wrap break-all" style="color:hsl(0 84% 50%);">{{ error_detail }}</pre>
+    </details>
+    {% endif %}
+
+    <div class="flex gap-3 justify-center">
+      <button onclick="location.reload()" class="uk-btn uk-btn-primary" style="border-radius:999px; height:44px; font-weight:600;">
+        Refresh page
+      </button>
+      <a href="/dashboard" class="uk-btn uk-btn-outline" style="border-radius:999px; height:44px;">
+        Go to Dashboard
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

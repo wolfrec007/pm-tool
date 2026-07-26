@@ -5,6 +5,7 @@ from datetime import date, timedelta
 import pytest
 from fastapi.testclient import TestClient
 
+from app.config import settings
 from app.database import SessionLocal, get_db
 from app.main import app
 from app.models.models import (
@@ -16,6 +17,7 @@ from app.models.models import (
     EngagementInstance,
     EngagementStatus,
     EngagementType,
+    FirmUser,
     InstanceStatus,
     Leave,
     RecurrencePattern,
@@ -29,9 +31,14 @@ from app.models.models import (
 @pytest.fixture(autouse=True)
 def clean_tables():
     """Clean up test data after each test."""
+    # Safety guard: only run against test database
+    db_url = settings.DATABASE_URL
+    if "test" not in db_url.lower() and not settings.TESTING:
+        pytest.skip("Refusing to clean tables — not a test database")
     yield
     db = SessionLocal()
     try:
+        # Delete in correct order to respect foreign key constraints
         db.query(EmailOutbox).delete()
         db.query(Leave).delete()
         db.query(Assignment).delete()
@@ -39,6 +46,7 @@ def clean_tables():
         db.query(Engagement).delete()
         db.query(Client).delete()
         db.query(TeamMember).delete()
+        db.query(FirmUser).delete()  # Must delete before User
         db.query(User).delete()
         db.commit()
     finally:

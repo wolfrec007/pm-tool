@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Refund Policy — splanly</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #16324f;
+            --steel: #4f82b0;
+            --bg: #f6fafe;
+            --bg-secondary: #eaf1f8;
+            --text: #1a2a3a;
+            --text-muted: #5a7a9a;
+            --border: #d0dde8;
+            --card-bg: #ffffff;
+            --nav-bg: rgba(255,255,255,0.85);
+            --footer-bg: #16324f;
+            --footer-text: #c8d8e8;
+            --shadow: 0 1px 3px rgba(22,50,79,0.08);
+        }
+
+        [data-theme="dark"] {
+            --bg: #0b1a29;
+            --bg-secondary: #112238;
+            --text: #d8e4f0;
+            --text-muted: #7a9ab8;
+            --border: #1e3a54;
+            --card-bg: #0f2438;
+            --nav-bg: rgba(11,26,41,0.9);
+            --footer-bg: #061018;
+            --footer-text: #7a9ab8;
+            --shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            color: var(--navy);
+            line-height: 1.3;
+        }
+
+        [data-theme="dark"] h1,
+        [data-theme="dark"] h2,
+        [data-theme="dark"] h3,
+        [data-theme="dark"] h4 {
+            color: #e8f0f8;
+        }
+
+        /* ── Navigation ── */
+        .nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--nav-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 1.5rem;
+        }
+
+        .nav-inner {
+            max-width: 1120px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .nav-brand {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 800;
+            font-size: 1.35rem;
+            color: var(--navy);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        [data-theme="dark"] .nav-brand { color: #e8f0f8; }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--navy); }
+        [data-theme="dark"] .nav-links a:hover { color: #e8f0f8; }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--steel);
+            color: var(--steel);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1.15rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-ghost {
+            color: var(--text-muted);
+            background: transparent;
+        }
+
+        .btn-ghost:hover { color: var(--navy); background: var(--bg-secondary); }
+        [data-theme="dark"] .btn-ghost:hover { color: #e8f0f8; }
+
+        .btn-primary {
+            background: var(--steel);
+            color: #fff;
+        }
+
+        .btn-primary:hover { background: var(--navy); }
+
+        .nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text);
+        }
+
+        @media (max-width: 768px) {
+            .nav-toggle { display: block; }
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 64px;
+                left: 0;
+                right: 0;
+                background: var(--nav-bg);
+                backdrop-filter: blur(12px);
+                flex-direction: column;
+                padding: 1rem 1.5rem;
+                gap: 0.75rem;
+                border-bottom: 1px solid var(--border);
+            }
+            .nav-links.open { display: flex; }
+            .nav-actions .btn-ghost { display: none; }
+        }
+
+        /* ── Main Content ── */
+        .page-header {
+            text-align: center;
+            padding: 3.5rem 1.5rem 2rem;
+        }
+
+        .page-header h1 {
+            font-size: 2.25rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header .meta {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 1.5rem 4rem;
+            flex: 1;
+        }
+
+        .content h2 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-top: 2.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .content h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .content p {
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+        }
+
+        .content li {
+            margin-bottom: 0.4rem;
+        }
+
+        .content a {
+            color: var(--steel);
+            text-decoration: underline;
+            text-decoration-color: rgba(79,130,176,0.3);
+            text-underline-offset: 2px;
+            transition: text-decoration-color 0.2s;
+        }
+
+        .content a:hover {
+            text-decoration-color: var(--steel);
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .content th, .content td {
+            text-align: left;
+            padding: 0.65rem 0.85rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .content th {
+            font-weight: 600;
+            color: var(--navy);
+            background: var(--bg-secondary);
+        }
+
+        [data-theme="dark"] .content th { color: #c8d8e8; }
+
+        .highlight-box {
+            background: var(--bg-secondary);
+            border-left: 3px solid var(--steel);
+            border-radius: 0 8px 8px 0;
+            padding: 1rem 1.25rem;
+            margin: 1.5rem 0;
+        }
+
+        .highlight-box p:last-child { margin-bottom: 0; }
+
+        .highlight-green {
+            background: var(--bg-secondary);
+            border-left-color: #2a9d8f;
+        }
+
+        .steps {
+            counter-reset: step;
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .steps li {
+            counter-increment: step;
+            position: relative;
+            padding-left: 2.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .steps li::before {
+            content: counter(step);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 2rem;
+            height: 2rem;
+            background: var(--steel);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        /* ── Footer ── */
+        .footer {
+            background: var(--footer-bg);
+            color: var(--footer-text);
+            padding: 2rem 1.5rem;
+            text-align: center;
+            font-size: 0.85rem;
+            line-height: 1.8;
+            margin-top: auto;
+        }
+
+        .footer a {
+            color: #8ab4d8;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer a:hover { color: #b8daf0; }
+
+        .footer-links {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-links a {
+            margin: 0 0.5rem;
+        }
+
+        .footer-copy {
+            opacity: 0.7;
+        }
+
+        @media (max-width: 600px) {
+            .page-header h1 { font-size: 1.75rem; }
+            .content h2 { font-size: 1.15rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="/" class="nav-brand">splanly</a>
+            <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Toggle menu">☰</button>
+            <ul class="nav-links">
+                <li><a href="/#features">Features</a></li>
+                <li><a href="/faq">FAQ</a></li>
+                <li><a href="/docs-app">Docs</a></li>
+                <li><a href="/contact">Contact</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme" id="themeBtn">🌙</button>
+                <a href="/auth/login" class="btn btn-ghost">Sign in</a>
+                <a href="/auth/register" class="btn btn-primary">Get started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <div class="page-header">
+        <h1>Refund Policy</h1>
+        <p class="meta">Effective date: July 2026 &middot; splanly by SkilledCA Enterprises</p>
+    </div>
+
+    <!-- Content -->
+    <main class="content">
+        <p>At splanly, we want you to be completely satisfied with your subscription. This Refund Policy outlines the terms under which refunds are available and the process to request one.</p>
+
+        <h2>1. Free Trial Period</h2>
+        <div class="highlight-box highlight-green">
+            <p><strong>14-Day Free Trial</strong> — When you sign up for splanly, you get full access to all features for 14 days at no charge. No credit card is required to start your trial.</p>
+        </div>
+        <p>During the trial period:</p>
+        <ul>
+            <li>You have access to all splanly features with no restrictions.</li>
+            <li>No payment information is collected or charged.</li>
+            <li>You can cancel at any time during the trial with no obligation.</li>
+            <li>At the end of the trial, you can choose to subscribe to a paid plan or your account will be downgraded automatically. You will not be charged without your explicit consent.</li>
+        </ul>
+
+        <h2>2. 14-Day Money-Back Guarantee</h2>
+        <div class="highlight-box">
+            <p><strong>14-Day Money-Back Guarantee</strong> — If you subscribe to a paid plan and are not satisfied, you may request a full refund within 14 days of your initial payment.</p>
+        </div>
+        <p>The money-back guarantee applies under the following conditions:</p>
+        <ul>
+            <li>The refund request is made within <strong>14 calendar days</strong> of the first payment on a new subscription.</li>
+            <li>The refund applies to the <strong>initial payment only</strong> — subsequent renewal payments are not covered by this guarantee.</li>
+            <li>Only one money-back guarantee refund is available per firm/account. The guarantee does not apply if a refund has been previously issued for the same account.</li>
+            <li>The guarantee covers both monthly and annual subscription plans.</li>
+        </ul>
+
+        <h2>3. Refund Eligibility</h2>
+        <table>
+            <thead>
+                <tr><th>Scenario</th><th>Refund Eligible?</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Request within 14 days of first payment</td>
+                    <td><strong>Yes</strong> — Full refund</td>
+                </tr>
+                <tr>
+                    <td>Request after 14 days of first payment</td>
+                    <td><strong>No</strong> — Refund not applicable</td>
+                </tr>
+                <tr>
+                    <td>Annual plan — request within 14 days</td>
+                    <td><strong>Yes</strong> — Full refund</td>
+                </tr>
+                <tr>
+                    <td>Renewal payment (monthly or annual)</td>
+                    <td><strong>No</strong> — Renewals are non-refundable</td>
+                </tr>
+                <tr>
+                    <td>Service outage exceeding SLA commitments</td>
+                    <td><strong>Case-by-case</strong> — Contact us to discuss</td>
+                </tr>
+                <tr>
+                    <td>Account cancelled during free trial</td>
+                    <td><strong>N/A</strong> — No charge was made</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>4. How to Request a Refund</h2>
+        <p>To request a refund, follow these steps:</p>
+        <ol class="steps">
+            <li>
+                <strong>Send an email</strong> to <a href="mailto:samarth@skilledca.in">samarth@skilledca.in</a> with the subject line "Refund Request — splanly".
+            </li>
+            <li>
+                <strong>Include the following details:</strong>
+                <ul>
+                    <li>Your registered email address</li>
+                    <li>Firm name associated with the account</li>
+                    <li>Date of payment and amount</li>
+                    <li>Reason for the refund request (optional but appreciated — it helps us improve)</li>
+                </ul>
+            </li>
+            <li>
+                <strong>Acknowledgement:</strong> We will acknowledge your request within <strong>2 business days</strong>.
+            </li>
+            <li>
+                <strong>Processing:</strong> Approved refunds will be processed within <strong>7–10 business days</strong> and credited to the original payment method.
+            </li>
+        </ol>
+
+        <h2>5. Cancellation Without Refund</h2>
+        <p>You may cancel your subscription at any time through your account settings. Cancellation takes effect at the end of your current billing period:</p>
+        <ul>
+            <li><strong>Monthly plans</strong> — Your access continues until the end of the current month. No partial refunds are issued for unused days.</li>
+            <li><strong>Annual plans</strong> — Your access continues until the end of the current year. No prorated refunds are issued for unused months after the 14-day guarantee period.</li>
+        </ul>
+        <p>Upon cancellation, your data will be retained for 90 days and then permanently deleted. You may export your data before cancellation.</p>
+
+        <h2>6. Exceptions</h2>
+        <p>We may, at our sole discretion, offer refunds or credits outside the terms of this policy in the following situations:</p>
+        <ul>
+            <li>Extended, unresolved service outages beyond our committed uptime.</li>
+            <li>Billing errors or duplicate charges.</li>
+            <li>Extraordinary circumstances communicated directly to us.</li>
+        </ul>
+        <p>Such exceptions are evaluated on a case-by-case basis and do not set a precedent for future requests.</p>
+
+        <h2>7. Contact Us</h2>
+        <p>For refund requests, billing questions, or any payment-related concerns, please contact:</p>
+        <div class="highlight-box">
+            <p><strong>SkilledCA Enterprises</strong><br>
+            Email: <a href="mailto:samarth@skilledca.in">samarth@skilledca.in</a><br><br>
+            We aim to make the refund process as simple and transparent as possible.</p>
+        </div>
+
+        <h2>8. Related Policies</h2>
+        <ul>
+            <li><a href="/legal/terms">Terms of Service</a> — General terms governing your use of splanly.</li>
+            <li><a href="/legal/privacy">Privacy Policy</a> — How we handle your personal data.</li>
+        </ul>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="/legal/privacy">Privacy Policy</a> |
+            <a href="/legal/terms">Terms of Service</a> |
+            <a href="/legal/dpdp">DPDP Act</a> |
+            <a href="/legal/cookies">Cookie Policy</a> |
+            <a href="/legal/refund">Refund Policy</a>
+        </div>
+        <div class="footer-copy">splanly by SkilledCA Enterprises &copy; 2026. All rights reserved.</div>
+    </footer>
+
+    <script>
+        function getTheme() {
+            return localStorage.getItem('splanly-theme') || 'light';
+        }
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            const btn = document.getElementById('themeBtn');
+            if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+
+        function toggleTheme() {
+            const current = getTheme();
+            const next = current === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('splanly-theme', next);
+            applyTheme(next);
+        }
+
+        applyTheme(getTheme());
+    </script>
+</body>
+</html>

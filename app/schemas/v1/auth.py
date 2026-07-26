@@ -2,6 +2,8 @@
 
 from pydantic import BaseModel, EmailStr
 
+from app.schemas.base import ORMModel
+
 
 class LoginRequest(BaseModel):
     email: str
@@ -18,27 +20,21 @@ class RefreshRequest(BaseModel):
     refresh_token: str
 
 
-class UserResponse(BaseModel):
+class UserResponse(ORMModel):
     id: int
     email: str
     display_name: str
     is_active: bool
 
-    class Config:
-        from_attributes = True
 
-
-class FirmResponse(BaseModel):
+class FirmResponse(ORMModel):
     id: int
     name: str
     code: str
     logo_url: str | None = None
 
-    class Config:
-        from_attributes = True
 
-
-class FirmUserResponse(BaseModel):
+class FirmUserResponse(ORMModel):
     firm: FirmResponse
     role: str
 

@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+from datetime import date, timedelta
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Query, Request
@@ -240,7 +241,27 @@ def home_dashboard(
 
     now_str = today.strftime("%d %b %Y, %I:%M %p")
 
+    # License status
+    from app.models.models import Firm
+    from app.services.license_service import check_license, get_days_remaining
+    firm = db.query(Firm).filter(Firm.id == firm_id).first() if firm_id else None
+    license_status = check_license(firm) if firm else "no_license"
+    license_days_remaining = get_days_remaining(firm) if firm else None
+
+    # Check if this is a new firm (created within last 7 days)
+    show_onboarding = False
+    if firm:
+        from datetime import datetime, timezone
+        if firm.created_at and firm.created_at > datetime.now(timezone.utc) - timedelta(days=7):
+            # Check if firm has no team members yet
+            if total_members == 0:
+                show_onboarding = True
+
     resp = templates.TemplateResponse(request, "dashboard/home.html", {
+        # License info
+        "license_status": license_status,
+        "license_days_remaining": license_days_remaining,
+        "show_onboarding": show_onboarding,
         # Overview (Section 2)
         "total_members": total_members,
         "now": now_str,

@@ -4,6 +4,7 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     APP_NAME: str = "splanly"
     ENV: str = "development"
+    TESTING: bool = False
 
     DATABASE_URL: str = ""
 
@@ -26,6 +27,7 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: str = ""
     SMTP_FROM_EMAIL: str = "noreply@splanly.local"
     SMTP_USE_TLS: bool = True
+    SMTP_USE_SSL: bool = False
     EMAIL_WORKER_INTERVAL_SECONDS: int = 30
     EMAIL_MAX_RETRIES: int = 3
 
@@ -33,6 +35,9 @@ class Settings(BaseSettings):
     DEFAULT_BENCH_ROLLOFF_DAYS: int = 7
     BULK_UPLOAD_MAX_ROWS: int = 8000
     CSV_MAX_FILE_SIZE_MB: int = 10
+
+    # Licensing
+    LICENSE_SIGNING_KEY: str = "change-me-to-a-strong-random-key"
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 

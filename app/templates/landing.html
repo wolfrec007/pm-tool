@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>splanly — Resource Planning for CA Firms</title>
+<title>splanly - Resource Planning for CA Firms</title>
 <meta name="description" content="splanly gives chartered accountant firms one place to staff engagements, watch team capacity, and catch overlaps before they become client-facing problems.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%2314304d'/><circle cx='38' cy='54' r='22' fill='%234f82b0' fill-opacity='0.85'/><circle cx='62' cy='46' r='22' fill='%23eef5fc'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -67,7 +67,7 @@
   }
 
   *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
+  html{scroll-behavior:smooth; overflow-x:hidden;}
   @media (prefers-reduced-motion: reduce){
     html{scroll-behavior:auto;}
     *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important;}
@@ -79,6 +79,7 @@
     font-family:'Inter',sans-serif;
     -webkit-font-smoothing:antialiased;
     line-height:1.5;
+    overflow-x:hidden;
     transition:background .25s var(--ease), color .25s var(--ease);
   }
   h1,h2,h3,.display{
@@ -89,12 +90,12 @@
   }
   a{color:inherit; text-decoration:none;}
   img,svg{display:block;}
-  .wrap{max-width:1180px; margin:0 auto; padding:0 24px;}
+  .wrap{max-width:1280px; margin:0 auto; padding:0 40px;}
   ::selection{background:var(--steel-light); color:var(--heading);}
   :focus-visible{outline:2.5px solid var(--steel); outline-offset:3px; border-radius:6px;}
 
   /* ---------- Brand ---------- */
-  .brand{display:flex; align-items:center; gap:10px;}
+  .brand{display:flex; align-items:center; gap:6px;}
   .brand-mark{width:34px; height:34px; border-radius:10px; position:relative; overflow:hidden; background:var(--navy); flex-shrink:0;}
   html[data-theme="dark"] .brand-mark{background:#0e2032;}
   .brand-mark span{position:absolute; border-radius:50%;}
@@ -123,15 +124,22 @@
   .btn-sm{padding:9px 18px; font-size:14px;}
 
   .theme-toggle{
-    width:38px; height:38px; border-radius:50%; border:1px solid var(--border);
-    background:var(--card); display:flex; align-items:center; justify-content:center;
-    cursor:pointer; color:var(--heading); flex-shrink:0; transition:border-color .18s, transform .18s var(--ease);
+    width:auto; height:auto; border-radius:0; border:none;
+    background:transparent; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; color:var(--heading); flex-shrink:0; padding:4px;
+    transition:transform .3s var(--ease), color .18s;
   }
-  .theme-toggle:hover{border-color:var(--steel); transform:translateY(-1px);}
-  .theme-toggle svg{width:18px; height:18px;}
+  .theme-toggle:hover{transform:rotate(15deg); color:var(--steel);}
+  .theme-toggle svg{width:20px; height:20px;}
   .theme-toggle .icon-moon{display:none;}
   html[data-theme="dark"] .theme-toggle .icon-sun{display:none;}
   html[data-theme="dark"] .theme-toggle .icon-moon{display:block;}
+  .theme-toggle.spin{animation:theme-spin .4s var(--ease);}
+  @keyframes theme-spin{
+    0%{transform:rotate(0deg) scale(1);}
+    50%{transform:rotate(180deg) scale(1.2);}
+    100%{transform:rotate(360deg) scale(1);}
+  }
 
   /* ---------- Nav ---------- */
   header{
@@ -141,7 +149,7 @@
     transition:background .25s var(--ease), border-color .25s var(--ease);
   }
   .nav{display:flex; align-items:center; justify-content:space-between; height:72px;}
-  .brand{display:flex; align-items:center; gap:10px;}
+  .brand{display:flex; align-items:center; gap:6px;}
   .brand-logo{height:26px; width:auto; display:block;}
   .brand-logo.footer-logo{height:22px;}
   /* Recolor the embedded logo's exact fills for dark backgrounds (inline
@@ -156,6 +164,31 @@
 
   @media (max-width: 860px){
     .nav-links{display:none;}
+  }
+
+  /* Nav dropdown */
+  .nav-dropdown .nav-dropdown-menu{
+    display:none;
+    position:absolute; top:100%; left:50%; transform:translateX(-50%);
+    margin-top:0; padding-top:8px; /* bridge gap so mouse doesn't lose hover */
+    pointer-events:auto;
+  }
+  .nav-dropdown .nav-dropdown-menu-inner{
+    background:var(--card); border:1px solid var(--border); border-radius:var(--radius-md);
+    padding:6px 0; min-width:160px; box-shadow:var(--shadow);
+  }
+  .nav-dropdown:hover .nav-dropdown-menu,
+  .nav-dropdown.menu-open .nav-dropdown-menu{display:block!important;}
+  .nav-dropdown-trigger{color:var(--muted);font-size:14.5px;font-weight:500;transition:color .15s;}
+  .nav-dropdown-trigger:hover{color:var(--heading);}
+  .help-icon:hover{color:var(--heading);}
+  @keyframes wobble{
+    0%,100%{transform:rotate(0deg);}
+    15%{transform:rotate(-8deg);}
+    30%{transform:rotate(6deg);}
+    45%{transform:rotate(-4deg);}
+    60%{transform:rotate(2deg);}
+    75%{transform:rotate(0deg);}
   }
 
   /* ---------- Hero ---------- */
@@ -272,6 +305,35 @@
   .feature-card h3{font-size:16.5px; font-weight:700; margin-bottom:8px;}
   .feature-card p{font-size:14px; color:var(--muted); margin:0;}
 
+  /* ---------- Testimonials ---------- */
+  .testimonial-card{
+    background:var(--card); border:1px solid var(--border); border-radius:var(--radius-md);
+    padding:28px; min-width:340px; max-width:380px; flex-shrink:0;
+    transition:transform .22s var(--ease), box-shadow .22s var(--ease), border-color .22s var(--ease);
+  }
+  .testimonial-card:hover{transform:translateY(-3px); box-shadow:var(--shadow); border-color:var(--steel-light);}
+  .testimonial-quote{font-size:14px; color:var(--ink); line-height:1.7; margin-bottom:20px; font-style:italic;}
+  .testimonial-author{display:flex; align-items:center; gap:12px;}
+  .testimonial-avatar{
+    width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:13px; font-weight:700; color:#fff; flex-shrink:0;
+  }
+  .testimonial-name{font-size:14px; font-weight:700; color:var(--heading);}
+  .testimonial-role{font-size:12px; color:var(--muted); margin-top:2px;}
+  @keyframes scroll-testimonials{
+    0%{transform:translateX(0);}
+    100%{transform:translateX(-50%);}
+  }
+  .testimonial-track-wrapper::before,
+  .testimonial-track-wrapper::after{
+    content:""; position:absolute; top:0; bottom:0; width:80px; z-index:2; pointer-events:none;
+  }
+  .testimonial-track-wrapper::before{left:0; background:linear-gradient(to right, var(--bg), transparent);}
+  .testimonial-track-wrapper::after{right:0; background:linear-gradient(to left, var(--bg), transparent);}
+  @media (max-width:640px){
+    .testimonial-card{min-width:280px; max-width:300px; padding:20px;}
+  }
+
   /* ---------- How it works ---------- */
   .how{background:linear-gradient(180deg, var(--card), var(--bg)); transition:background .25s var(--ease);}
   .steps{display:grid; grid-template-columns:repeat(3,1fr); gap:0; position:relative; counter-reset:step;}
@@ -316,6 +378,24 @@
   .footer-bottom{border-top:1px solid var(--border); padding-top:26px; text-align:center; font-size:13px; color:var(--muted);}
   .footer-bottom a{text-decoration:underline; text-decoration-color:var(--border); text-underline-offset:3px;}
   .footer-bottom a:hover{color:var(--heading); text-decoration-color:var(--steel);}
+
+  /* ---------- Responsive fit ---------- */
+  @media (max-width: 640px){
+    section{padding:56px 0;}
+    .hero{padding:48px 0 0;}
+    .hero h1{font-size:28px;}
+    .hero p.lede{font-size:16px;}
+    .hero-actions{flex-direction:column; align-items:stretch;}
+    .hero-actions .btn{text-align:center;}
+    .board-frame{padding:14px; overflow-x:auto;}
+    .board-days, .board-row{grid-template-columns:80px repeat(5,1fr); gap:4px; min-width:380px;}
+    .person{font-size:11px; gap:5px;}
+    .avatar{width:20px; height:20px; font-size:9px;}
+    .cell{height:22px; border-radius:5px;}
+    .board-legend{gap:10px;}
+    .cta-banner{padding:40px 24px;}
+    .footer-grid{grid-template-columns:1fr; gap:28px;}
+  }
 </style>
 </head>
 <body>
@@ -328,10 +408,32 @@
     </a>
     <nav class="nav-links" aria-label="Primary">
       <a href="#features">Features</a>
-      <a href="#how-it-works">How it works</a>
-      <a href="#" onclick="return false;" aria-disabled="true" style="opacity:.55; cursor:default;">Pricing</a>
+      <a href="#pricing">Pricing</a>
+      <div class="nav-dropdown" style="position:relative;">
+        <a href="/faq" class="nav-dropdown-trigger" style="display:flex;align-items:center;gap:4px;">
+          Help
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </a>
+        <div class="nav-dropdown-menu">
+          <div class="nav-dropdown-menu-inner">
+            <a href="/faq" style="display:flex;align-items:center;gap:8px;padding:8px 16px;font-size:14px;font-weight:500;color:var(--ink);transition:background .15s;" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background='transparent'">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+              FAQ
+            </a>
+            <a href="/docs-app" style="display:flex;align-items:center;gap:8px;padding:8px 16px;font-size:14px;font-weight:500;color:var(--ink);transition:background .15s;" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background='transparent'">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+              Docs
+            </a>
+            <a href="/contact" style="display:flex;align-items:center;gap:8px;padding:8px 16px;font-size:14px;font-weight:500;color:var(--ink);transition:background .15s;" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background='transparent'">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              Contact
+            </a>
+          </div>
+        </div>
+      </div>
     </nav>
     <div class="nav-cta">
+      <span class="help-icon" title="Need help?" style="font-size:16px;cursor:pointer;color:var(--muted);transition:color .15s;animation:wobble 3s ease-in-out infinite;" onclick="window.location.href='/faq'">?</span>
       <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">
         <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.9 19.1l1.7-1.7M17.4 6.6l1.7-1.7"/></svg>
         <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
@@ -451,13 +553,21 @@
 
         <div class="feature-card reveal" style="--d:0s">
           <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          </div>
+          <h3>Approval workflow</h3>
+          <p>Configurable approval gates for any resource operation. Set which roles can approve creates, updates, and deletes per resource type.</p>
+        </div>
+
+        <div class="feature-card reveal" style="--d:0.06s">
+          <div class="feature-icon">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
           </div>
           <h3>Leave management</h3>
           <p>Track vacation, sick leave, and exam leave. Approved leave automatically blocks any assignment that would conflict with it.</p>
         </div>
 
-        <div class="feature-card reveal" style="--d:0.06s">
+        <div class="feature-card reveal" style="--d:0.12s">
           <div class="feature-icon">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
           </div>
@@ -465,12 +575,28 @@
           <p>See instantly who's on the bench right now, and who's rolling off soon — with configurable windows for proactive planning.</p>
         </div>
 
-        <div class="feature-card reveal" style="--d:0.12s">
+        <div class="feature-card reveal" style="--d:0s">
           <div class="feature-icon">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6l-8-4Z"/></svg>
           </div>
           <h3>Role-based access</h3>
-          <p>Admin, moderator, and viewer roles with Microsoft 365 SSO and two-factor authentication built in for enterprise security.</p>
+          <p>Super admin, admin, moderator, and viewer roles with Microsoft 365 SSO, OTP verification, and two-factor authentication.</p>
+        </div>
+
+        <div class="feature-card reveal" style="--d:0.06s">
+          <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+          </div>
+          <h3>Reports & analytics</h3>
+          <p>11 built-in reports across 3 tiers — utilization, bench, capacity, leave, cost analysis, and budget vs actual. CSV export for all.</p>
+        </div>
+
+        <div class="feature-card reveal" style="--d:0.12s">
+          <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          </div>
+          <h3>Extension requests</h3>
+          <p>Request allocation extensions beyond the original plan. Approved extensions auto-create assignments — no manual rework.</p>
         </div>
       </div>
     </div>
@@ -500,6 +626,198 @@
           <div class="step-num">3</div>
           <h3>Assign & track</h3>
           <p>Allocate staff with built-in conflict detection, then monitor utilization and bench status in real time.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section style="padding:80px 0; overflow:hidden;">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div class="section-eyebrow">Trusted by teams</div>
+        <h2>What our users have to say</h2>
+        <p>Real feedback from CA firms using splanly every day.</p>
+      </div>
+    </div>
+
+    <div class="testimonial-track-wrapper" style="overflow:hidden; position:relative;">
+      <div class="testimonial-track" id="testimonial-track" style="display:flex; gap:20px; width:max-content; animation:scroll-testimonials 30s linear infinite;">
+        <!--
+          TESTIMONIALS — Edit this section to add/update testimonials.
+          Each card needs: avatar letter, name, role, firm, testimonial text.
+          The track auto-scrolls infinitely. Duplicate cards for seamless loop.
+        -->
+        <div class="testimonial-card">
+          <div class="testimonial-quote">"splanly completely replaced our Excel tracker. We used to double-book people every busy season — now it's impossible. The over-allocation guard alone paid for itself in the first month."</div>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar" style="background:var(--navy);">RS</div>
+            <div>
+              <div class="testimonial-name">Rajesh Sharma</div>
+              <div class="testimonial-role">Partner · Sharma & Associates</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
+          <div class="testimonial-quote">"The bench dashboard is a game changer. I can see who's free this week and next, and pull them into engagements before they sit idle. Our utilization went up 22% in three months."</div>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar" style="background:var(--steel);">PA</div>
+            <div>
+              <div class="testimonial-name">Priya Agarwal</div>
+              <div class="testimonial-role">Director · Agarwal & Associates</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
+          <div class="testimonial-quote">"We manage 200+ team members across 3 offices. splanly's multi-tenancy and branch support means each office sees their own data, and I get the consolidated view. Exactly what we needed."</div>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar" style="background:#7c3aed;">AM</div>
+            <div>
+              <div class="testimonial-name">Arun Mehta</div>
+              <div class="testimonial-role">Managing Partner · Mehta & Co.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
+          <div class="testimonial-quote">"The approval workflow is perfect for us. Partners approve assignments, and we never have unauthorized allocations anymore. The role-based access is exactly how CA firms operate."</div>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar" style="background:#0f766e;">NK</div>
+            <div>
+              <div class="testimonial-name">Neha Kapoor</div>
+              <div class="testimonial-role">CA Manager · Gupta & Partners</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
+          <div class="testimonial-quote">"I was skeptical about switching from spreadsheets, but the CSV bulk upload made migration painless. We imported 150 team members in one click. The reports are beautiful and my partners love them."</div>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar" style="background:#d97706;">VK</div>
+            <div>
+              <div class="testimonial-name">Vikram Kumar</div>
+              <div class="testimonial-role">Senior Manager · Reddy & Associates</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Duplicate set for seamless infinite scroll -->
+        <div class="testimonial-card">
+          <div class="testimonial-quote">"splanly completely replaced our Excel tracker. We used to double-book people every busy season — now it's impossible. The over-allocation guard alone paid for itself in the first month."</div>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar" style="background:var(--navy);">RS</div>
+            <div>
+              <div class="testimonial-name">Rajesh Sharma</div>
+              <div class="testimonial-role">Partner · Sharma & Associates</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
+          <div class="testimonial-quote">"The bench dashboard is a game changer. I can see who's free this week and next, and pull them into engagements before they sit idle. Our utilization went up 22% in three months."</div>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar" style="background:var(--steel);">PA</div>
+            <div>
+              <div class="testimonial-name">Priya Agarwal</div>
+              <div class="testimonial-role">Director · Agarwal & Associates</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
+          <div class="testimonial-quote">"We manage 200+ team members across 3 offices. splanly's multi-tenancy and branch support means each office sees their own data, and I get the consolidated view. Exactly what we needed."</div>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar" style="background:#7c3aed;">AM</div>
+            <div>
+              <div class="testimonial-name">Arun Mehta</div>
+              <div class="testimonial-role">Managing Partner · Mehta & Co.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
+          <div class="testimonial-quote">"The approval workflow is perfect for us. Partners approve assignments, and we never have unauthorized allocations anymore. The role-based access is exactly how CA firms operate."</div>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar" style="background:#0f766e;">NK</div>
+            <div>
+              <div class="testimonial-name">Neha Kapoor</div>
+              <div class="testimonial-role">CA Manager · Gupta & Partners</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
+          <div class="testimonial-quote">"I was skeptical about switching from spreadsheets, but the CSV bulk upload made migration painless. We imported 150 team members in one click. The reports are beautiful and my partners love them."</div>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar" style="background:#d97706;">VK</div>
+            <div>
+              <div class="testimonial-name">Vikram Kumar</div>
+              <div class="testimonial-role">Senior Manager · Reddy & Associates</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section id="pricing" style="padding:80px 0 60px;">
+    <div class="wrap">
+      <div style="text-align:center; margin-bottom:48px;">
+        <h2 style="font-size:32px; margin-bottom:12px;">Simple, transparent pricing</h2>
+        <p style="font-size:16px; color:var(--muted); max-width:500px; margin:0 auto;">Start free with a 14-day trial. No credit card required.</p>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:24px; max-width:800px; margin:0 auto;">
+        <!-- Free Trial -->
+        <div style="background:var(--card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:32px; text-align:center; transition:transform .2s var(--ease), box-shadow .2s var(--ease);" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='var(--shadow)';" onmouseout="this.style.transform=''; this.style.boxShadow='';">
+          <div style="display:inline-flex; align-items:center; justify-content:center; width:48px; height:48px; border-radius:12px; background:var(--icon-bg); margin-bottom:16px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--steel)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <h3 style="font-size:20px; margin-bottom:8px;">Free Trial</h3>
+          <div style="font-size:36px; font-weight:800; margin-bottom:4px;">14 days</div>
+          <p style="font-size:14px; color:var(--muted); margin-bottom:24px;">Full access, no credit card</p>
+          <ul style="list-style:none; padding:0; margin:0 0 24px; text-align:left; display:flex; flex-direction:column; gap:10px;">
+            <li style="display:flex; align-items:center; gap:8px; font-size:14px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--steel)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              Up to 50 users
+            </li>
+            <li style="display:flex; align-items:center; gap:8px; font-size:14px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--steel)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              Up to 599 team members
+            </li>
+            <li style="display:flex; align-items:center; gap:8px; font-size:14px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--steel)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              All features included
+            </li>
+          </ul>
+          <a href="/auth/register" class="btn" style="width:100%; text-align:center;">Start Free Trial</a>
+        </div>
+        <!-- 1-Year License -->
+        <div style="background:var(--card); border:2px solid var(--steel); border-radius:var(--radius-lg); padding:32px; text-align:center; position:relative; transition:transform .2s var(--ease), box-shadow .2s var(--ease);" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='var(--shadow)';" onmouseout="this.style.transform=''; this.style.boxShadow='';">
+          <div style="position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:var(--steel); color:white; font-size:11px; font-weight:700; padding:4px 12px; border-radius:20px; letter-spacing:0.5px;">POPULAR</div>
+          <div style="display:inline-flex; align-items:center; justify-content:center; width:48px; height:48px; border-radius:12px; background:var(--icon-bg); margin-bottom:16px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--steel)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h3 style="font-size:20px; margin-bottom:8px;">1-Year License</h3>
+          <div style="font-size:36px; font-weight:800; margin-bottom:4px;">Standard & Enterprise</div>
+          <p style="font-size:14px; color:var(--muted); margin-bottom:24px;">Annual license with full support</p>
+          <ul style="list-style:none; padding:0; margin:0 0 24px; text-align:left; display:flex; flex-direction:column; gap:10px;">
+            <li style="display:flex; align-items:center; gap:8px; font-size:14px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--steel)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              50-100 users
+            </li>
+            <li style="display:flex; align-items:center; gap:8px; font-size:14px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--steel)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              599-5000 team members
+            </li>
+            <li style="display:flex; align-items:center; gap:8px; font-size:14px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--steel)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              Priority support
+            </li>
+          </ul>
+          <a href="/contact" class="btn btn-onvy" style="width:100%; text-align:center;">Contact Us</a>
         </div>
       </div>
     </div>
@@ -545,8 +863,9 @@
         <h4>Product</h4>
         <ul>
           <li><a href="#features">Features</a></li>
-          <li><a href="#" onclick="return false;">Pricing</a></li>
-          <li><a href="#" onclick="return false;">Documentation</a></li>
+          <li><a href="/faq">FAQ</a></li>
+          <li><a href="/docs-app">Documentation</a></li>
+          <li><a href="#pricing">Pricing</a></li>
         </ul>
       </div>
       <div>
@@ -560,8 +879,11 @@
       <div>
         <h4>Legal</h4>
         <ul>
-          <li><a href="#" onclick="return false;">Privacy policy</a></li>
-          <li><a href="#" onclick="return false;">Terms of service</a></li>
+          <li><a href="/privacy">Privacy Policy</a></li>
+          <li><a href="/terms">Terms of Service</a></li>
+          <li><a href="/dpdp">DPDP Act</a></li>
+          <li><a href="/cookies">Cookie Policy</a></li>
+          <li><a href="/refund">Refund Policy</a></li>
         </ul>
       </div>
     </div>
@@ -581,6 +903,9 @@
       var next = current === 'dark' ? 'light' : 'dark';
       root.setAttribute('data-theme', next);
       try{ localStorage.setItem('splanly-theme', next); }catch(e){}
+      btn.classList.remove('spin');
+      void btn.offsetWidth; // reflow to restart animation
+      btn.classList.add('spin');
     });
   })();
 

@@ -4,6 +4,8 @@ from typing import Optional
 
 from pydantic import BaseModel, EmailStr, field_validator
 
+from app.schemas.base import ORMModel
+
 
 # ── Enums (mirror models for Pydantic) ──
 
@@ -74,7 +76,7 @@ class UserUpdate(BaseModel):
     technical_role: Optional[TechnicalRole] = None
     is_active: Optional[bool] = None
 
-class UserRead(BaseModel):
+class UserRead(ORMModel):
     id: int
     email: str
     display_name: str
@@ -84,10 +86,6 @@ class UserRead(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    model_config = {"from_attributes": True}
-
-
-# ── TeamMember ──
 
 class TeamMemberCreate(BaseModel):
     employee_code: Optional[str] = None
@@ -112,7 +110,7 @@ class TeamMemberUpdate(BaseModel):
     date_of_relieving: Optional[date] = None
     is_active: Optional[bool] = None
 
-class TeamMemberRead(BaseModel):
+class TeamMemberRead(ORMModel):
     id: int
     employee_code: Optional[str] = None
     name: str
@@ -126,8 +124,6 @@ class TeamMemberRead(BaseModel):
     is_active: bool
     created_at: datetime
     updated_at: datetime
-
-    model_config = {"from_attributes": True}
 
 
 # ── Client ──
@@ -143,7 +139,7 @@ class ClientUpdate(BaseModel):
     industry: Optional[str] = None
     is_active: Optional[bool] = None
 
-class ClientRead(BaseModel):
+class ClientRead(ORMModel):
     id: int
     name: str
     code: Optional[str] = None
@@ -151,8 +147,6 @@ class ClientRead(BaseModel):
     is_active: bool
     created_at: datetime
     updated_at: datetime
-
-    model_config = {"from_attributes": True}
 
 
 # ── Engagement ──
@@ -177,7 +171,7 @@ class EngagementUpdate(BaseModel):
     status: Optional[EngagementStatus] = None
     is_active: Optional[bool] = None
 
-class EngagementRead(BaseModel):
+class EngagementRead(ORMModel):
     id: int
     client_id: int
     name: str
@@ -190,8 +184,6 @@ class EngagementRead(BaseModel):
     is_active: bool
     created_at: datetime
     updated_at: datetime
-
-    model_config = {"from_attributes": True}
 
 
 # ── EngagementInstance ──
@@ -211,7 +203,7 @@ class EngagementInstanceUpdate(BaseModel):
     due_date: Optional[date] = None
     status: Optional[InstanceStatus] = None
 
-class EngagementInstanceRead(BaseModel):
+class EngagementInstanceRead(ORMModel):
     id: int
     engagement_id: int
     period_label: str
@@ -221,8 +213,6 @@ class EngagementInstanceRead(BaseModel):
     status: InstanceStatus
     created_at: datetime
     updated_at: datetime
-
-    model_config = {"from_attributes": True}
 
 
 # ── Assignment ──
@@ -262,7 +252,7 @@ class AssignmentUpdate(BaseModel):
             raise ValueError("allocation_percent must be between 1 and 100")
         return v
 
-class AssignmentRead(BaseModel):
+class AssignmentRead(ORMModel):
     id: int
     team_member_id: int
     engagement_instance_id: int
@@ -273,8 +263,6 @@ class AssignmentRead(BaseModel):
     created_by_user_id: Optional[int] = None
     created_at: datetime
     updated_at: datetime
-
-    model_config = {"from_attributes": True}
 
 
 # ── Leave ──
@@ -293,7 +281,7 @@ class LeaveUpdate(BaseModel):
     status: Optional[LeaveStatus] = None
     reason: Optional[str] = None
 
-class LeaveRead(BaseModel):
+class LeaveRead(ORMModel):
     id: int
     team_member_id: int
     leave_type: LeaveType
@@ -304,22 +292,18 @@ class LeaveRead(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    model_config = {"from_attributes": True}
-
 
 # ── SystemSetting ──
 
 class SystemSettingUpdate(BaseModel):
     value: str
 
-class SystemSettingRead(BaseModel):
+class SystemSettingRead(ORMModel):
     id: int
     key: str
     value: str
     description: Optional[str] = None
     updated_by_user_id: Optional[int] = None
-
-    model_config = {"from_attributes": True}
 
 
 # ── Bulk Upload ──

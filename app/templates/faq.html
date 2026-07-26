@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FAQ - splanly</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%2314304d'/><circle cx='38' cy='54' r='22' fill='%234f82b0' fill-opacity='0.85'/><circle cx='62' cy='46' r='22' fill='%23eef5fc'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script>
+  (function(){
+    try{
+      var saved = localStorage.getItem('splanly-theme');
+      var theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+    }catch(e){ document.documentElement.setAttribute('data-theme','light'); }
+  })();
+</script>
+<style>
+  :root{
+    --navy:#16324f;--heading:#16324f;--steel:#4f82b0;--steel-light:#a9c8e2;
+    --bg:#f6fafe;--card:#ffffff;--nav-bg:rgba(246,250,254,.82);
+    --ink:#10202f;--muted:#5c7086;--border:#dee9f3;
+    --radius-lg:22px;--radius-md:14px;--shadow:0 1px 2px rgba(16,32,47,.04),0 12px 32px -16px rgba(20,48,77,.18);
+    --ease:cubic-bezier(.16,.8,.28,1);
+  }
+  html[data-theme="dark"]{
+    --navy:#eaf2fb;--heading:#f2f7fc;--steel:#6fa2cf;--steel-light:#2e567c;
+    --bg:#0b1a29;--card:#12283d;--nav-bg:rgba(11,26,41,.82);
+    --ink:#e9f1f9;--muted:#93a9bd;--border:#1f3a52;
+    --shadow:0 1px 2px rgba(0,0,0,.2),0 16px 36px -16px rgba(0,0,0,.55);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;transition:background .25s var(--ease),color .25s var(--ease);}
+  h1,h2,h3{font-family:'Plus Jakarta Sans',sans-serif;color:var(--heading);letter-spacing:-0.02em;}
+  a{color:inherit;text-decoration:none;}
+  .wrap{max-width:800px;margin:0 auto;padding:0 24px;}
+
+  /* Nav */
+  header{position:sticky;top:0;z-index:100;background:var(--nav-bg);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);transition:background .25s var(--ease);}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:64px;}
+  .brand{display:flex;align-items:center;gap:6px;}
+  .brand-mark{width:28px;height:28px;border-radius:8px;background:var(--navy);position:relative;overflow:hidden;flex-shrink:0;}
+  .brand-mark span{position:absolute;border-radius:50%;}
+  .brand-mark .b1{width:18px;height:18px;background:var(--steel);opacity:.88;left:1px;top:8px;}
+  .brand-mark .b2{width:15px;height:15px;background:#eef5fc;right:2px;top:3px;}
+  html[data-theme="dark"] .brand-mark .b2{background:#0b1a29;}
+  .brand-word{font-family:'Plus Jakarta Sans';font-weight:700;font-size:17px;color:var(--heading);}
+  .nav-links{display:flex;align-items:center;gap:20px;}
+  .nav-links a{font-size:14px;font-weight:500;color:var(--muted);transition:color .15s;}
+  .nav-links a:hover{color:var(--heading);}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 20px;border-radius:999px;font-weight:600;font-size:14px;border:1.5px solid transparent;cursor:pointer;transition:transform .18s var(--ease);}
+  .btn:hover{transform:translateY(-1px);}
+  .btn-primary{background:var(--navy);color:#fff;}
+  html[data-theme="dark"] .btn-primary{color:var(--bg);}
+  .btn-ghost{background:transparent;color:var(--heading);border-color:var(--border);}
+  .btn-sm{padding:8px 16px;font-size:13px;}
+  .theme-toggle{width:34px;height:34px;border-radius:50%;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--heading);transition:border-color .18s;}
+  .theme-toggle:hover{border-color:var(--steel);}
+  .theme-toggle svg{width:16px;height:16px;}
+  .theme-toggle .icon-moon{display:none;}
+  html[data-theme="dark"] .theme-toggle .icon-sun{display:none;}
+  html[data-theme="dark"] .theme-toggle .icon-moon{display:block;}
+
+  /* FAQ */
+  .faq-hero{padding:64px 0 40px;text-align:center;}
+  .faq-hero h1{font-size:clamp(28px,4vw,42px);font-weight:800;margin-bottom:12px;}
+  .faq-hero p{color:var(--muted);font-size:16px;max-width:500px;margin:0 auto;}
+  .faq-list{padding:0 0 80px;}
+  .faq-item{border:1px solid var(--border);border-radius:var(--radius-md);background:var(--card);margin-bottom:12px;overflow:hidden;transition:border-color .2s,box-shadow .2s;}
+  .faq-item:hover{border-color:var(--steel-light);box-shadow:var(--shadow);}
+  .faq-q{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;cursor:pointer;font-weight:600;font-size:15px;color:var(--heading);gap:12px;user-select:none;}
+  .faq-q svg{flex-shrink:0;transition:transform .25s var(--ease);color:var(--muted);}
+  .faq-item.open .faq-q svg{transform:rotate(180deg);}
+  .faq-a{display:none;padding:0 22px 18px;color:var(--muted);font-size:14px;line-height:1.7;}
+  .faq-item.open .faq-a{display:block;}
+
+  /* Footer */
+  footer{background:var(--card);border-top:1px solid var(--border);padding:32px 0;text-align:center;font-size:13px;color:var(--muted);transition:background .25s var(--ease);}
+  footer a{text-decoration:underline;text-underline-offset:3px;}
+  footer a:hover{color:var(--heading);}
+
+  @media(max-width:640px){
+    .faq-hero{padding:40px 0 24px;}
+    .faq-q{padding:14px 16px;font-size:14px;}
+    .faq-a{padding:0 16px 14px;font-size:13px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a href="/" class="brand">
+      <span class="brand-mark"><span class="b2"></span><span class="b1"></span></span>
+      <span class="brand-word">splanly</span>
+    </a>
+    <div class="nav-links">
+      <a href="/#features">Features</a>
+      <a href="/faq">FAQ</a>
+      <a href="/contact">Contact</a>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.9 19.1l1.7-1.7M17.4 6.6l1.7-1.7"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+      </button>
+      <a href="/auth/login" class="btn btn-ghost btn-sm">Sign in</a>
+      <a href="/auth/register" class="btn btn-primary btn-sm">Get started</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="faq-hero">
+      <h1>Frequently asked questions</h1>
+      <p>Everything you need to know about splanly. Can't find an answer? <a href="/contact" style="color:var(--steel);font-weight:600;">Contact us</a>.</p>
+    </div>
+
+    <div class="faq-list">
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          What is splanly?
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="faq-a">splanly is a resource planning platform built specifically for chartered accountant firms. It helps you manage team allocations, track engagements, prevent over-booking, and monitor bench utilization — all in one place.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          How does the free trial work?
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="faq-a">When you create a new firm, you get a 14-day free trial with full access to all features. No credit card required. After the trial, you can activate a license key to continue using splanly.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Can I import my existing team data?
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="faq-a">Yes. splanly supports bulk CSV upload for team members. Go to Team Members → Bulk Upload, and upload a CSV with your team data. The system validates each row and reports any errors.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          How does over-allocation prevention work?
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="faq-a">When you assign someone to an engagement, splanly automatically checks their existing allocations for overlapping dates. If the total would exceed 100%, the assignment is blocked. It also checks for conflicts with approved leave.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          What user roles are available?
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="faq-a">splanly has four technical roles: <strong>Super Admin</strong> (platform-level), <strong>Admin</strong> (full firm management), <strong>Moderator</strong> (staffing operations), and <strong>Viewer</strong> (read-only). Roles are assigned per-firm, so a user can have different roles in different firms.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Is my data secure?
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="faq-a">Yes. splanly uses industry-standard security: bcrypt password hashing, TOTP two-factor authentication, CSRF protection, session-based auth with secure cookies, and Microsoft 365 SSO integration. All data is stored in encrypted PostgreSQL databases.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Can I use splanly on mobile?
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="faq-a">splanly is a web application that works on any device with a browser. The interface is responsive and adapts to mobile screens, though the desktop experience is optimized for the weekly planner grid view.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          How do I get support?
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="faq-a">You can reach us at <a href="mailto:samarth@skilledca.in" style="color:var(--steel);font-weight:600;">samarth@skilledca.in</a> or call <a href="tel:+919845145102" style="color:var(--steel);font-weight:600;">+91 98451 45102</a>. We typically respond within 24 hours on business days.</div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <a href="https://skilledca.in" target="_blank" rel="noopener">splanly by SkilledCA Enterprises</a> &copy; 2026
+  </div>
+</footer>
+
+<script>
+function toggleFaq(el) {
+  el.parentElement.classList.toggle('open');
+}
+
+(function(){
+  var root = document.documentElement;
+  var btn = document.getElementById('themeToggle');
+  btn.addEventListener('click', function(){
+    var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try{ localStorage.setItem('splanly-theme', next); }catch(e){}
+  });
+})();
+</script>
+</body>
+</html>

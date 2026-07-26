@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}License Expired - splanly{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center min-h-[80vh]">
+    <div style="width: 100%; max-width: 440px;">
+        <!-- Warning Icon -->
+        <div class="flex justify-center mb-6">
+            <div class="flex items-center justify-center w-16 h-16 rounded-2xl bg-red-100 dark:bg-red-900/30">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-red-600 dark:text-red-400"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
+            </div>
+        </div>
+
+        <!-- Card -->
+        <div class="uk-card uk-card-body text-center">
+            <h2 class="text-xl font-semibold mb-2">License Expired</h2>
+            <p class="text-sm text-muted-foreground mb-6">
+                Your license has expired and the grace period has ended.
+                Enter a new license key to restore access.
+            </p>
+
+            <!-- Inline Activation Form -->
+            <form method="POST" action="/license/activate" class="space-y-4 text-left">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                
+                {% if error %}
+                <div class="flex items-center gap-2 p-3 rounded-md text-sm font-medium" style="background:hsl(0 84% 95%); color:hsl(0 84% 40%); border:1px solid hsl(0 84% 88%);">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                    {{ error }}
+                </div>
+                {% endif %}
+
+                <div>
+                    <label class="uk-form-label" for="license_key">License Key</label>
+                    <input
+                        class="uk-input w-full text-center font-mono text-lg tracking-widest"
+                        id="license_key"
+                        name="license_key"
+                        type="text"
+                        placeholder="SPLY-XXXX-XXXX-XXXX-XXXX"
+                        autocomplete="off"
+                        spellcheck="false"
+                        required
+                        autofocus
+                    >
+                </div>
+
+                <button type="submit" class="uk-btn uk-btn-primary w-full" style="border-radius:999px; height:44px; font-weight:600;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+                    Activate License
+                </button>
+            </form>
+
+            <div class="mt-6 pt-4 border-t border-border">
+                <p class="text-xs text-muted-foreground">
+                    Don't have a license? 
+                    <a href="mailto:support@skilledca.in" class="text-primary hover:underline">Contact us</a> or
+                    <a href="/" class="text-primary hover:underline">visit our website</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

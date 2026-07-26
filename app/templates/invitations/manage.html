@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% from "macros/_csrf.html" import csrf_field %}
+
+{% block title %}Manage Users - splanly{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px;">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-foreground" style="font-family:'Plus Jakarta Sans',sans-serif;">Manage Users</h1>
+        <p class="text-sm text-muted-foreground mt-1">Promote users and manage super admin roles</p>
+    </div>
+
+    <!-- Super Admin Info -->
+    <div class="p-3 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 mb-4">
+        <div class="flex items-start gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg>
+            <div class="text-sm text-blue-600 dark:text-blue-400">
+                <p><strong>Super Admins:</strong> {{ super_admin_count }}/{{ max_super_admins }}</p>
+                <p>Super admins can manage licenses and promote other users. Max {{ max_super_admins }} per firm.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="uk-card uk-card-body">
+        <div class="overflow-auto">
+            <table class="uk-table uk-table-hover uk-table-divider uk-table-small">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Current Role</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in users_with_roles %}
+                    <tr class="hover:bg-muted/50 transition-colors">
+                        <td class="font-medium">{{ entry.user.display_name }}</td>
+                        <td class="text-muted-foreground">{{ entry.user.email }}</td>
+                        <td>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
+                                {% if entry.role == 'super_admin' %}bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300
+                                {% elif entry.role == 'admin' %}bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300
+                                {% elif entry.role == 'moderator' %}bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300
+                                {% else %}bg-muted text-muted-foreground{% endif %}">
+                                {{ entry.role | replace('_', ' ') | title }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if entry.user.id != current_user_id %}
+                            <div class="flex gap-2">
+                                <!-- Promote/Demote -->
+                                {% if entry.role == 'viewer' %}
+                                <form method="POST" action="/invitations/promote/{{ entry.user.id }}" class="inline">
+                                    {{ csrf_field(csrf_token) }}
+                                    <input type="hidden" name="role" value="moderator">
+                                    <button type="submit" class="uk-btn uk-btn-sm uk-btn-outline">Promote to Moderator</button>
+                                </form>
+                                <form method="POST" action="/invitations/promote/{{ entry.user.id }}" class="inline">
+                                    {{ csrf_field(csrf_token) }}
+                                    <input type="hidden" name="role" value="admin">
+                                    <button type="submit" class="uk-btn uk-btn-sm uk-btn-outline">Promote to Admin</button>
+                                </form>
+                                {% elif entry.role == 'moderator' %}
+                                <form method="POST" action="/invitations/promote/{{ entry.user.id }}" class="inline">
+                                    {{ csrf_field(csrf_token) }}
+                                    <input type="hidden" name="role" value="admin">
+                                    <button type="submit" class="uk-btn uk-btn-sm uk-btn-outline">Promote to Admin</button>
+                                </form>
+                                <form method="POST" action="/invitations/promote/{{ entry.user.id }}" class="inline">
+                                    {{ csrf_field(csrf_token) }}
+                                    <input type="hidden" name="role" value="viewer">
+                                    <button type="submit" class="uk-btn uk-btn-sm uk-btn-ghost text-destructive">Demote to Viewer</button>
+                                </form>
+                                {% elif entry.role == 'admin' %}
+                                {% if super_admin_count < max_super_admins %}
+                                <form method="POST" action="/invitations/promote/{{ entry.user.id }}" class="inline">
+                                    {{ csrf_field(csrf_token) }}
+                                    <input type="hidden" name="role" value="super_admin">
+                                    <button type="submit" class="uk-btn uk-btn-sm uk-btn-outline">Promote to Super Admin</button>
+                                </form>
+                                {% endif %}
+                                <form method="POST" action="/invitations/promote/{{ entry.user.id }}" class="inline">
+                                    {{ csrf_field(csrf_token) }}
+                                    <input type="hidden" name="role" value="moderator">
+                                    <button type="submit" class="uk-btn uk-btn-sm uk-btn-ghost text-destructive">Demote to Moderator</button>
+                                </form>
+                                {% elif entry.role == 'super_admin' %}
+                                <!-- Transfer Super Admin -->
+                                <form method="POST" action="/invitations/transfer-super-admin/{{ entry.user.id }}" class="inline" onsubmit="return confirm('Transfer super admin role? You will become admin.')">
+                                    {{ csrf_field(csrf_token) }}
+                                    <button type="submit" class="uk-btn uk-btn-sm uk-btn-primary">Transfer Super Admin</button>
+                                </form>
+                                <form method="POST" action="/invitations/promote/{{ entry.user.id }}" class="inline">
+                                    {{ csrf_field(csrf_token) }}
+                                    <input type="hidden" name="role" value="admin">
+                                    <button type="submit" class="uk-btn uk-btn-sm uk-btn-ghost text-destructive">Demote to Admin</button>
+                                </form>
+                                {% endif %}
+                            </div>
+                            {% else %}
+                            <span class="text-xs text-muted-foreground">You</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a href="/invitations" class="text-sm text-muted-foreground hover:text-foreground">
+            ← Back to Invitations
+        </a>
+    </div>
+</div>
+{% endblock %}

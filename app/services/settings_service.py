@@ -48,3 +48,32 @@ def list_all_settings(db: Session, firm_id: int | None = None):
             SystemSetting.firm_id.is_(None),
         ))
     return query.order_by(SystemSetting.key).all()
+
+
+def get_auth_method(db: Session, firm_id: int | None = None) -> str:
+    """Get authentication method for firm. Returns '2fa' or 'otp'."""
+    return get_setting_value(db, "auth_method", firm_id, default="2fa")
+
+
+def set_auth_method(db: Session, method: str, firm_id: int | None = None, updated_by_user_id: int | None = None):
+    """Set authentication method for firm."""
+    if method not in ("2fa", "otp"):
+        raise ValueError("Invalid auth method. Must be '2fa' or 'otp'")
+    return update_setting(db, "auth_method", method, updated_by_user_id, firm_id)
+
+
+def get_password_expiry_days(db: Session, firm_id: int | None = None) -> int:
+    """Get password expiry days for firm. Returns 0 if disabled."""
+    val = get_setting_value(db, "password_expiry_days", firm_id, default="90")
+    try:
+        days = int(val)
+        return min(max(days, 0), 90)
+    except (ValueError, TypeError):
+        return 90
+
+
+def set_password_expiry_days(db: Session, days: int, firm_id: int | None = None,
+                             updated_by_user_id: int | None = None):
+    """Set password expiry days for firm. 0=disabled, max=90."""
+    days = min(max(days, 0), 90)
+    return update_setting(db, "password_expiry_days", str(days), updated_by_user_id, firm_id)

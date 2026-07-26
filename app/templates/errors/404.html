@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Page Not Found - splanly{% endblock %}
+
+{% block content %}
+<style>
+  .error-face {
+    width: 110px; height: 110px; margin: 0 auto 22px;
+    border-radius: 50%; background: hsl(var(--card));
+    border: 3px solid hsl(var(--foreground));
+    position: relative;
+    box-shadow: 0 14px 30px -14px rgba(0,0,0,.2);
+  }
+  .error-eye {
+    position: absolute; top: 38px;
+    width: 11px; height: 11px; border-radius: 50%;
+    background: hsl(var(--foreground));
+    animation: lookaround 5s infinite;
+  }
+  @keyframes lookaround {
+    0%,40%,100%{transform:translateX(0)}
+    10%{transform:translateX(-5px)}
+    25%{transform:translateX(5px)}
+    35%{transform:translateX(0)}
+  }
+  .error-mouth {
+    position: absolute; bottom: 26px; left: 50%;
+    width: 20px; height: 10px;
+    border: 3px solid hsl(var(--foreground));
+    border-top: 0; border-radius: 0 0 20px 20px;
+    transform: translateX(-50%);
+  }
+  .magnifier {
+    position: absolute; bottom: -6px; right: -10px;
+    width: 38px; height: 38px;
+    display: flex; align-items: center; justify-content: center;
+  }
+</style>
+
+<div class="flex items-center justify-center min-h-[80vh] px-4">
+  <div class="text-center" style="max-width: 460px;">
+    <div class="error-face">
+      <span class="error-eye" style="left:30px;"></span>
+      <span class="error-eye" style="right:30px; animation-delay:0.15s;"></span>
+      <span class="error-mouth"></span>
+      <div class="magnifier">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="hsl(var(--foreground))" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      </div>
+    </div>
+
+    <h1 class="text-2xl font-semibold tracking-tight mb-2">Page not found</h1>
+    <p class="text-muted-foreground text-sm mb-6" style="line-height:1.65;">
+      We looked everywhere but couldn't find this page. It may have moved or never existed.
+    </p>
+
+    <div class="flex gap-3 justify-center">
+      <a href="/dashboard" class="uk-btn uk-btn-primary" style="border-radius:999px; height:44px; font-weight:600;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;display:inline;vertical-align:-2px;"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Go to Dashboard
+      </a>
+      <a href="/" class="uk-btn uk-btn-outline" style="border-radius:999px; height:44px;">
+        Home
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

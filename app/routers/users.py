@@ -131,6 +131,9 @@ def list_users(
         log_total = 0
         approval_logs = []
 
+    # Get deleted users
+    deleted_users, deleted_total = service.list_deleted_users(db, firm_id) if firm_id else ([], 0)
+
     return templates.TemplateResponse(request, "users/list.html", {
         "items": items,
         "total": total,
@@ -145,6 +148,8 @@ def list_users(
         "log_total": log_total,
         "log_limit": log_limit,
         "log_offset": log_offset_val,
+        "deleted_users": deleted_users,
+        "deleted_total": deleted_total,
     })
 
 
@@ -208,9 +213,9 @@ async def create_user_form(
 
     if not errors:
         try:
-            new_user = service.create_user(db, data, password=password or None)
-            # Add user to firm with role
             firm_id = request.session.get("firm_id")
+            new_user = service.create_user(db, data, password=password or None, firm_id=firm_id)
+            # Add user to firm with role
             if firm_id:
                 from app.services.firm_service import add_user_to_firm
                 from app.models.models import TechnicalRole
@@ -314,18 +319,32 @@ def deactivate_user_form(
     if user_id == current_user.id:
         set_flash(request, "You cannot deactivate your own account.", "danger")
         return RedirectResponse(url="/users", status_code=303)
-    service.soft_delete_user(db, user_id)
+    service.soft_delete_user(db, user_id, current_user.id)
     set_flash(request, "User deactivated.", "warning")
+    return RedirectResponse(url="/users", status_code=303)
+
+
+@router.post("/{user_id}/restore")
+def restore_user_form(
+    request: Request,
+    user_id: int,
+    db: Session = Depends(get_db),
+    _=Depends(require_role(TechnicalRole.admin)),
+):
+    service.restore_user(db, user_id)
+    set_flash(request, "User restored.", "success")
     return RedirectResponse(url="/users", status_code=303)
 
 
 @router.post("", response_model=UserRead, status_code=201)
 def create_user_api(
+    request: Request,
     data: UserCreate,
     db: Session = Depends(get_db),
     _=Depends(require_role(TechnicalRole.admin)),
 ):
-    result = service.create_user(db, data.model_dump())
+    firm_id = request.session.get("firm_id")
+    result = service.create_user(db, data.model_dump(), firm_id=firm_id)
     return UserRead.model_validate(result)
 
 

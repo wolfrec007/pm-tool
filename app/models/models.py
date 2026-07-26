@@ -3,6 +3,7 @@ from datetime import date, datetime
 
 from sqlalchemy import (
     Boolean,
+    CheckConstraint,
     Column,
     Date,
     DateTime,
@@ -22,6 +23,7 @@ from app.database import Base
 
 
 class TechnicalRole(str, enum.Enum):
+    super_admin = "super_admin"
     admin = "admin"
     moderator = "moderator"
     viewer = "viewer"
@@ -114,6 +116,14 @@ class Firm(Base):
     logo_url = Column(String(500), nullable=True)
     allowed_domains = Column(Text, nullable=True)  # Comma-separated: "pkfindia.com,pkf.in"
     is_active = Column(Boolean, default=True, nullable=False)
+
+    # License fields
+    license_key = Column(String(255), nullable=True)  # Full key for validation
+    license_key_hash = Column(String(64), nullable=True, index=True)
+    license_tier = Column(String(50), nullable=True)  # "standard", "enterprise"
+    license_expires_at = Column(DateTime(timezone=True), nullable=True)  # NULL = perpetual
+    license_activated_at = Column(DateTime(timezone=True), nullable=True)
+
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
@@ -145,7 +155,11 @@ class Branch(Base):
 
 class FirmUser(Base):
     __tablename__ = "firm_users"
-    __table_args__ = (UniqueConstraint("user_id", "firm_id", name="uq_firm_user"),)
+    __table_args__ = (
+        UniqueConstraint("user_id", "firm_id", name="uq_firm_user"),
+        Index("ix_firm_user_firm_id", "firm_id"),
+        Index("ix_firm_user_user_id", "user_id"),
+    )
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="RESTRICT"), nullable=False)
@@ -203,6 +217,10 @@ class ApprovalRequest(Base):
     requested_by = relationship("User", foreign_keys=[requested_by_user_id])
     reviewed_by = relationship("User", foreign_keys=[reviewed_by_user_id])
 
+    __table_args__ = (
+        Index("ix_approval_request_firm_status", "firm_id", "status"),
+    )
+
 
 class ExtensionStatus(str, enum.Enum):
     pending = "pending"
@@ -238,6 +256,12 @@ class ExtensionRequest(Base):
     requested_by = relationship("User", foreign_keys=[requested_by_user_id])
     reviewed_by = relationship("User", foreign_keys=[reviewed_by_user_id])
 
+    __table_args__ = (
+        Index("ix_extension_request_firm_status", "firm_id", "status"),
+        CheckConstraint("allocation_percent >= 0 AND allocation_percent <= 100", name="ck_extension_allocation_range"),
+        CheckConstraint("end_date >= start_date", name="ck_extension_date_order"),
+    )
+
 
 class User(Base):
     __tablename__ = "users"
@@ -254,6 +278,9 @@ class User(Base):
     updated_at = Column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
     )
+    deleted_at = Column(DateTime(timezone=True), nullable=True)
+    deleted_by_user_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    password_changed_at = Column(DateTime(timezone=True), nullable=True)
 
     firm_users = relationship("FirmUser", back_populates="user")
 
@@ -344,6 +371,10 @@ class EngagementInstance(Base):
     engagement = relationship("Engagement", back_populates="instances")
     assignments = relationship("Assignment", back_populates="engagement_instance")
 
+    __table_args__ = (
+        CheckConstraint("end_date >= start_date", name="ck_engagement_instance_date_order"),
+    )
+
 
 class Assignment(Base):
     __tablename__ = "assignments"
@@ -373,6 +404,8 @@ class Assignment(Base):
         Index("ix_assignment_team_member_dates", "team_member_id", "start_date", "end_date"),
         Index("ix_assignment_instance", "engagement_instance_id"),
         Index("ix_assignment_team_instance", "team_member_id", "engagement_instance_id"),
+        CheckConstraint("allocation_percent >= 0 AND allocation_percent <= 100", name="ck_assignment_allocation_range"),
+        CheckConstraint("end_date >= start_date", name="ck_assignment_date_order"),
     )
 
 
@@ -395,7 +428,10 @@ class Leave(Base):
 
     team_member = relationship("TeamMember", back_populates="leaves")
 
-    __table_args__ = (Index("ix_leave_team_member_dates", "team_member_id", "start_date", "end_date"),)
+    __table_args__ = (
+        Index("ix_leave_team_member_dates", "team_member_id", "start_date", "end_date"),
+        CheckConstraint("end_date >= start_date", name="ck_leave_date_order"),
+    )
 
 
 class SystemSetting(Base):

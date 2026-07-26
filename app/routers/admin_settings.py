@@ -17,7 +17,7 @@ from app.templates_setup import templates
 router = APIRouter(prefix="/admin/settings", tags=["settings"])
 
 
-def _render(request, db, saved=False, error="", approval_saved=False, domains_saved=False):
+def _render(request, db, saved=False, error="", approval_saved=False, domains_saved=False, auth_saved=False, roles_saved=False, security_saved=False):
     """Render the settings page with common context."""
     firm_id = request.session.get("firm_id")
     all_settings = service.list_all_settings(db)
@@ -30,12 +30,44 @@ def _render(request, db, saved=False, error="", approval_saved=False, domains_sa
         key = f"{rule.resource_type.value}_{rule.operation.value}"
         approval_rules[key] = rule.is_enabled
 
-    # Get firm domains
+    # Get firm domains and license info
     firm_domains = ""
+    firm = None
     if firm_id:
         from app.services.firm_service import get_firm
         firm = get_firm(db, firm_id)
         firm_domains = firm.allowed_domains or ""
+    
+    # License info
+    from app.services.license_service import check_license
+    from app.services.license_tiers import get_tier_limits
+    license_status = check_license(firm) if firm else "no_license"
+    tier_limits = get_tier_limits(firm.license_tier) if firm and firm.license_tier else None
+    
+    # Count current users and team members
+    from app.models.models import FirmUser, TeamMember
+    current_users = 0
+    current_team_members = 0
+    if firm_id:
+        current_users = db.query(FirmUser).filter(FirmUser.firm_id == firm_id, FirmUser.is_active == True).count()
+        current_team_members = db.query(TeamMember).filter(TeamMember.firm_id == firm_id, TeamMember.is_active == True).count()
+    
+    # Auth method
+    auth_method = service.get_auth_method(db, firm_id)
+
+    # Password expiry days
+    password_expiry_days = service.get_password_expiry_days(db, firm_id)
+    
+    # Business roles
+    from app.models.firm_business_role import FirmBusinessRole
+    business_roles = []
+    if firm_id:
+        business_roles = db.query(FirmBusinessRole).filter(
+            FirmBusinessRole.firm_id == firm_id
+        ).order_by(FirmBusinessRole.role_code).all()
+    
+    # Default currency
+    default_currency = service.get_setting_value(db, "default_currency", firm_id, "INR")
     
     csrf_token = get_csrf_token(request)
     return templates.TemplateResponse(
@@ -49,7 +81,19 @@ def _render(request, db, saved=False, error="", approval_saved=False, domains_sa
             "approval_saved": approval_saved,
             "firm_domains": firm_domains,
             "domains_saved": domains_saved,
+            "auth_method": auth_method,
+            "auth_saved": auth_saved,
+            "roles_saved": roles_saved,
             "csrf_token": csrf_token,
+            "firm": firm,
+            "license_status": license_status,
+            "tier_limits": tier_limits,
+            "current_users": current_users,
+            "current_team_members": current_team_members,
+            "business_roles": business_roles,
+            "default_currency": default_currency,
+            "password_expiry_days": password_expiry_days,
+            "security_saved": security_saved,
         },
     )
 
@@ -186,3 +230,134 @@ async def update_domains(
     db.commit()
 
     return _render(request, db, domains_saved=True)
+
+
+@router.post("/auth-method", response_class=HTMLResponse)
+async def update_auth_method(
+    request: Request,
+    db: Session = Depends(get_db),
+    user=Depends(require_role(TechnicalRole.admin)),
+):
+    form_data = await request.form()
+    if not validate_csrf(request, form_data.get("csrf_token")):
+        raise HTTPException(status_code=403, detail="Invalid CSRF token")
+
+    firm_id = request.session.get("firm_id")
+    if not firm_id:
+        from app.services.firm_service import get_user_firms
+        user_id = request.session.get("user_id")
+        if user_id:
+            firms = get_user_firms(db, user_id)
+            if firms:
+                firm_id = firms[0].id
+                request.session["firm_id"] = firm_id
+
+    if not firm_id:
+        return _render(request, db, error="No firm selected")
+
+    auth_method = form_data.get("auth_method", "2fa")
+    if auth_method not in ("2fa", "otp"):
+        return _render(request, db, error="Invalid authentication method")
+
+    service.set_auth_method(db, auth_method, firm_id, user.id)
+
+    return _render(request, db, auth_saved=True)
+
+
+@router.post("/business-roles", response_class=HTMLResponse)
+async def update_business_roles(
+    request: Request,
+    db: Session = Depends(get_db),
+    user=Depends(require_role(TechnicalRole.admin)),
+):
+    form_data = await request.form()
+    if not validate_csrf(request, form_data.get("csrf_token")):
+        raise HTTPException(status_code=403, detail="Invalid CSRF token")
+
+    firm_id = request.session.get("firm_id")
+    if not firm_id:
+        from app.services.firm_service import get_user_firms
+        user_id = request.session.get("user_id")
+        if user_id:
+            firms = get_user_firms(db, user_id)
+            if firms:
+                firm_id = firms[0].id
+                request.session["firm_id"] = firm_id
+
+    if not firm_id:
+        return _render(request, db, error="No firm selected")
+
+    # Update currency
+    currency = form_data.get("currency", "INR")
+    service.update_setting(db, "default_currency", currency, user.id, firm_id)
+
+    # Update business roles
+    from app.models.firm_business_role import FirmBusinessRole
+    
+    roles = db.query(FirmBusinessRole).filter(FirmBusinessRole.firm_id == firm_id).all()
+    
+    for role in roles:
+        # Check if enabled
+        enabled_key = f"role_{role.role_code}_enabled"
+        is_enabled = form_data.get(enabled_key) == "on"
+        
+        # Get rate type and value
+        rate_type_key = f"role_{role.role_code}_rate_type"
+        rate_value_key = f"role_{role.role_code}_rate_value"
+        
+        rate_type = form_data.get(rate_type_key, "daily")
+        rate_value_str = form_data.get(rate_value_key, "0")
+        
+        try:
+            rate_value = float(rate_value_str) if rate_value_str else 0
+        except ValueError:
+            rate_value = 0
+        
+        # Update role
+        role.is_enabled = is_enabled
+        if is_enabled:
+            role.rate_type = rate_type
+            role.rate_value = rate_value
+            role.currency = currency
+        else:
+            role.rate_type = None
+            role.rate_value = None
+    
+    db.commit()
+
+    return _render(request, db, roles_saved=True)
+
+
+@router.post("/security", response_class=HTMLResponse)
+async def update_security(
+    request: Request,
+    db: Session = Depends(get_db),
+    user=Depends(require_role(TechnicalRole.admin)),
+):
+    form_data = await request.form()
+    if not validate_csrf(request, form_data.get("csrf_token")):
+        raise HTTPException(status_code=403, detail="Invalid CSRF token")
+
+    firm_id = request.session.get("firm_id")
+    if not firm_id:
+        from app.services.firm_service import get_user_firms
+        user_id = request.session.get("user_id")
+        if user_id:
+            firms = get_user_firms(db, user_id)
+            if firms:
+                firm_id = firms[0].id
+                request.session["firm_id"] = firm_id
+
+    if not firm_id:
+        return _render(request, db, error="No firm selected")
+
+    days_str = form_data.get("password_expiry_days", "90")
+    try:
+        days = int(days_str)
+    except (ValueError, TypeError):
+        days = 90
+    days = min(max(days, 0), 90)
+
+    service.set_password_expiry_days(db, days, firm_id, user.id)
+
+    return _render(request, db, security_saved=True)
