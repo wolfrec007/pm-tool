@@ -152,22 +152,36 @@
     border-bottom:1px solid var(--border);
     transition:background .25s var(--ease), border-color .25s var(--ease);
   }
-  .nav{display:flex; align-items:center; justify-content:space-between; height:72px;}
+  .nav{display:flex; align-items:center; justify-content:space-between; height:72px; gap:16px;}
   .brand{display:flex; align-items:center; gap:6px;}
-  .brand-logo{height:26px; width:auto; display:block;}
-  .brand-logo.footer-logo{height:22px;}
-  /* Recolor the embedded logo's exact fills for dark backgrounds (inline
-     styles need !important to override) */
-  html[data-theme="dark"] .brand-logo path[style*="fill: rgb(28,55,92)"]{fill:#eaf2fb !important;}
-  html[data-theme="dark"] .brand-logo path[style*="fill: rgb(84,136,183)"]{fill:#7fb0da !important;}
-  html[data-theme="dark"] .brand-logo path[style*="fill: rgb(56,94,136)"]{fill:#5f8fbe !important;}
-  .nav-links{display:flex; align-items:center; gap:32px;}
+  .brand-mark{width:34px; height:34px; border-radius:10px; position:relative; overflow:hidden; background:var(--navy); flex-shrink:0;}
+  html[data-theme="dark"] .brand-mark{background:#0e2032;}
+  .brand-mark span{position:absolute; border-radius:50%;}
+  .brand-mark .b1{width:26px; height:26px; background:var(--steel); opacity:.88; left:2px; top:12px;}
+  .brand-mark .b2{width:22px; height:22px; background:#eef5fc; right:3px; top:4px;}
+  html[data-theme="dark"] .brand-mark .b2{background:#0b1a29;}
+  .brand-word{font-family:'Plus Jakarta Sans'; font-weight:700; font-size:20px; color:var(--heading); letter-spacing:-0.01em;}
+
+  .nav-links{display:flex; align-items:center; gap:28px;}
   .nav-links a{font-size:14.5px; font-weight:500; color:var(--muted); transition:color .15s;}
   .nav-links a:hover{color:var(--heading);}
-  .nav-cta{display:flex; align-items:center; gap:12px;}
+  .nav-right{display:flex; align-items:center; gap:10px;}
+
+  /* Mobile hamburger */
+  .hamburger{display:none; width:36px; height:36px; border-radius:8px; border:1px solid var(--border); background:transparent; color:var(--heading); align-items:center; justify-content:center; cursor:pointer; padding:0;}
+  .hamburger:hover{background:var(--card);}
+  .mobile-menu{display:none; position:absolute; top:72px; left:0; right:0; background:var(--card); border-bottom:1px solid var(--border); box-shadow:0 8px 24px rgba(0,0,0,.15); z-index:200; padding:8px 0;}
+  .mobile-menu.open{display:block;}
+  .mobile-menu a{display:block; padding:14px 24px; font-size:15px; font-weight:500; color:var(--ink); border-bottom:1px solid var(--line-soft);}
+  .mobile-menu a:last-child{border-bottom:none;}
+  .mobile-menu a:hover{background:var(--bg);}
+  .mobile-menu .mob-actions{display:flex; gap:8px; padding:12px 24px;}
+  .mobile-menu .mob-actions a{border:none; flex:1; text-align:center; border-radius:8px; padding:10px; font-weight:600;}
 
   @media (max-width: 860px){
     .nav-links{display:none;}
+    .nav-right .theme-toggle{display:none;}
+    .hamburger{display:flex;}
   }
 
   /* Nav dropdown */
@@ -460,7 +474,7 @@
 </head>
 <body>
 
-<header>
+<header style="position:relative;">
   <div class="wrap nav">
     <a href="#" class="brand" aria-label="splanly home">
       <span class="brand-mark"><span class="b2"></span><span class="b1"></span></span>
@@ -493,12 +507,27 @@
         </div>
       </div>
     </nav>
-    <div class="nav-cta">
-      <span class="help-icon" title="Need help?" style="font-size:16px;cursor:pointer;color:var(--muted);transition:color .15s;animation:wobble 3s ease-in-out infinite;" onclick="window.location.href='/faq'">?</span>
+    <div class="nav-right">
       <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">
         <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.9 19.1l1.7-1.7M17.4 6.6l1.7-1.7"/></svg>
         <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
       </button>
+      <a href="/auth/login" class="btn btn-ghost btn-sm">Sign in</a>
+      <a href="/auth/register" class="btn btn-primary btn-sm">Get started</a>
+      <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+    </div>
+  </div>
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#features" onclick="closeMobile()">Features</a>
+    <a href="#pricing" onclick="closeMobile()">Pricing</a>
+    <a href="#demo" onclick="closeMobile()">Book Demo</a>
+    <a href="/faq">FAQ</a>
+    <a href="/docs-app">Docs</a>
+    <a href="/contact">Contact</a>
+    <div class="mob-actions">
       <a href="/auth/login" class="btn btn-ghost btn-sm">Sign in</a>
       <a href="/auth/register" class="btn btn-primary btn-sm">Get started</a>
     </div>
@@ -1022,6 +1051,13 @@
       else btn.classList.remove('visible');
     }, {passive:true});
   })();
+
+  // Mobile menu
+  var hamburger = document.getElementById('hamburgerBtn');
+  var mobileMenu = document.getElementById('mobileMenu');
+  function closeMobile(){ mobileMenu.classList.remove('open'); }
+  hamburger.addEventListener('click', function(){ mobileMenu.classList.toggle('open'); });
+  document.addEventListener('click', function(e){ if(!hamburger.contains(e.target) && !mobileMenu.contains(e.target)) closeMobile(); });
 
   // Theme toggle
   (function(){
