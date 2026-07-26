@@ -138,7 +138,8 @@ def faq_page(request: Request):
 
 @app.get("/book-demo")
 def book_demo_page(request: Request):
-    return templates.TemplateResponse(request, "book_demo.html")
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url="https://calendar.zoho.in/zc/view/slot-booking/zz080212300acc13033d01ac0cdd47751184164ddc793c900fba9f96207145c64ddf5695a014546d2030fdcbb2a669de45cf4f4c5f", status_code=302)
 
 
 @app.get("/docs-app")
