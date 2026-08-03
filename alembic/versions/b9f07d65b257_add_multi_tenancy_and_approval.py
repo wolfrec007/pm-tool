@@ -104,9 +104,23 @@ def upgrade() -> None:
     # ── Step 2: Seed default firm ──
     conn = op.get_bind()
     conn.execute(sa.text(
-        "INSERT INTO firms (name, code, is_active) VALUES ('PKF Sridhar & Santhanam', 'PKF', true)"
+        "INSERT INTO firms (name, code, is_active) "
+        "SELECT 'skilledca enterprises', 'SKILLEDCA', true "
+        "WHERE NOT EXISTS (SELECT 1 FROM firms WHERE code = 'SKILLEDCA')"
     ))
-    default_firm_id = conn.execute(sa.text("SELECT id FROM firms WHERE code = 'PKF'")).scalar()
+    default_firm_id = conn.execute(
+        sa.text("SELECT id FROM firms WHERE code = 'SKILLEDCA'")
+    ).scalar()
+
+    # ── Step 2b: Seed sample admin user ──
+    conn.execute(sa.text(
+        "INSERT INTO users (email, display_name, is_active, technical_role) "
+        "SELECT 'samarth@skilledca.in', 'Samarth', true, 'admin' "
+        "WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'samarth@skilledca.in')"
+    ))
+    admin_user_id = conn.execute(
+        sa.text("SELECT id FROM users WHERE email = 'samarth@skilledca.in'")
+    ).scalar()
     
     # ── Step 3: Add firm_id columns as NULLABLE first ──
     op.add_column('clients', sa.Column('firm_id', sa.Integer(), nullable=True))
