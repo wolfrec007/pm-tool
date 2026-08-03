@@ -26,8 +26,8 @@ def require_dev_portal(request: Request):
     if not check_gate(request):
         raise HTTPException(status_code=404, detail="Not found")
 
-    sa_id = request.session.get("dev_portal_sa_id")
-    if not sa_id:
+    dev_id = request.session.get("dev_portal_dev_id")
+    if not dev_id:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
     session_started = request.session.get("dev_portal_started_at", 0)
@@ -36,4 +36,4 @@ def require_dev_portal(request: Request):
         raise HTTPException(status_code=401, detail="Session expired")
 
     request.session["dev_portal_started_at"] = time.time()
-    return sa_id
+    return dev_id

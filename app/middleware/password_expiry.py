@@ -38,6 +38,7 @@ EXEMPT_PATHS = [
     "/redoc",
     "/api/v1/auth/",
     "/contact",
+    "/dev-portal/",
 ]
 
 

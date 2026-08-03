@@ -489,7 +489,7 @@ pydantic-settings with:
 - `ALLOWED_ORIGINS`
 - `SESSION_COOKIE_NAME`, `SESSION_MAX_AGE_SECONDS`
 - `MS365_TENANT_ID`, `MS365_CLIENT_ID`, `MS365_CLIENT_SECRET`, `MS365_REDIRECT_URI`
-- `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM_EMAIL`, `SMTP_USE_TLS`
+- `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM_EMAIL`, `SMTP_USE_TLS`, `SMTP_USE_SSL`, `SMTP_INVITATION_FROM_EMAIL`
 - `EMAIL_WORKER_INTERVAL_SECONDS`, `EMAIL_MAX_RETRIES`
 - `DEFAULT_BENCH_ROLLOFF_DAYS=7`
 - `BULK_UPLOAD_MAX_ROWS=8000`
@@ -540,7 +540,7 @@ create_engine(
 - `render.yaml` — service name: `staffplan`, build: pip install, start: `alembic upgrade head && uvicorn`
 - `.env.example` — all required keys including LICENSE_SIGNING_KEY, SMTP config
 - Database: Neon PostgreSQL
-- Email: Zoho SMTP (smtp.zoho.com:587)
+- Email: ZeptoMail SMTP (smtp.zeptomail.in:587, STARTTLS)
 
 ---
 

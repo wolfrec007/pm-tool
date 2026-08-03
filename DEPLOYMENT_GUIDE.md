@@ -60,11 +60,14 @@ git push origin main
 | `MS365_CLIENT_ID` | Azure AD app client ID | For OAuth |
 | `MS365_CLIENT_SECRET` | Azure AD app secret | For OAuth |
 | `MS365_REDIRECT_URI` | `https://your-app.onrender.com/auth/callback` | OAuth callback |
-| `SMTP_HOST` | `smtp.zoho.com` | For emails |
+| `SMTP_HOST` | `smtp.zeptomail.in` | For emails |
 | `SMTP_PORT` | `587` | |
-| `SMTP_USER` | Your SMTP username | |
-| `SMTP_PASSWORD` | Your SMTP password | |
-| `SMTP_FROM_EMAIL` | `noreply@yourdomain.com` | |
+| `SMTP_USER` | `emailapikey` | ZeptoMail SMTP username |
+| `SMTP_PASSWORD` | Your ZeptoMail API key | |
+| `SMTP_FROM_EMAIL` | `noreply@yourdomain.com` | Default From for OTP, contact, notifications |
+| `SMTP_USE_TLS` | `true` | Set true for port 587 (STARTTLS), false for implicit SSL |
+| `SMTP_USE_SSL` | `false` | Set true for port 465 (SSL) |
+| `SMTP_INVITATION_FROM_EMAIL` | `hello@yourdomain.com` | From address for invitations & role-change emails |
 
 ---
 
@@ -77,9 +80,11 @@ git push origin main
 
 ---
 
-### Step 6: Create Admin User
+### Step 6: Create Developer Account
 
-After deployment, create a super admin via Render Shell:
+The seed migration automatically creates a sample firm ("skilledca enterprises") with
+an admin user (`samarth@skilledca.in`). To create a platform-level **developer** account
+for the dev portal, use Render Shell:
 
 ```bash
 python -c "
@@ -87,12 +92,16 @@ from app.database import SessionLocal
 from app.models.super_admin import SuperAdmin
 from app.services.auth_service import hash_password
 db = SessionLocal()
-sa = SuperAdmin(email='admin@yourcompany.com', display_name='Admin', password_hash=hash_password('your-secure-password'), is_active=True)
-db.add(sa)
+dev = SuperAdmin(email='dev@yourcompany.com', display_name='Developer', password_hash=hash_password('your-secure-password'), is_active=True)
+db.add(dev)
 db.commit()
-print('Super admin created!')
+print('Developer account created!')
 "
 ```
+
+**Developer** = platform-level access to the dev portal (private endpoint).
+**Admin** = firm-level access with UAM + reports.
+**Super Admin** = firm-level access with all rights (incl. license management).
 
 ---
 

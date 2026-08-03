@@ -91,5 +91,5 @@
 - `ENV` — production/development
 - `TESTING` — false (must be true to run tests against DB)
 - `LICENSE_SIGNING_KEY` — HMAC key for license validation
-- SMTP config (Zoho: smtp.zoho.com:587)
+- SMTP config (ZeptoMail: smtp.zeptomail.in:587, STARTTLS; username: emailapikey)
 - MS365 OAuth config (optional)

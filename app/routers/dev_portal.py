@@ -1,7 +1,7 @@
 """Dev Portal router — standalone developer control plane at /dev-portal/.
 
 Auth flow: access code gate → username/password → OTP → TOTP 2FA → dashboard.
-Credentials hardcoded (single developer). Uses SuperAdmin model for TOTP storage only.
+Credentials hardcoded (single developer). Uses DevPortalUser model for auth.
 """
 
 import base64
@@ -90,14 +90,14 @@ def _ensure_dev_user(db) -> DevPortalUser:
 
 @router.get("/", response_class=HTMLResponse)
 def dev_portal_root(request: Request):
-    if request.session.get("dev_portal_sa_id") and check_gate(request):
+    if request.session.get("dev_portal_dev_id") and check_gate(request):
         return RedirectResponse("/dev-portal/dashboard", status_code=302)
     return RedirectResponse("/dev-portal/gate", status_code=302)
 
 
 @router.get("/gate", response_class=HTMLResponse)
 def gate_page(request: Request):
-    if check_gate(request) and request.session.get("dev_portal_sa_id"):
+    if check_gate(request) and request.session.get("dev_portal_dev_id"):
         return RedirectResponse("/dev-portal/dashboard", status_code=302)
     return _render(request, "gate.html")
 
@@ -116,7 +116,7 @@ async def gate_verify(request: Request, access_code: str = Form(...)):
 def login_page(request: Request):
     if not check_gate(request):
         raise HTTPException(status_code=404, detail="Not found")
-    if request.session.get("dev_portal_sa_id"):
+    if request.session.get("dev_portal_dev_id"):
         return RedirectResponse("/dev-portal/dashboard", status_code=302)
     return _render(request, "login.html")
 
@@ -250,9 +250,9 @@ async def verify_2fa_submit(request: Request, code: str = Form(...)):
     finally:
         db.close()
 
-    request.session["dev_portal_sa_id"] = dp_user.id
-    request.session["dev_portal_sa_email"] = dp_user.username
-    request.session["dev_portal_sa_name"] = dp_user.username
+    request.session["dev_portal_dev_id"] = dp_user.id
+    request.session["dev_portal_dev_email"] = dp_user.username
+    request.session["dev_portal_dev_name"] = dp_user.username
     request.session["dev_portal_started_at"] = time.time()
     request.session.pop("dev_portal_email", None)
     request.session.pop("dev_portal_otp_verified", None)
@@ -271,7 +271,7 @@ def logout(request: Request):
 
 
 @router.post("/api/change-password")
-def api_change_password(request: Request, sa_id=Depends(require_dev_portal)):
+def api_change_password(request: Request, dev_id=Depends(require_dev_portal)):
     import asyncio
 
     async def _body():
@@ -288,7 +288,7 @@ def api_change_password(request: Request, sa_id=Depends(require_dev_portal)):
 
     db = SessionLocal()
     try:
-        dp_user = db.query(DevPortalUser).filter(DevPortalUser.id == sa_id).first()
+        dp_user = db.query(DevPortalUser).filter(DevPortalUser.id == dev_id).first()
         if not dp_user:
             raise HTTPException(404, "User not found")
         if not verify_password(old_password, dp_user.password_hash):
@@ -304,9 +304,9 @@ def api_change_password(request: Request, sa_id=Depends(require_dev_portal)):
 
 
 @router.get("/dashboard", response_class=HTMLResponse)
-def dashboard_page(request: Request, sa_id=Depends(require_dev_portal)):
+def dashboard_page(request: Request, dev_id=Depends(require_dev_portal)):
     return _render(request, "dashboard.html", {
-        "sa_name": request.session.get("dev_portal_sa_name", "Developer"),
+        "dev_name": request.session.get("dev_portal_dev_name", "Developer"),
     })
 
 
@@ -314,7 +314,7 @@ def dashboard_page(request: Request, sa_id=Depends(require_dev_portal)):
 
 
 @router.get("/api/overview")
-def api_overview(sa_id=Depends(require_dev_portal)):
+def api_overview(dev_id=Depends(require_dev_portal)):
     db = SessionLocal()
     try:
         uptime_secs = int(time.time() - _SERVER_START)
@@ -369,7 +369,7 @@ def api_overview(sa_id=Depends(require_dev_portal)):
 
 
 @router.get("/api/db")
-def api_db(sa_id=Depends(require_dev_portal)):
+def api_db(dev_id=Depends(require_dev_portal)):
     db = SessionLocal()
     try:
         pg_version = db.execute(text("SELECT version()")).scalar()
@@ -427,7 +427,7 @@ def api_db(sa_id=Depends(require_dev_portal)):
 
 
 @router.post("/api/db/kill-query")
-def api_kill_query(request: Request, sa_id=Depends(require_dev_portal)):
+def api_kill_query(request: Request, dev_id=Depends(require_dev_portal)):
     import asyncio
 
     async def _body():
@@ -448,7 +448,7 @@ def api_kill_query(request: Request, sa_id=Depends(require_dev_portal)):
 
 
 @router.post("/api/sql")
-def api_sql(request: Request, sa_id=Depends(require_dev_portal)):
+def api_sql(request: Request, dev_id=Depends(require_dev_portal)):
     import asyncio
 
     async def _body():
@@ -479,7 +479,7 @@ def api_sql(request: Request, sa_id=Depends(require_dev_portal)):
 
 
 @router.get("/api/endpoints")
-def api_endpoints(sa_id=Depends(require_dev_portal)):
+def api_endpoints(dev_id=Depends(require_dev_portal)):
     from app.main import app as fastapi_app
 
     routes = []
@@ -506,7 +506,7 @@ def api_endpoints(sa_id=Depends(require_dev_portal)):
 
 
 @router.get("/api/logs")
-def api_logs(request: Request, sa_id=Depends(require_dev_portal)):
+def api_logs(request: Request, dev_id=Depends(require_dev_portal)):
     level = request.query_params.get("level", "")
     keyword = request.query_params.get("keyword", "")
 
@@ -525,7 +525,7 @@ def api_logs(request: Request, sa_id=Depends(require_dev_portal)):
 
 
 @router.get("/api/outbox")
-def api_outbox(sa_id=Depends(require_dev_portal)):
+def api_outbox(dev_id=Depends(require_dev_portal)):
     db = SessionLocal()
     try:
         from app.models.models import EmailOutbox
@@ -550,7 +550,7 @@ def api_outbox(sa_id=Depends(require_dev_portal)):
 
 
 @router.post("/api/outbox/retry")
-def api_outbox_retry(request: Request, sa_id=Depends(require_dev_portal)):
+def api_outbox_retry(request: Request, dev_id=Depends(require_dev_portal)):
     import asyncio
 
     async def _body():
@@ -577,7 +577,7 @@ def api_outbox_retry(request: Request, sa_id=Depends(require_dev_portal)):
 
 
 @router.post("/api/outbox/test")
-def api_outbox_test(sa_id=Depends(require_dev_portal)):
+def api_outbox_test(dev_id=Depends(require_dev_portal)):
     from app.services.otp_service import send_otp_email
     try:
         send_otp_email(settings.SMTP_FROM_EMAIL, "000000", purpose="dev_portal")
@@ -587,7 +587,7 @@ def api_outbox_test(sa_id=Depends(require_dev_portal)):
 
 
 @router.get("/api/users")
-def api_users(sa_id=Depends(require_dev_portal)):
+def api_users(dev_id=Depends(require_dev_portal)):
     db = SessionLocal()
     try:
         users = db.query(User).all()
@@ -619,7 +619,7 @@ def api_users(sa_id=Depends(require_dev_portal)):
 
 
 @router.get("/api/firms")
-def api_firms(sa_id=Depends(require_dev_portal)):
+def api_firms(dev_id=Depends(require_dev_portal)):
     db = SessionLocal()
     try:
         from app.services.license_service import check_license, get_days_remaining
@@ -642,7 +642,7 @@ def api_firms(sa_id=Depends(require_dev_portal)):
 
 
 @router.post("/api/firms/extend-trial")
-def api_extend_trial(request: Request, sa_id=Depends(require_dev_portal)):
+def api_extend_trial(request: Request, dev_id=Depends(require_dev_portal)):
     import asyncio
 
     async def _body():
@@ -668,7 +668,7 @@ def api_extend_trial(request: Request, sa_id=Depends(require_dev_portal)):
 
 
 @router.get("/api/licenses")
-def api_licenses(sa_id=Depends(require_dev_portal)):
+def api_licenses(dev_id=Depends(require_dev_portal)):
     db = SessionLocal()
     try:
         from app.models.license_inventory import LicenseInventory
@@ -691,7 +691,7 @@ def api_licenses(sa_id=Depends(require_dev_portal)):
 
 
 @router.post("/api/licenses/generate")
-def api_generate_licenses(request: Request, sa_id=Depends(require_dev_portal)):
+def api_generate_licenses(request: Request, dev_id=Depends(require_dev_portal)):
     import asyncio
 
     async def _body():
@@ -712,7 +712,7 @@ def api_generate_licenses(request: Request, sa_id=Depends(require_dev_portal)):
             key_hash = hashlib.sha256(key.encode()).hexdigest()
             li = LicenseInventory(
                 license_key=key, license_key_hash=key_hash, tier=tier,
-                duration_days=duration, note=note, generated_by_id=sa_id,
+                duration_days=duration, note=note, generated_by_id=dev_id,
             )
             db.add(li)
             generated.append(key)
@@ -723,7 +723,7 @@ def api_generate_licenses(request: Request, sa_id=Depends(require_dev_portal)):
 
 
 @router.post("/api/licenses/assign")
-def api_assign_license(request: Request, sa_id=Depends(require_dev_portal)):
+def api_assign_license(request: Request, dev_id=Depends(require_dev_portal)):
     import asyncio
 
     async def _body():
@@ -757,7 +757,7 @@ def api_assign_license(request: Request, sa_id=Depends(require_dev_portal)):
 
 
 @router.post("/api/licenses/revoke")
-def api_revoke_license(request: Request, sa_id=Depends(require_dev_portal)):
+def api_revoke_license(request: Request, dev_id=Depends(require_dev_portal)):
     import asyncio
 
     async def _body():
@@ -786,7 +786,7 @@ def api_revoke_license(request: Request, sa_id=Depends(require_dev_portal)):
 
 
 @router.get("/api/licenses/export")
-def api_export_licenses(sa_id=Depends(require_dev_portal)):
+def api_export_licenses(dev_id=Depends(require_dev_portal)):
     db = SessionLocal()
     try:
         from app.models.license_inventory import LicenseInventory
@@ -807,7 +807,7 @@ def api_export_licenses(sa_id=Depends(require_dev_portal)):
 
 
 @router.get("/api/alerts")
-def api_alerts(sa_id=Depends(require_dev_portal)):
+def api_alerts(dev_id=Depends(require_dev_portal)):
     db = SessionLocal()
     try:
         from app.services.license_service import check_license
@@ -848,7 +848,7 @@ def api_alerts(sa_id=Depends(require_dev_portal)):
 
 
 @router.get("/api/system")
-def api_system(sa_id=Depends(require_dev_portal)):
+def api_system(dev_id=Depends(require_dev_portal)):
     sensitive_keys = {"SECRET_KEY", "SMTP_PASSWORD", "MS365_CLIENT_SECRET", "LICENSE_SIGNING_KEY", "DEV_PORTAL_ACCESS_CODE"}
     env_vars = {}
     for k, v in os.environ.items():
@@ -864,7 +864,7 @@ def api_system(sa_id=Depends(require_dev_portal)):
 
 
 @router.post("/api/settings/update")
-def api_update_setting(request: Request, sa_id=Depends(require_dev_portal)):
+def api_update_setting(request: Request, dev_id=Depends(require_dev_portal)):
     import asyncio
 
     async def _body():

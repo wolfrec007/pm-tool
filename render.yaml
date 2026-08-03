@@ -15,3 +15,20 @@ services:
         value: production
       - key: SESSION_COOKIE_NAME
         value: staffplan_session
+      # SMTP / Email (set in Render Dashboard → Environment → Environment Variables)
+      - key: SMTP_HOST
+        value: smtp.zeptomail.in
+      - key: SMTP_PORT
+        value: 587
+      - key: SMTP_USER
+        value: emailapikey
+      - key: SMTP_PASSWORD
+        value: your-zeptomail-api-key
+      - key: SMTP_FROM_EMAIL
+        value: noreply@yourdomain.com
+      - key: SMTP_USE_TLS
+        value: "true"
+      - key: SMTP_USE_SSL
+        value: "false"
+      - key: SMTP_INVITATION_FROM_EMAIL
+        value: hello@yourdomain.com
