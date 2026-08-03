@@ -63,9 +63,10 @@ async def contact_submit(request: Request, db: Session = Depends(get_db)):
 
     # Send email notification
     try:
-        import smtplib
         from email.mime.multipart import MIMEMultipart
         from email.mime.text import MIMEText
+
+        from app.services.email_service import get_smtp_connection
 
         # Format inquiry type for display
         inquiry_labels = {
@@ -109,8 +110,7 @@ async def contact_submit(request: Request, db: Session = Depends(get_db)):
 
         msg.attach(MIMEText(html, "html"))
 
-        with smtplib.SMTP_SSL(settings.SMTP_HOST, settings.SMTP_PORT) as server:
-            server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
+        with get_smtp_connection() as server:
             server.send_message(msg)
     except Exception as e:
         import logging

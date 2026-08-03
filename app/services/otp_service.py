@@ -2,7 +2,6 @@
 
 import logging
 import random
-import smtplib
 import string
 from datetime import datetime, timedelta, timezone
 from email.mime.multipart import MIMEMultipart
@@ -342,18 +341,11 @@ def send_otp_email(to_email: str, otp: str, purpose: str = "verification") -> No
     msg.attach(MIMEText(html, "html"))
 
     try:
-        if settings.SMTP_USE_SSL:
-            with smtplib.SMTP_SSL(settings.SMTP_HOST, settings.SMTP_PORT) as server:
-                server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
-                server.send_message(msg)
-                logger.info(f"OTP email sent to {to_email}")
-        else:
-            with smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT) as server:
-                if settings.SMTP_USE_TLS:
-                    server.starttls()
-                server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
-                server.send_message(msg)
-                logger.info(f"OTP email sent to {to_email}")
+        from app.services.email_service import get_smtp_connection
+
+        with get_smtp_connection() as server:
+            server.send_message(msg)
+            logger.info(f"OTP email sent to {to_email}")
     except Exception as e:
         logger.error(f"SMTP error: {e}")
         raise

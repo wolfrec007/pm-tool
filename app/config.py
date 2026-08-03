@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     SMTP_FROM_EMAIL: str = "noreply@splanly.local"
     SMTP_USE_TLS: bool = True
     SMTP_USE_SSL: bool = False
+    SMTP_INVITATION_FROM_EMAIL: str = "hello@skilledca.in"
     EMAIL_WORKER_INTERVAL_SECONDS: int = 30
     EMAIL_MAX_RETRIES: int = 3
 
@@ -38,6 +39,11 @@ class Settings(BaseSettings):
 
     # Licensing
     LICENSE_SIGNING_KEY: str = "change-me-to-a-strong-random-key"
+
+    # Dev Portal
+    DEV_PORTAL_ACCESS_CODE: str = "change-me-dev-portal-code"
+    DEV_PORTAL_SESSION_MAX_AGE: int = 7200  # 2 hours
+    DEV_PORTAL_ALLOWED_IPS: str = ""  # comma-separated, empty = no restriction
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 

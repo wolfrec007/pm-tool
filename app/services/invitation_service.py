@@ -64,7 +64,6 @@ def create_invitation(db: Session, firm_id: int, email: str, role: str, invited_
 
 def send_invitation_email(invitation: Invitation) -> None:
     """Send invitation email."""
-    import smtplib
     from email.mime.multipart import MIMEMultipart
     from email.mime.text import MIMEText
     
@@ -121,23 +120,16 @@ def send_invitation_email(invitation: Invitation) -> None:
     
     msg = MIMEMultipart("alternative")
     msg["Subject"] = f"Invitation to join {firm_name} on splanly"
-    msg["From"] = f"splanly <{settings.SMTP_FROM_EMAIL or settings.SMTP_USER}>"
+    msg["From"] = f"splanly <{settings.SMTP_INVITATION_FROM_EMAIL or settings.SMTP_FROM_EMAIL or settings.SMTP_USER}>"
     msg["To"] = invitation.email
     msg.attach(MIMEText(html, "html"))
     
     try:
-        if settings.SMTP_USE_SSL:
-            with smtplib.SMTP_SSL(settings.SMTP_HOST, settings.SMTP_PORT) as server:
-                server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
-                server.send_message(msg)
-                logger.info(f"Invitation email sent to {invitation.email}")
-        else:
-            with smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT) as server:
-                if settings.SMTP_USE_TLS:
-                    server.starttls()
-                server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
-                server.send_message(msg)
-                logger.info(f"Invitation email sent to {invitation.email}")
+        from app.services.email_service import get_smtp_connection
+
+        with get_smtp_connection() as server:
+            server.send_message(msg)
+            logger.info(f"Invitation email sent to {invitation.email}")
     except Exception as e:
         logger.error(f"SMTP error: {e}")
         raise
@@ -323,7 +315,6 @@ def transfer_super_admin(db: Session, current_super_admin_id: int, new_super_adm
 
 def send_role_change_email(user: User, firm: Firm, old_role: str, new_role: str) -> None:
     """Send role change notification email."""
-    import smtplib
     from email.mime.multipart import MIMEMultipart
     from email.mime.text import MIMEText
     
@@ -361,13 +352,14 @@ def send_role_change_email(user: User, firm: Firm, old_role: str, new_role: str)
     
     msg = MIMEMultipart("alternative")
     msg["Subject"] = f"Role Update in {firm.name}"
-    msg["From"] = f"splanly <{settings.SMTP_FROM_EMAIL or settings.SMTP_USER}>"
+    msg["From"] = f"splanly <{settings.SMTP_INVITATION_FROM_EMAIL or settings.SMTP_FROM_EMAIL or settings.SMTP_USER}>"
     msg["To"] = user.email
     msg.attach(MIMEText(html, "html"))
     
     try:
-        with smtplib.SMTP_SSL(settings.SMTP_HOST, settings.SMTP_PORT) as server:
-            server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
+        from app.services.email_service import get_smtp_connection
+
+        with get_smtp_connection() as server:
             server.send_message(msg)
     except Exception as e:
         logger.error(f"Failed to send role change email: {e}")

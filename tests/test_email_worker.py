@@ -1,7 +1,7 @@
 """Tests for email service — queue, process, retry, outbox admin."""
 
 from datetime import date, timedelta
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 from sqlalchemy.orm import Session
@@ -192,3 +192,101 @@ class TestOutboxAdmin:
 
         items, total = list_outbox(db, q="b@test")
         assert total == 1
+
+
+class TestSmtpConnectionMethod:
+    """Verify the correct smtplib connection method is used based on config flags."""
+
+    @patch("app.services.email_service.smtplib")
+    @patch("app.services.email_service.settings")
+    def test_ssl_uses_smtp_ssl(self, mock_settings, mock_smtplib):
+        """When SMTP_USE_SSL is True, SMT_SSL should be used (port 465)."""
+        mock_settings.SMTP_USE_SSL = True
+        mock_settings.SMTP_USE_TLS = False
+        mock_settings.SMTP_HOST = "smtp.example.com"
+        mock_settings.SMTP_PORT = 465
+        mock_settings.SMTP_FROM_EMAIL = "noreply@test.local"
+        mock_settings.SMTP_USER = "emailapikey"
+        mock_settings.SMTP_PASSWORD = "secret"
+
+        mock_server = MagicMock()
+        mock_smtplib.SMTP_SSL.return_value = mock_server
+
+        from app.services.email_service import _send_via_smtp
+        _send_via_smtp("to@test.com", "Subject", "Body")
+
+        mock_smtplib.SMTP_SSL.assert_called_once_with(
+            "smtp.example.com", 465, timeout=10
+        )
+        mock_smtplib.SMTP.assert_not_called()
+        mock_server.starttls.assert_not_called()
+
+    @patch("app.services.email_service.smtplib")
+    @patch("app.services.email_service.settings")
+    def test_tls_uses_smtp_with_starttls(self, mock_settings, mock_smtplib):
+        """When SMTP_USE_TLS is True and SMTP_USE_SSL is False, SMTP+starttls should be used (port 587)."""
+        mock_settings.SMTP_USE_SSL = False
+        mock_settings.SMTP_USE_TLS = True
+        mock_settings.SMTP_HOST = "smtp.example.com"
+        mock_settings.SMTP_PORT = 587
+        mock_settings.SMTP_FROM_EMAIL = "noreply@test.local"
+        mock_settings.SMTP_USER = "emailapikey"
+        mock_settings.SMTP_PASSWORD = "secret"
+
+        mock_server = MagicMock()
+        mock_smtplib.SMTP.return_value = mock_server
+
+        from app.services.email_service import _send_via_smtp
+        _send_via_smtp("to@test.com", "Subject", "Body")
+
+        mock_smtplib.SMTP.assert_called_once_with(
+            "smtp.example.com", 587, timeout=10
+        )
+        mock_smtplib.SMTP_SSL.assert_not_called()
+        mock_server.starttls.assert_called_once()
+
+    @patch("app.services.email_service.smtplib")
+    @patch("app.services.email_service.settings")
+    def test_no_tls_no_ssl_uses_plain_smtp(self, mock_settings, mock_smtplib):
+        """When both SSL and TLS are False, plain SMTP without encryption should be used."""
+        mock_settings.SMTP_USE_SSL = False
+        mock_settings.SMTP_USE_TLS = False
+        mock_settings.SMTP_HOST = "smtp.example.com"
+        mock_settings.SMTP_PORT = 25
+        mock_settings.SMTP_FROM_EMAIL = "noreply@test.local"
+        mock_settings.SMTP_USER = "emailapikey"
+        mock_settings.SMTP_PASSWORD = "secret"
+
+        mock_server = MagicMock()
+        mock_smtplib.SMTP.return_value = mock_server
+
+        from app.services.email_service import _send_via_smtp
+        _send_via_smtp("to@test.com", "Subject", "Body")
+
+        mock_smtplib.SMTP.assert_called_once_with(
+            "smtp.example.com", 25, timeout=10
+        )
+        mock_smtplib.SMTP_SSL.assert_not_called()
+        mock_server.starttls.assert_not_called()
+
+    @patch("app.services.email_service.smtplib")
+    @patch("app.services.email_service.settings")
+    def test_get_smtp_connection_logs_in(self, mock_settings, mock_smtplib):
+        """get_smtp_connection should call login when SMTP_USER is set."""
+        mock_settings.SMTP_USE_SSL = True
+        mock_settings.SMTP_USE_TLS = False
+        mock_settings.SMTP_HOST = "smtp.example.com"
+        mock_settings.SMTP_PORT = 465
+        mock_settings.SMTP_USER = "emailapikey"
+        mock_settings.SMTP_PASSWORD = "secret"
+        mock_settings.SMTP_FROM_EMAIL = "noreply@test.local"
+
+        mock_server = MagicMock()
+        mock_smtplib.SMTP_SSL.return_value = mock_server
+
+        from app.services.email_service import get_smtp_connection
+        with get_smtp_connection() as server:
+            assert server is mock_server
+
+        mock_server.login.assert_called_once_with("emailapikey", "secret")
+        mock_server.quit.assert_called_once()

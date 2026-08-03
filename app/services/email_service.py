@@ -2,6 +2,7 @@
 
 import logging
 import smtplib
+from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from email.mime.text import MIMEText
 from typing import Optional
@@ -13,6 +14,30 @@ from app.config import settings
 from app.models.models import Assignment, EmailOutbox, TeamMember
 
 logger = logging.getLogger(__name__)
+
+
+@contextmanager
+def get_smtp_connection():
+    """Return an SMTP connection context manager using config-driven SSL/TLS.
+
+    Mirrors the port-based branching in the reference ZeptoMail helper script:
+      - SMTP_USE_SSL=True  → SMTP_SSL (implicit TLS, port 465)
+      - SMTP_USE_TLS=True  → SMTP + starttls() (explicit TLS, port 587)
+      - both False         → plain SMTP (port 25)
+    """
+    if settings.SMTP_USE_SSL:
+        server = smtplib.SMTP_SSL(settings.SMTP_HOST, settings.SMTP_PORT, timeout=10)
+    else:
+        server = smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT, timeout=10)
+        if settings.SMTP_USE_TLS:
+            server.ehlo()
+            server.starttls()
+    try:
+        if settings.SMTP_USER:
+            server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
+        yield server
+    finally:
+        server.quit()
 
 
 def queue_email(
@@ -76,19 +101,8 @@ def _send_via_smtp(recipient: str, subject: str, body: str) -> None:
     msg["From"] = settings.SMTP_FROM_EMAIL
     msg["To"] = recipient
 
-    if settings.SMTP_USE_TLS:
-        server = smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT, timeout=10)
-        server.ehlo()
-        server.starttls()
-    else:
-        server = smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT, timeout=10)
-
-    try:
-        if settings.SMTP_USER:
-            server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
+    with get_smtp_connection() as server:
         server.sendmail(settings.SMTP_FROM_EMAIL, [recipient], msg.as_string())
-    finally:
-        server.quit()
 
 
 def send_outbox_entry(db: Session, outbox_id: int) -> bool:
