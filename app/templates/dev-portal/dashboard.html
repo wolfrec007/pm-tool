@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dev Portal — splanly</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #0a0e14; --surface: #111820; --surface-2: #161e29; --border: #1e2a38;
+            --fg: #c5cdd8; --fg-dim: #5a6a7e; --fg-bright: #e8ecf1;
+            --primary: #3b82f6; --primary-hover: #2563eb;
+            --green: #22c55e; --red: #ef4444; --amber: #f59e0b; --cyan: #06b6d4;
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--fg); min-height: 100vh; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Top bar */
+        .topbar {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 24px; border-bottom: 1px solid var(--border); background: var(--surface);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 12px; }
+        .logo { font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 600; color: var(--primary); }
+        .badge { font-size: 11px; padding: 2px 8px; border-radius: 4px; background: var(--primary); color: #fff; font-weight: 500; }
+        .topbar-right { display: flex; align-items: center; gap: 16px; }
+        .topbar-right a { color: var(--fg-dim); text-decoration: none; font-size: 13px; }
+        .topbar-right a:hover { color: var(--fg); }
+
+        /* Tabs */
+        .tabs {
+            display: flex; gap: 0; border-bottom: 1px solid var(--border); background: var(--surface);
+            overflow-x: auto; padding: 0 24px; position: sticky; top: 45px; z-index: 99;
+        }
+        .tab-btn {
+            padding: 10px 16px; font-size: 13px; font-weight: 500; color: var(--fg-dim);
+            border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent;
+            white-space: nowrap; transition: color 0.15s, border-color 0.15s;
+        }
+        .tab-btn:hover { color: var(--fg); }
+        .tab-btn.active { color: var(--fg-bright); border-bottom-color: var(--primary); }
+
+        /* Content */
+        .content { padding: 24px; max-width: 1400px; margin: 0 auto; }
+        .panel { display: none; }
+        .panel.active { display: block; }
+
+        /* Cards */
+        .card {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+            padding: 20px; margin-bottom: 16px;
+        }
+        .card-title { font-size: 14px; font-weight: 600; color: var(--fg-bright); margin-bottom: 16px; }
+        .grid { display: grid; gap: 16px; }
+        .grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-4 { grid-template-columns: repeat(4, 1fr); }
+        @media (max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+        .stat { text-align: center; }
+        .stat-value { font-size: 28px; font-weight: 700; color: var(--fg-bright); }
+        .stat-label { font-size: 12px; color: var(--fg-dim); margin-top: 4px; }
+        .stat-ok { color: var(--green); }
+        .stat-warn { color: var(--amber); }
+        .stat-err { color: var(--red); }
+
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border); color: var(--fg-dim); font-weight: 500; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        td { padding: 8px 12px; border-bottom: 1px solid var(--border); color: var(--fg); }
+        tr:hover td { background: var(--surface-2); }
+
+        /* Badges */
+        .badge-sm { font-size: 11px; padding: 2px 6px; border-radius: 3px; font-weight: 500; }
+        .badge-get { background: #065f46; color: #34d399; }
+        .badge-post { background: #1e3a5f; color: #60a5fa; }
+        .badge-patch { background: #78350f; color: #fbbf24; }
+        .badge-delete { background: #7f1d1d; color: #f87171; }
+        .badge-ok { background: #065f46; color: #34d399; }
+        .badge-err { background: #7f1d1d; color: #f87171; }
+        .badge-warn { background: #78350f; color: #fbbf24; }
+        .badge-info { background: #1e3a5f; color: #60a5fa; }
+
+        /* Forms */
+        .form-row { display: flex; gap: 12px; align-items: end; margin-bottom: 12px; flex-wrap: wrap; }
+        .form-group { display: flex; flex-direction: column; gap: 4px; }
+        .form-group label { font-size: 12px; color: var(--fg-dim); font-weight: 500; }
+        input, select, textarea {
+            padding: 8px 12px; background: var(--bg); border: 1px solid var(--border);
+            border-radius: 6px; color: var(--fg); font-size: 13px; outline: none;
+        }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); }
+        textarea { font-family: 'JetBrains Mono', monospace; min-height: 120px; resize: vertical; }
+        button.btn {
+            padding: 8px 16px; border: none; border-radius: 6px; font-size: 13px; font-weight: 500;
+            cursor: pointer; transition: background 0.15s;
+        }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-danger { background: var(--red); color: #fff; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-sm { padding: 4px 10px; font-size: 12px; }
+
+        /* Log viewer */
+        .log-viewer {
+            background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+            padding: 12px; max-height: 500px; overflow-y: auto; font-family: 'JetBrains Mono', monospace;
+            font-size: 12px; line-height: 1.6; white-space: pre-wrap; word-break: break-all;
+        }
+
+        /* Loading */
+        .loading { color: var(--fg-dim); font-size: 13px; padding: 20px; text-align: center; }
+
+        /* Health indicator */
+        .health-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+        .health-ok { background: var(--green); }
+        .health-err { background: var(--red); }
+        .health-warn { background: var(--amber); }
+
+        /* Scrollable table wrapper */
+        .table-wrap { overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="topbar-left">
+            <span class="logo">dev://portal</span>
+            <span class="badge">splanly</span>
+        </div>
+        <div class="topbar-right">
+            <span style="font-size:13px; color:var(--fg-dim);">{{ sa_name }}</span>
+            <a href="/dev-portal/logout">Logout</a>
+        </div>
+    </div>
+
+    <div class="tabs" id="tab-bar">
+        <button class="tab-btn active" data-tab="overview">Overview</button>
+        <button class="tab-btn" data-tab="database">Database</button>
+        <button class="tab-btn" data-tab="sql">SQL Editor</button>
+        <button class="tab-btn" data-tab="endpoints">Endpoints</button>
+        <button class="tab-btn" data-tab="apidocs">API Docs</button>
+        <button class="tab-btn" data-tab="logs">Logs</button>
+        <button class="tab-btn" data-tab="outbox">Email</button>
+        <button class="tab-btn" data-tab="users">Users</button>
+        <button class="tab-btn" data-tab="licenses">Licenses</button>
+        <button class="tab-btn" data-tab="alerts">Alerts</button>
+        <button class="tab-btn" data-tab="system">System</button>
+        <button class="tab-btn" data-tab="bestpractices">Best Practices</button>
+    </div>
+
+    <div class="content">
+        <!-- Overview -->
+        <div class="panel active" id="panel-overview"><div class="loading">Loading...</div></div>
+        <!-- Database -->
+        <div class="panel" id="panel-database"><div class="loading">Loading...</div></div>
+        <!-- SQL Editor -->
+        <div class="panel" id="panel-sql">
+            <div class="card">
+                <div class="card-title">SQL Query Editor (read-only)</div>
+                <div class="form-row">
+                    <div class="form-group" style="flex:1">
+                        <select id="sql-quick">
+                            <option value="">Quick queries...</option>
+                            <option value="SELECT * FROM users ORDER BY id LIMIT 50">All users</option>
+                            <option value="SELECT * FROM firms">All firms</option>
+                            <option value="SELECT * FROM assignments WHERE end_date >= CURRENT_DATE">Active assignments</option>
+                            <option value="SELECT relname, pg_size_pretty(pg_total_relation_size(relid)) FROM pg_catalog.pg_statio_user_tables ORDER BY pg_total_relation_size(relid) DESC">Table sizes</option>
+                            <option value="SELECT pid, now()-pg_stat_activity.query_start AS duration, query FROM pg_stat_activity WHERE state != 'idle' ORDER BY duration DESC">Slow queries</option>
+                        </select>
+                    </div>
+                </div>
+                <textarea id="sql-input" placeholder="SELECT * FROM users LIMIT 10;"></textarea>
+                <div class="form-row" style="margin-top:8px">
+                    <button class="btn btn-primary" onclick="runSQL()">Execute</button>
+                    <button class="btn btn-primary" onclick="exportSQL()">Export CSV</button>
+                    <span id="sql-time" style="font-size:12px; color:var(--fg-dim); margin-left:8px;"></span>
+                </div>
+                <div id="sql-result" class="table-wrap" style="margin-top:12px;"></div>
+            </div>
+        </div>
+        <!-- Endpoints -->
+        <div class="panel" id="panel-endpoints"><div class="loading">Loading...</div></div>
+        <!-- API Docs -->
+        <div class="panel" id="panel-apidocs">
+            <div class="card">
+                <div class="card-title">API Documentation</div>
+                <p style="color:var(--fg-dim); font-size:13px; margin-bottom:16px;">FastAPI auto-generated Swagger UI</p>
+                <a href="/docs" target="_blank" class="btn btn-primary" style="text-decoration:none; display:inline-block;">Open Swagger UI →</a>
+                <a href="/redoc" target="_blank" class="btn btn-primary" style="text-decoration:none; display:inline-block; margin-left:8px;">Open ReDoc →</a>
+            </div>
+        </div>
+        <!-- Logs -->
+        <div class="panel" id="panel-logs">
+            <div class="card">
+                <div class="card-title">Server Logs</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Level</label>
+                        <select id="log-level" onchange="loadLogs()">
+                            <option value="">All</option>
+                            <option value="ERROR">ERROR</option>
+                            <option value="WARNING">WARNING</option>
+                            <option value="INFO">INFO</option>
+                            <option value="DEBUG">DEBUG</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="flex:1">
+                        <label>Search</label>
+                        <input type="text" id="log-search" placeholder="Filter..." onkeyup="loadLogs()">
+                    </div>
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button class="btn btn-primary btn-sm" onclick="loadLogs()">Refresh</button>
+                    </div>
+                </div>
+                <div id="log-content" class="log-viewer">Loading...</div>
+            </div>
+        </div>
+        <!-- Email/Outbox -->
+        <div class="panel" id="panel-outbox"><div class="loading">Loading...</div></div>
+        <!-- Users -->
+        <div class="panel" id="panel-users"><div class="loading">Loading...</div></div>
+        <!-- Licenses -->
+        <div class="panel" id="panel-licenses"><div class="loading">Loading...</div></div>
+        <!-- Alerts -->
+        <div class="panel" id="panel-alerts"><div class="loading">Loading...</div></div>
+        <!-- System -->
+        <div class="panel" id="panel-system"><div class="loading">Loading...</div></div>
+        <!-- Best Practices -->
+        <div class="panel" id="panel-bestpractices">
+            <div class="card">
+                <div class="card-title">FastAPI Best Practices Audit</div>
+                <div id="bp-content" class="loading">Loading...</div>
+            </div>
+        </div>
+    </div>
+
+<script>
+// ─── Tab switching ────────────────────────────────────────────────────────────
+const tabBtns = document.querySelectorAll('.tab-btn');
+const panels = document.querySelectorAll('.panel');
+const tabLoaders = {
+    overview: loadOverview, database: loadDatabase, endpoints: loadEndpoints,
+    logs: loadLogs, outbox: loadOutbox, users: loadUsers,
+    licenses: loadLicenses, alerts: loadAlerts, system: loadSystem, bestpractices: loadBP,
+};
+let loaded = {};
+
+tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        const tab = btn.dataset.tab;
+        tabBtns.forEach(b => b.classList.remove('active'));
+        panels.forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('panel-' + tab).classList.add('active');
+        if (tabLoaders[tab] && !loaded[tab]) { loaded[tab] = true; tabLoaders[tab](); }
+    });
+});
+
+// Restore last tab
+(function() {
+    const saved = localStorage.getItem('devportal-tab');
+    if (saved) {
+        const btn = document.querySelector(`[data-tab="${saved}"]`);
+        if (btn) btn.click();
+    } else { loaded.overview = true; loadOverview(); }
+})();
+
+// Save tab on switch
+tabBtns.forEach(btn => btn.addEventListener('click', () => localStorage.setItem('devportal-tab', btn.dataset.tab)));
+
+// ─── Fetch helper ─────────────────────────────────────────────────────────────
+async function api(path) {
+    const r = await fetch('/dev-portal/api/' + path);
+    if (!r.ok) throw new Error(await r.text());
+    return r.json();
+}
+async function apiPost(path, body) {
+    const r = await fetch('/dev-portal/api/' + path, {
+        method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)
+    });
+    return r.json();
+}
+
+function badge(cls, text) { return `<span class="badge-sm badge-${cls}">${text}</span>`; }
+function healthDot(ok) { return `<span class="health-dot ${ok ? 'health-ok' : 'health-err'}"></span>`; }
+
+// ─── Overview ─────────────────────────────────────────────────────────────────
+async function loadOverview() {
+    const el = document.getElementById('panel-overview');
+    try {
+        const d = await api('overview');
+        const hrs = Math.floor(d.uptime_seconds / 3600);
+        const mins = Math.floor((d.uptime_seconds % 3600) / 60);
+        el.innerHTML = `
+            <div class="grid grid-4">
+                <div class="card stat"><div class="stat-value">${d.counts.users}</div><div class="stat-label">Users</div></div>
+                <div class="card stat"><div class="stat-value">${d.counts.firms}</div><div class="stat-label">Firms</div></div>
+                <div class="card stat"><div class="stat-value">${d.counts.team_members}</div><div class="stat-label">Team Members</div></div>
+                <div class="card stat"><div class="stat-value">${d.counts.engagements}</div><div class="stat-label">Engagements</div></div>
+            </div>
+            <div class="grid grid-3">
+                <div class="card">
+                    <div class="card-title">Server</div>
+                    <table>
+                        <tr><td style="color:var(--fg-dim)">Uptime</td><td>${hrs}h ${mins}m</td></tr>
+                        <tr><td style="color:var(--fg-dim)">Python</td><td>${d.python_version}</td></tr>
+                        <tr><td style="color:var(--fg-dim)">OS</td><td>${d.os}</td></tr>
+                    </table>
+                </div>
+                <div class="card">
+                    <div class="card-title">DB Pool</div>
+                    <table>
+                        <tr><td style="color:var(--fg-dim)">Size</td><td>${d.db_pool.size}</td></tr>
+                        <tr><td style="color:var(--fg-dim)">Checked in</td><td>${d.db_pool.checked_in}</td></tr>
+                        <tr><td style="color:var(--fg-dim)">Checked out</td><td>${d.db_pool.checked_out}</td></tr>
+                        <tr><td style="color:var(--fg-dim)">Overflow</td><td>${d.db_pool.overflow}</td></tr>
+                    </table>
+                </div>
+                <div class="card">
+                    <div class="card-title">Health</div>
+                    <table>
+                        <tr><td>${healthDot(d.health.database === 'ok')}Database</td><td>${d.health.database}</td></tr>
+                        <tr><td>${healthDot(d.health.smtp === 'ok')}SMTP</td><td>${d.health.smtp}</td></tr>
+                        <tr><td>${healthDot(d.health.oauth === 'ok')}OAuth</td><td>${d.health.oauth}</td></tr>
+                    </table>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">Licenses</div>
+                <table>
+                    <tr>${Object.entries(d.licenses).map(([k,v]) => `<td style="color:var(--fg-dim)">${k}</td><td>${v} firms</td>`).join('')}</tr>
+                </table>
+            </div>
+        `;
+    } catch(e) { el.innerHTML = `<div class="card stat-err">Error: ${e.message}</div>`; }
+}
+
+// ─── Database ─────────────────────────────────────────────────────────────────
+async function loadDatabase() {
+    const el = document.getElementById('panel-database');
+    try {
+        const d = await api('db');
+        let rowsHtml = Object.entries(d.row_counts).map(([t,c]) =>
+            `<tr><td class="mono">${t}</td><td>${c}</td></tr>`
+        ).join('');
+        let sizesHtml = d.table_sizes.map(s =>
+            `<tr><td class="mono">${s.name}</td><td>${s.total}</td><td>${s.indexes}</td></tr>`
+        ).join('');
+        let connsHtml = d.active_connections.map(c =>
+            `<tr><td>${c.pid}</td><td>${c.state}</td><td class="mono" style="max-width:400px;overflow:hidden;text-overflow:ellipsis">${c.query}</td><td>${c.duration}</td></tr>`
+        ).join('');
+
+        el.innerHTML = `
+            <div class="card"><div class="card-title">PostgreSQL</div><p class="mono" style="font-size:12px;color:var(--fg-dim)">${d.pg_version}</p></div>
+            <div class="grid grid-2">
+                <div class="card">
+                    <div class="card-title">Row Counts</div>
+                    <div class="table-wrap"><table><tr><th>Table</th><th>Rows</th></tr>${rowsHtml}</table></div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Table Sizes</div>
+                    <div class="table-wrap"><table><tr><th>Table</th><th>Total</th><th>Indexes</th></tr>${sizesHtml}</table></div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">Active Connections</div>
+                <div class="table-wrap"><table><tr><th>PID</th><th>State</th><th>Query</th><th>Duration</th></tr>${connsHtml || '<tr><td colspan="4" style="color:var(--fg-dim)">No active queries</td></tr>'}</table></div>
+            </div>
+        `;
+    } catch(e) { el.innerHTML = `<div class="card stat-err">Error: ${e.message}</div>`; }
+}
+
+// ─── SQL Editor ───────────────────────────────────────────────────────────────
+document.getElementById('sql-quick').addEventListener('change', function() {
+    if (this.value) document.getElementById('sql-input').value = this.value;
+});
+async function runSQL() {
+    const q = document.getElementById('sql-input').value.trim();
+    if (!q) return;
+    const el = document.getElementById('sql-result');
+    const timeEl = document.getElementById('sql-time');
+    el.innerHTML = '<div class="loading">Executing...</div>';
+    try {
+        const d = await apiPost('sql', {query: q});
+        timeEl.textContent = `${d.elapsed_ms}ms — ${d.row_count} rows`;
+        if (!d.data.length) { el.innerHTML = '<p style="color:var(--fg-dim);font-size:13px">Query executed. No rows returned.</p>'; return; }
+        let html = '<table><tr>' + d.columns.map(c => `<th>${c}</th>`).join('') + '</tr>';
+        d.data.forEach(row => { html += '<tr>' + d.columns.map(c => `<td class="mono">${row[c] ?? ''}</td>`).join('') + '</tr>'; });
+        html += '</table>';
+        el.innerHTML = html;
+    } catch(e) { el.innerHTML = `<div style="color:var(--red);font-size:13px">${e.message}</div>`; timeEl.textContent = ''; }
+}
+let _lastSqlData = null;
+async function exportSQL() {
+    const q = document.getElementById('sql-input').value.trim();
+    if (!q) return;
+    try {
+        const d = await apiPost('sql', {query: q});
+        if (!d.data.length) return;
+        let csv = d.columns.join(',') + '\n';
+        d.data.forEach(row => { csv += d.columns.map(c => `"${(row[c]??'').toString().replace(/"/g,'""')}"`).join(',') + '\n'; });
+        const blob = new Blob([csv], {type:'text/csv'});
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'query_result.csv'; a.click();
+    } catch(e) { alert(e.message); }
+}
+
+// ─── Endpoints ────────────────────────────────────────────────────────────────
+async function loadEndpoints() {
+    const el = document.getElementById('panel-endpoints');
+    try {
+        const d = await api('endpoints');
+        const methodColors = {GET:'get', POST:'post', PATCH:'patch', DELETE:'delete'};
+        let html = `<div class="card"><div class="card-title">All Routes (${d.routes.length})</div>
+            <div class="form-row"><div class="form-group" style="flex:1"><input type="text" id="ep-search" placeholder="Search routes..." onkeyup="filterEndpoints()"></div></div>
+            <div class="table-wrap"><table id="ep-table"><tr><th>Method</th><th>Path</th><th>Auth</th></tr>`;
+        d.routes.forEach(r => {
+            html += `<tr><td>${badge(methodColors[r.method] || 'info', r.method)}</td><td class="mono" style="font-size:12px">${r.path}</td><td>${badge('info', r.auth)}</td></tr>`;
+        });
+        html += '</table></div></div>';
+        el.innerHTML = html;
+    } catch(e) { el.innerHTML = `<div class="card stat-err">Error: ${e.message}</div>`; }
+}
+function filterEndpoints() {
+    const q = document.getElementById('ep-search').value.toLowerCase();
+    document.querySelectorAll('#ep-table tr').forEach((tr, i) => {
+        if (i === 0) return;
+        tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+}
+
+// ─── Logs ─────────────────────────────────────────────────────────────────────
+async function loadLogs() {
+    const el = document.getElementById('log-content');
+    const level = document.getElementById('log-level').value;
+    const keyword = document.getElementById('log-search').value;
+    try {
+        const d = await api(`logs?level=${level}&keyword=${keyword}`);
+        el.textContent = d.lines.length ? d.lines.join('\n') : 'No log entries found.';
+    } catch(e) { el.textContent = 'Error loading logs: ' + e.message; }
+}
+
+// ─── Outbox ───────────────────────────────────────────────────────────────────
+async function loadOutbox() {
+    const el = document.getElementById('panel-outbox');
+    try {
+        const d = await api('outbox');
+        const c = d.counts;
+        el.innerHTML = `
+            <div class="grid grid-4">
+                <div class="card stat"><div class="stat-value">${c.total}</div><div class="stat-label">Total</div></div>
+                <div class="card stat"><div class="stat-value stat-ok">${c.sent}</div><div class="stat-label">Sent</div></div>
+                <div class="card stat"><div class="stat-value" style="color:var(--amber)">${c.pending}</div><div class="stat-label">Pending</div></div>
+                <div class="card stat"><div class="stat-value stat-err">${c.failed}</div><div class="stat-label">Failed</div></div>
+            </div>
+            <div class="card">
+                <div class="card-title">Failed Emails</div>
+                <div class="table-wrap"><table>
+                    <tr><th>To</th><th>Subject</th><th>Error</th><th>Action</th></tr>
+                    ${d.failed.map(e => `<tr><td>${e.to}</td><td>${e.subject}</td><td style="color:var(--red);font-size:12px">${e.error || ''}</td><td><button class="btn btn-primary btn-sm" onclick="retryEmail(${e.id})">Retry</button></td></tr>`).join('')}
+                    ${!d.failed.length ? '<tr><td colspan="4" style="color:var(--fg-dim)">No failed emails</td></tr>' : ''}
+                </table></div>
+            </div>
+            <div class="card"><button class="btn btn-primary btn-sm" onclick="testEmail()">Send Test Email</button></div>
+        `;
+    } catch(e) { el.innerHTML = `<div class="card stat-err">Error: ${e.message}</div>`; }
+}
+async function retryEmail(id) { await apiPost('outbox/retry', {id}); loadOutbox(); loaded.outbox = false; }
+async function testEmail() { const r = await apiPost('outbox/test', {}); alert(r.message); }
+
+// ─── Users ────────────────────────────────────────────────────────────────────
+async function loadUsers() {
+    const el = document.getElementById('panel-users');
+    try {
+        const d = await api('users');
+        el.innerHTML = `
+            <div class="card">
+                <div class="card-title">App Users (${d.users.length})</div>
+                <div class="table-wrap"><table>
+                    <tr><th>Email</th><th>Name</th><th>Firm</th><th>Role</th><th>Active</th><th>2FA</th></tr>
+                    ${d.users.map(u => `<tr><td class="mono" style="font-size:12px">${u.email}</td><td>${u.display_name}</td><td>${u.firm}</td><td>${u.role}</td><td>${u.is_active ? badge('ok','Yes') : badge('err','No')}</td><td>${u.totp_enabled ? badge('ok','Yes') : badge('warn','No')}</td></tr>`).join('')}
+                </table></div>
+            </div>
+            <div class="card">
+                <div class="card-title">Change Password</div>
+                <div class="form-row">
+                    <div class="form-group"><label>Current Password</label><input type="password" id="cp-old"></div>
+                    <div class="form-group"><label>New Password</label><input type="password" id="cp-new"></div>
+                    <div class="form-group"><label>&nbsp;</label><button class="btn btn-primary" onclick="changePassword()">Update</button></div>
+                </div>
+                <div id="cp-result" style="margin-top:8px;font-size:12px;color:var(--fg-dim)"></div>
+            </div>
+        `;
+    } catch(e) { el.innerHTML = `<div class="card stat-err">Error: ${e.message}</div>`; }
+}
+async function changePassword() {
+    const oldP = document.getElementById('cp-old').value;
+    const newP = document.getElementById('cp-new').value;
+    const el = document.getElementById('cp-result');
+    try {
+        const r = await fetch('/dev-portal/api/change-password', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({old_password: oldP, new_password: newP})
+        });
+        const d = await r.json();
+        el.textContent = d.ok ? 'Password changed' : (d.detail || 'Error');
+        el.style.color = d.ok ? 'var(--green)' : 'var(--red)';
+    } catch(e) { el.textContent = 'Error: ' + e.message; el.style.color = 'var(--red)'; }
+}
+
+// ─── Licenses ─────────────────────────────────────────────────────────────────
+async function loadLicenses() {
+    const el = document.getElementById('panel-licenses');
+    try {
+        const d = await api('licenses');
+        el.innerHTML = `
+            <div class="card">
+                <div class="card-title">Generate License Keys</div>
+                <div class="form-row">
+                    <div class="form-group"><label>Tier</label><select id="lic-tier"><option value="standard">Standard</option><option value="enterprise">Enterprise</option></select></div>
+                    <div class="form-group"><label>Duration (days)</label><input type="number" id="lic-days" value="365"></div>
+                    <div class="form-group"><label>Quantity</label><input type="number" id="lic-qty" value="1" min="1" max="50"></div>
+                    <div class="form-group"><label>Note</label><input type="text" id="lic-note" placeholder="Optional"></div>
+                    <div class="form-group"><label>&nbsp;</label><button class="btn btn-primary" onclick="genLicenses()">Generate</button></div>
+                </div>
+                <div id="lic-result" style="margin-top:8px;font-size:12px;color:var(--fg-dim)"></div>
+            </div>
+            <div class="card">
+                <div class="card-title">Inventory (${d.licenses.length})</div>
+                <div class="table-wrap"><table>
+                    <tr><th>Key</th><th>Tier</th><th>Duration</th><th>Status</th><th>Note</th></tr>
+                    ${d.licenses.map(l => `<tr><td class="mono" style="font-size:12px">${l.key_masked}</td><td>${l.tier}</td><td>${l.duration_days}d</td><td>${l.status === 'available' ? badge('ok', l.status) : badge('info', l.status)}</td><td>${l.note || ''}</td></tr>`).join('')}
+                    ${!d.licenses.length ? '<tr><td colspan="5" style="color:var(--fg-dim)">No licenses generated</td></tr>' : ''}
+                </table></div>
+            </div>
+            <div class="card"><a href="/dev-portal/api/licenses/export" class="btn btn-primary btn-sm" style="text-decoration:none;display:inline-block">Export CSV</a></div>
+        `;
+    } catch(e) { el.innerHTML = `<div class="card stat-err">Error: ${e.message}</div>`; }
+}
+async function genLicenses() {
+    const r = await apiPost('licenses/generate', {
+        tier: document.getElementById('lic-tier').value,
+        duration_days: parseInt(document.getElementById('lic-days').value),
+        quantity: parseInt(document.getElementById('lic-qty').value),
+        note: document.getElementById('lic-note').value,
+    });
+    document.getElementById('lic-result').textContent = r.ok ? `Generated ${r.count} keys` : 'Error';
+    loaded.licenses = false; loadLicenses();
+}
+
+// ─── Alerts ───────────────────────────────────────────────────────────────────
+async function loadAlerts() {
+    const el = document.getElementById('panel-alerts');
+    try {
+        const d = await api('alerts');
+        el.innerHTML = `
+            <div class="card">
+                <div class="card-title">System Alerts (${d.alerts.length})</div>
+                ${d.alerts.length ? d.alerts.map(a => `
+                    <div style="padding:8px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px">
+                        <span class="health-dot ${a.level === 'error' ? 'health-err' : 'health-warn'}"></span>
+                        <span style="font-size:13px">${a.message}</span>
+                    </div>
+                `).join('') : '<p style="color:var(--fg-dim);padding:12px">No alerts — system looks healthy</p>'}
+            </div>
+        `;
+    } catch(e) { el.innerHTML = `<div class="card stat-err">Error: ${e.message}</div>`; }
+}
+
+// ─── System ───────────────────────────────────────────────────────────────────
+async function loadSystem() {
+    const el = document.getElementById('panel-system');
+    try {
+        const d = await api('system');
+        const envHtml = Object.entries(d.env_vars).map(([k,v]) =>
+            `<tr><td class="mono" style="font-size:12px">${k}</td><td class="mono" style="font-size:12px;color:var(--fg-dim)">${v}</td></tr>`
+        ).join('');
+        el.innerHTML = `
+            <div class="card">
+                <div class="card-title">Environment Variables</div>
+                <div class="table-wrap"><table><tr><th>Key</th><th>Value</th></tr>${envHtml}</table></div>
+            </div>
+            <div class="card">
+                <div class="card-title">Server Info</div>
+                <table>
+                    <tr><td style="color:var(--fg-dim)">Started</td><td>${d.server_start}</td></tr>
+                    <tr><td style="color:var(--fg-dim)">Routes</td><td>${d.route_count}</td></tr>
+                </table>
+            </div>
+        `;
+    } catch(e) { el.innerHTML = `<div class="card stat-err">Error: ${e.message}</div>`; }
+}
+
+// ─── Best Practices ───────────────────────────────────────────────────────────
+const BP_RULES = [
+    { id: 1, rule: "async def with blocking ops", fix: "Change ~55 async router endpoints to def (sync SQLAlchemy)" },
+    { id: 2, rule: "BackgroundTasks for non-critical work", fix: "Route OTP/emails through outbox or BackgroundTasks" },
+    { id: 3, rule: "Hide Swagger in production", fix: "Set docs_url=None when ENV=production" },
+    { id: 4, rule: "Custom base Pydantic model", fix: "Create shared ORMBaseModel with from_attributes=True" },
+    { id: 5, rule: "Use response_model", fix: "Add response_model to V1 API route decorators" },
+    { id: 6, rule: "Validate with Pydantic", fix: "Replace inline if-not checks with Pydantic request models" },
+    { id: 7, rule: "Dependencies for DB validation", fix: "Extract CSRF check into reusable dependency" },
+    { id: 8, rule: "Connection pool config", status: "ok", fix: "pool_pre_ping, pool_recycle, pool_size all set" },
+    { id: 9, rule: "lifespan vs on_event", status: "ok", fix: "Uses lifespan context manager" },
+    { id: 10, rule: "Secrets in .env + config class", status: "ok", fix: "Pydantic BaseSettings, .env in .gitignore" },
+    { id: 11, rule: "Structured logging", fix: "Replace print() with logger, add JSON formatter" },
+    { id: 12, rule: "Gunicorn in production", fix: "Add Gunicorn + UvicornWorker" },
+];
+function loadBP() {
+    const el = document.getElementById('bp-content');
+    const passed = BP_RULES.filter(r => r.status === 'ok').length;
+    el.innerHTML = `
+        <p style="font-size:14px;margin-bottom:16px">Score: <strong>${passed}/12</strong> rules passing</p>
+        <table>
+            <tr><th>#</th><th>Rule</th><th>Status</th><th>Fix</th></tr>
+            ${BP_RULES.map(r => `<tr><td>${r.id}</td><td>${r.rule}</td><td>${r.status === 'ok' ? badge('ok','Pass') : badge('err','Fail')}</td><td style="font-size:12px;color:var(--fg-dim)">${r.fix}</td></tr>`).join('')}
+        </table>
+    `;
+}
+</script>
+</body>
+</html>

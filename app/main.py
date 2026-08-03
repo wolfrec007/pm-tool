@@ -33,6 +33,7 @@ from app.routers import (
     team_members,
     users,
 )
+from app.routers import dev_portal
 from app.api.v1 import router as api_v1_router
 from app.middleware.license import LicenseMiddleware
 
@@ -123,6 +124,7 @@ app.include_router(dashboard.router)
 app.include_router(users.router)
 app.include_router(outbox.router)
 app.include_router(license.router)
+app.include_router(dev_portal.router)
 app.include_router(api_v1_router)
 
 

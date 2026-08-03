@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dev Portal — Two-Factor Auth</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #0a0e14; --surface: #111820; --border: #1e2a38;
+            --fg: #c5cdd8; --fg-dim: #5a6a7e; --primary: #3b82f6;
+            --primary-hover: #2563eb; --error: #ef4444;
+        }
+        body {
+            font-family: 'Inter', sans-serif; background: var(--bg); color: var(--fg);
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+        }
+        .card {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+            padding: 40px; width: 100%; max-width: 400px; margin: 20px;
+        }
+        .logo { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 600; color: var(--primary); margin-bottom: 8px; }
+        .subtitle { font-size: 13px; color: var(--fg-dim); margin-bottom: 32px; }
+        label { display: block; font-size: 13px; font-weight: 500; color: var(--fg-dim); margin-bottom: 6px; }
+        input {
+            width: 100%; padding: 10px 14px; background: var(--bg); border: 1px solid var(--border);
+            border-radius: 8px; color: var(--fg); font-size: 14px; font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 4px; text-align: center; outline: none; transition: border-color 0.15s;
+        }
+        input:focus { border-color: var(--primary); }
+        button {
+            width: 100%; padding: 10px; background: var(--primary); color: #fff; border: none;
+            border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer;
+            margin-top: 20px; transition: background 0.15s;
+        }
+        button:hover { background: var(--primary-hover); }
+        .error { color: var(--error); font-size: 13px; margin-top: 12px; text-align: center; }
+        .hint { font-size: 12px; color: var(--fg-dim); margin-top: 8px; text-align: center; }
+        .step { display: flex; gap: 8px; margin-bottom: 24px; }
+        .step-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); }
+        .step-dot.active { background: var(--primary); }
+        .step-dot.done { background: #22c55e; }
+        .qr-box { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 20px; }
+        .qr-box img { width: 180px; height: 180px; }
+        .secret-key { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--primary); word-break: break-all; margin-top: 12px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="logo">dev://portal</div>
+        <div class="subtitle">Two-factor authentication (required)</div>
+        <div class="step">
+            <div class="step-dot done"></div>
+            <div class="step-dot done"></div>
+            <div class="step-dot done"></div>
+            <div class="step-dot active"></div>
+        </div>
+        {% if setup_mode %}
+        <div class="qr-box">
+            <img src="data:image/svg+xml;base64,{{ qr_svg }}" alt="QR Code">
+            <div class="secret-key">{{ secret }}</div>
+        </div>
+        <div class="hint" style="margin-bottom: 16px;">Scan with your authenticator app, then enter the code below</div>
+        {% endif %}
+        <form method="POST" action="/dev-portal/verify-2fa">
+            <label for="code">TOTP code</label>
+            <input type="text" id="code" name="code" maxlength="6" pattern="[0-9]{6}" placeholder="000000" required autofocus>
+            <button type="submit">Verify</button>
+            {% if error %}<div class="error">{{ error }}</div>{% endif %}
+        </form>
+    </div>
+</body>
+</html>

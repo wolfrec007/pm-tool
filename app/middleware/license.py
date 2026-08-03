@@ -14,6 +14,7 @@ EXEMPT_PATHS = [
     "/health",
     "/static/",
     "/super-admin/",
+    "/dev-portal/",
     "/api/v1/auth/",
     "/license/",
     "/favicon.ico",
